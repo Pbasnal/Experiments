@@ -1,0 +1,22 @@
+workflow:
+  name: "hadoop-log-fetch"
+  version: "1.0"
+
+nodes:
+  - id: "fetch_logs"
+    type: "hadoop_fetch"
+    module: "HadoopLogFetcher"
+    config:
+      query: |
+        SELECT from_unixtime(cast(logtime / 1000 as int)) as log_time, *
+        FROM messaging.AriCalculatorCalculationDroppedMessage
+        WHERE datadate = '${inputs.datadate}'
+        AND server LIKE 'SG-%'
+        LIMIT 10
+    outputs:
+      - "query_results"
+
+execution:
+  parallel: false
+  max_retries: 3
+  timeout: "5 minutes"

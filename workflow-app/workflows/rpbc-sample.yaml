@@ -1,0 +1,38 @@
+workflow:
+  name: "rpbc-mismatch"
+  version: "1.0"
+  description: "Sample workflow for RPBC mismatch analysis"
+
+nodes:
+  - id: "fetch_rpbc_data"
+    type: "hadoop_fetch"
+    module: "HadoopLogFetcher"
+    config:
+      query: |
+        SELECT * FROM messaging.rpbc_table 
+        WHERE datadate = '${inputs.datadate}'
+        AND hour = ${inputs.hour}
+    outputs:
+      - "rpbc_data"
+
+  - id: "analyze_mismatches"
+    type: "python_script"
+    script: "scripts/pydoop/analyze_rpbc.py"
+    depends_on: ["fetch_rpbc_data"]
+    inputs:
+      raw_data: "${fetch_rpbc_data.rpbc_data}"
+    outputs:
+      - "mismatch_report"
+
+  - id: "generate_summary"
+    type: "python_script"
+    script: "scripts/pydoop/generate_summary.py"
+    depends_on: ["analyze_mismatches"]
+    inputs:
+      mismatch_data: "${analyze_mismatches.mismatch_report}"
+    outputs:
+      - "summary_report"
+
+execution:
+  parallel: false
+  max_retries: 3

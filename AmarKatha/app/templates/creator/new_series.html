@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Series - AmarKatha{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/creator.css') }}">
+<script>
+    // Add class to body for creator pages
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('creator-page');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="creator-container">
+
+    
+    <!-- Content Wrapper -->
+    <div class="creator-content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h5>Creator Tools</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="{{ url_for('creator.dashboard') }}" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('creator.new_comic') }}" class="sidebar-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Comic</span>
+                </a>
+                <a href="{{ url_for('creator.new_series') }}" class="sidebar-item active">
+                    <i class="fas fa-book-open"></i>
+                    <span>New Series</span>
+                </a>
+                <a href="{{ url_for('creator.profile') }}" class="sidebar-item">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('creator.schedule') }}" class="sidebar-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+                <!-- Header -->
+                <div class="content-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="content-title">Create New Series</h1>
+                            <p class="content-subtitle">Organize your comics into a cohesive series</p>
+                        </div>
+                        <div class="header-actions">
+                            <a href="{{ url_for('creator.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Card -->
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <!-- Left Column - Basic Info -->
+                                <div class="col-lg-8">
+                                    <h5 class="card-title mb-4">
+                                        <i class="fas fa-info-circle text-primary"></i>
+                                        Series Information
+                                    </h5>
+
+                                    <!-- Series Name -->
+                                    <div class="form-group mb-3">
+                                        <label for="name" class="form-label">
+                                            <i class="fas fa-book"></i>
+                                            Series Name *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control form-control-lg" 
+                                               id="name" 
+                                               name="name" 
+                                               value="{{ request.form.get('name', '') }}"
+                                               placeholder="Enter series name"
+                                               required>
+                                        <div class="form-text">
+                                            Choose a memorable name that represents your series
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="form-group mb-3">
+                                        <label for="description" class="form-label">
+                                            <i class="fas fa-align-left"></i>
+                                            Description
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="description" 
+                                                  name="description" 
+                                                  rows="4"
+                                                  placeholder="Describe your series...">{{ request.form.get('description', '') }}</textarea>
+                                        <div class="form-text">
+                                            Provide an overview of your series and what readers can expect
+                                        </div>
+                                    </div>
+
+                                    <!-- Genre and Status Row -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="genre" class="form-label">
+                                                    <i class="fas fa-tags"></i>
+                                                    Genre
+                                                </label>
+                                                <select class="form-select" id="genre" name="genre">
+                                                    <option value="">Select Genre</option>
+                                                    <option value="Shonen" {{ 'selected' if request.form.get('genre') == 'Shonen' }}>Shonen</option>
+                                                    <option value="Shojo" {{ 'selected' if request.form.get('genre') == 'Shojo' }}>Shojo</option>
+                                                    <option value="Seinen" {{ 'selected' if request.form.get('genre') == 'Seinen' }}>Seinen</option>
+                                                    <option value="Josei" {{ 'selected' if request.form.get('genre') == 'Josei' }}>Josei</option>
+                                                    <option value="Romance" {{ 'selected' if request.form.get('genre') == 'Romance' }}>Romance</option>
+                                                    <option value="Drama" {{ 'selected' if request.form.get('genre') == 'Drama' }}>Drama</option>
+                                                    <option value="Comedy" {{ 'selected' if request.form.get('genre') == 'Comedy' }}>Comedy</option>
+                                                    <option value="Action" {{ 'selected' if request.form.get('genre') == 'Action' }}>Action</option>
+                                                    <option value="Adventure" {{ 'selected' if request.form.get('genre') == 'Adventure' }}>Adventure</option>
+                                                    <option value="Fantasy" {{ 'selected' if request.form.get('genre') == 'Fantasy' }}>Fantasy</option>
+                                                    <option value="Sci-Fi" {{ 'selected' if request.form.get('genre') == 'Sci-Fi' }}>Sci-Fi</option>
+                                                    <option value="Horror" {{ 'selected' if request.form.get('genre') == 'Horror' }}>Horror</option>
+                                                    <option value="Mystery" {{ 'selected' if request.form.get('genre') == 'Mystery' }}>Mystery</option>
+                                                    <option value="Thriller" {{ 'selected' if request.form.get('genre') == 'Thriller' }}>Thriller</option>
+                                                    <option value="Slice of Life" {{ 'selected' if request.form.get('genre') == 'Slice of Life' }}>Slice of Life</option>
+                                                    <option value="Historical" {{ 'selected' if request.form.get('genre') == 'Historical' }}>Historical</option>
+                                                    <option value="Sports" {{ 'selected' if request.form.get('genre') == 'Sports' }}>Sports</option>
+                                                    <option value="Music" {{ 'selected' if request.form.get('genre') == 'Music' }}>Music</option>
+                                                    <option value="Food" {{ 'selected' if request.form.get('genre') == 'Food' }}>Food</option>
+                                                    <option value="Educational" {{ 'selected' if request.form.get('genre') == 'Educational' }}>Educational</option>
+                                                    <option value="Other" {{ 'selected' if request.form.get('genre') == 'Other' }}>Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="status" class="form-label">
+                                                    <i class="fas fa-signal"></i>
+                                                    Status
+                                                </label>
+                                                <select class="form-select" id="status" name="status">
+                                                    <option value="ongoing" {{ 'selected' if request.form.get('status') == 'ongoing' }}>Ongoing</option>
+                                                    <option value="completed" {{ 'selected' if request.form.get('status') == 'completed' }}>Completed</option>
+                                                    <option value="hiatus" {{ 'selected' if request.form.get('status') == 'hiatus' }}>Hiatus</option>
+                                                    <option value="cancelled" {{ 'selected' if request.form.get('status') == 'cancelled' }}>Cancelled</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Schedule -->
+                                    <div class="form-group mb-3">
+                                        <label for="schedule" class="form-label">
+                                            <i class="fas fa-calendar"></i>
+                                            Update Schedule (Optional)
+                                        </label>
+                                        <select class="form-select" id="schedule" name="schedule">
+                                            <option value="" {{ 'selected' if request.form.get('schedule','')=='' }}>No Schedule</option>
+                                            <option value="weekly" {{ 'selected' if request.form.get('schedule') == 'weekly' }}>Weekly</option>
+                                            <option value="biweekly" {{ 'selected' if request.form.get('schedule') == 'biweekly' }}>Bi-weekly</option>
+                                            <option value="monthly" {{ 'selected' if request.form.get('schedule') == 'monthly' }}>Monthly</option>
+                                            <option value="irregular" {{ 'selected' if request.form.get('schedule') == 'irregular' }}>Irregular</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Readers like predictable updates; set a schedule if possible.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column - Cover Image -->
+                                <div class="col-lg-4">
+                                    <h5 class="card-title mb-4">
+                                        <i class="fas fa-image text-primary"></i>
+                                        Cover Image
+                                    </h5>
+
+                                    <div class="cover-upload-area">
+                                        <div class="upload-preview" id="coverPreview">
+                                            <div class="upload-placeholder">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Upload Series Cover</p>
+                                                <small>PNG, JPG, JPEG, GIF up to 5MB</small>
+                                            </div>
+                                        </div>
+                                        <input type="file" 
+                                               class="form-control" 
+                                               id="cover_image" 
+                                               name="cover_image" 
+                                               accept="image/*"
+                                               style="display: none;">
+                                        <button type="button" 
+                                                class="btn btn-outline-primary btn-sm mt-2" 
+                                                onclick="document.getElementById('cover_image').click()">
+                                            <i class="fas fa-upload"></i>
+                                            Choose Image
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-lightbulb"></i>
+                                            <strong>Tip:</strong> A good series cover should:
+                                            <ul class="mb-0 mt-2">
+                                                <li>Be visually appealing</li>
+                                                <li>Represent the series theme</li>
+                                                <li>Have good contrast</li>
+                                                <li>Be at least 400x600px</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{{ url_for('creator.dashboard') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i>
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-plus-circle"></i>
+                                            Create Series
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+// Cover image preview functionality
+document.getElementById('cover_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('coverPreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Cover Preview">`;
+            preview.classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = `
+            <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Upload Series Cover</p>
+                <small>PNG, JPG, JPEG, GIF up to 5MB</small>
+            </div>
+        `;
+        preview.classList.remove('has-image');
+    }
+});
+
+// Mobile menu functionality is now handled by the unified mobile menu in base.html
+</script>
+{% endblock %} 

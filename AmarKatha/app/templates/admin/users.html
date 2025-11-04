@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Admin - User Management</h1>
+<ul>
+  {% for user in users.items %}
+    <li>{{ user.username }} ({{ user.email }}) - {% if user.is_artist %}Creator{% else %}Reader{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endblock %} 

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Series – {{ series.name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('creator.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ series.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Series Header -->
+    <div class="d-flex align-items-center mb-4">
+        {% if series.cover_image %}
+            <img src="{{ url_for('static', filename=series.cover_image) }}" class="rounded me-3" style="width: 160px; height: 160px; object-fit: cover;" alt="{{ series.name }} cover">
+        {% endif %}
+        <div>
+            <h1 class="h3 mb-1">{{ series.name }}</h1>
+            <p class="text-muted mb-2">{{ series.description }}</p>
+            <div class="d-flex gap-3">
+                <span class="badge bg-primary">{{ series.genre }}</span>
+                <span class="badge bg-secondary">Status: {{ series.status.title() }}</span>
+                <span class="badge bg-info">{{ analytics.total_comics }} Comics</span>
+            </div>
+            <a href="{{ url_for('creator.series_edit', series_id=series.id) }}" class="btn btn-sm btn-outline-primary mt-2"><i class="fas fa-edit me-1"></i>Edit Series</a>
+        </div>
+    </div>
+
+    <!-- Series Analytics -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center p-3">
+                <h4 class="mb-0">{{ analytics.total_views }}</h4>
+                <small class="text-muted">Total Views</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center p-3">
+                <h4 class="mb-0">{{ analytics.total_followers }}</h4>
+                <small class="text-muted">Followers</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center p-3">
+                <h4 class="mb-0">{{ analytics.avg_rating }}</h4>
+                <small class="text-muted">Avg Rating</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center p-3">
+                <h4 class="mb-0">{{ analytics.total_comics }}</h4>
+                <small class="text-muted">Comics</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comics Grid -->
+    <h2 class="h4 mb-3">Comics in this Series</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for comic in comics %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ url_for('static', filename=comic.cover_image) if comic.cover_image else '/static/default-cover.jpg' }}" class="card-img-top" style="height: 220px; object-fit: cover;" alt="{{ comic.title }} cover">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ comic.title }}</h5>
+                    <p class="card-text text-truncate">{{ comic.description }}</p>
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="fas fa-eye me-1"></i>{{ comic.total_views }}</small>
+                        <a href="{{ url_for('creator.comic_edit', comic_id=comic.id) }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No comics in this series yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

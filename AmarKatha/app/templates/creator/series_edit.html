@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}{{ series.name }} - Edit Series - AmarKatha{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/creator.css') }}">
+<script>
+    // Add class to body for creator pages
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('creator-page');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="creator-container">
+
+    
+
+    
+    <!-- Content Wrapper -->
+    <div class="creator-content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h5>Creator Tools</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="{{ url_for('creator.dashboard') }}" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('creator.new_comic') }}" class="sidebar-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Comic</span>
+                </a>
+                <a href="{{ url_for('creator.new_series') }}" class="sidebar-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>New Series</span>
+                </a>
+                <a href="{{ url_for('creator.profile') }}" class="sidebar-item">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('creator.schedule') }}" class="sidebar-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+                <!-- Header -->
+                <div class="content-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="content-title">{{ series.name }}</h1>
+                            <p class="content-subtitle">Edit series details and manage comics</p>
+                        </div>
+                        <div class="header-actions">
+                            <a href="{{ url_for('creator.new_comic') }}?series_id={{ series.id }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Add Comic to Series
+                            </a>
+                            <a href="{{ url_for('creator.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="row">
+                    <!-- Series Edit Form -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-edit text-primary"></i>
+                                    Series Information
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" enctype="multipart/form-data">
+                                    <div class="row">
+                                        <!-- Series Name -->
+                                        <div class="col-12">
+                                            <div class="form-group mb-3">
+                                                <label for="name" class="form-label">
+                                                    <i class="fas fa-book"></i>
+                                                    Series Name *
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control form-control-lg" 
+                                                       id="name" 
+                                                       name="name" 
+                                                       value="{{ series.name }}"
+                                                       placeholder="Enter series name"
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                        <!-- Description -->
+                                        <div class="col-12">
+                                            <div class="form-group mb-3">
+                                                <label for="description" class="form-label">
+                                                    <i class="fas fa-align-left"></i>
+                                                    Description
+                                                </label>
+                                                <textarea class="form-control" 
+                                                          id="description" 
+                                                          name="description" 
+                                                          rows="4"
+                                                          placeholder="Describe your series...">{{ series.description or '' }}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- Genre and Status -->
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="genre" class="form-label">
+                                                    <i class="fas fa-tags"></i>
+                                                    Genre
+                                                </label>
+                                                <select class="form-select" id="genre" name="genre">
+                                                    <option value="">Select Genre</option>
+                                                    <option value="Shonen" {{ 'selected' if series.genre == 'Shonen' }}>Shonen</option>
+                                                    <option value="Shojo" {{ 'selected' if series.genre == 'Shojo' }}>Shojo</option>
+                                                    <option value="Seinen" {{ 'selected' if series.genre == 'Seinen' }}>Seinen</option>
+                                                    <option value="Josei" {{ 'selected' if series.genre == 'Josei' }}>Josei</option>
+                                                    <option value="Romance" {{ 'selected' if series.genre == 'Romance' }}>Romance</option>
+                                                    <option value="Drama" {{ 'selected' if series.genre == 'Drama' }}>Drama</option>
+                                                    <option value="Comedy" {{ 'selected' if series.genre == 'Comedy' }}>Comedy</option>
+                                                    <option value="Action" {{ 'selected' if series.genre == 'Action' }}>Action</option>
+                                                    <option value="Adventure" {{ 'selected' if series.genre == 'Adventure' }}>Adventure</option>
+                                                    <option value="Fantasy" {{ 'selected' if series.genre == 'Fantasy' }}>Fantasy</option>
+                                                    <option value="Sci-Fi" {{ 'selected' if series.genre == 'Sci-Fi' }}>Sci-Fi</option>
+                                                    <option value="Horror" {{ 'selected' if series.genre == 'Horror' }}>Horror</option>
+                                                    <option value="Mystery" {{ 'selected' if series.genre == 'Mystery' }}>Mystery</option>
+                                                    <option value="Thriller" {{ 'selected' if series.genre == 'Thriller' }}>Thriller</option>
+                                                    <option value="Slice of Life" {{ 'selected' if series.genre == 'Slice of Life' }}>Slice of Life</option>
+                                                    <option value="Historical" {{ 'selected' if series.genre == 'Historical' }}>Historical</option>
+                                                    <option value="Sports" {{ 'selected' if series.genre == 'Sports' }}>Sports</option>
+                                                    <option value="Music" {{ 'selected' if series.genre == 'Music' }}>Music</option>
+                                                    <option value="Food" {{ 'selected' if series.genre == 'Food' }}>Food</option>
+                                                    <option value="Educational" {{ 'selected' if series.genre == 'Educational' }}>Educational</option>
+                                                    <option value="Other" {{ 'selected' if series.genre == 'Other' }}>Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="status" class="form-label">
+                                                    <i class="fas fa-signal"></i>
+                                                    Status
+                                                </label>
+                                                <select class="form-select" id="status" name="status">
+                                                    <option value="ongoing" {{ 'selected' if series.status == 'ongoing' }}>Ongoing</option>
+                                                    <option value="completed" {{ 'selected' if series.status == 'completed' }}>Completed</option>
+                                                    <option value="hiatus" {{ 'selected' if series.status == 'hiatus' }}>Hiatus</option>
+                                                    <option value="cancelled" {% if series.status=='cancelled' %}selected{% endif %}>Cancelled</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cover Image -->
+                                        <div class="col-12">
+                                            <div class="form-group mb-3">
+                                                <label for="cover_image" class="form-label">
+                                                    <i class="fas fa-image"></i>
+                                                    Cover Image
+                                                </label>
+                                                <input type="file" 
+                                                       class="form-control" 
+                                                       id="cover_image" 
+                                                       name="cover_image" 
+                                                       accept="image/*">
+                                                <div class="form-text">
+                                                    Leave empty to keep the current cover image
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Schedule -->
+                                    <div class="form-group mb-3">
+                                        <label for="schedule" class="form-label">
+                                            <i class="fas fa-calendar"></i>
+                                            Update Schedule (Optional)
+                                        </label>
+                                        <select class="form-select" id="schedule" name="schedule">
+                                            <option value="" {% if not series.schedule %}selected{% endif %}>No Schedule</option>
+                                            <option value="weekly" {% if series.schedule=='weekly' %}selected{% endif %}>Weekly</option>
+                                            <option value="biweekly" {% if series.schedule=='biweekly' %}selected{% endif %}>Bi-weekly</option>
+                                            <option value="monthly" {% if series.schedule=='monthly' %}selected{% endif %}>Monthly</option>
+                                            <option value="irregular" {% if series.schedule=='irregular' %}selected{% endif %}>Irregular</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i>
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Series Info and Stats -->
+                    <div class="col-lg-4">
+                        <!-- Series Cover -->
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <img src="{{ url_for('static', filename=series.cover_image) if series.cover_image else '/static/images/default-series.jpg' }}" 
+                                     alt="{{ series.name }}" 
+                                     class="img-fluid rounded" 
+                                     style="max-height: 300px; object-fit: cover;">
+                                <h5 class="mt-3">{{ series.name }}</h5>
+                                <p class="text-muted">{{ series.genre or 'No genre' }} • {{ series.status.title() }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Series Stats -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-chart-bar text-primary"></i>
+                                    Series Statistics
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="stat-item">
+                                            <h4 class="text-primary">{{ comics_in_series|length }}</h4>
+                                            <small class="text-muted">Comics</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="stat-item">
+                                            <h4 class="text-success">
+                                                {% set total_chapters = 0 %}
+                                                {% for comic in comics_in_series %}
+                                                    {% set total_chapters = total_chapters + comic.chapters.count() %}
+                                                {% endfor %}
+                                                {{ total_chapters }}
+                                            </h4>
+                                            <small class="text-muted">Chapters</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-bolt text-primary"></i>
+                                    Quick Actions
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('creator.new_comic') }}?series_id={{ series.id }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-plus"></i>
+                                        Add Comic
+                                    </a>
+                                    <a href="#" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                        View Series
+                                    </a>
+                                    <a href="#" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-share"></i>
+                                        Share Series
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comics in Series -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-book text-primary"></i>
+                                    Comics in Series
+                                </h5>
+                                <a href="{{ url_for('creator.new_comic') }}?series_id={{ series.id }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i>
+                                    Add Comic
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                {% if comics_in_series %}
+                                    <div class="row">
+                                        {% for comic in comics_in_series %}
+                                            <div class="col-lg-4 col-md-6 mb-4">
+                                                <div class="comic-card">
+                                                    <div class="comic-image">
+                                                        <img src="{{ url_for('static', filename=comic.cover_image) if comic.cover_image else '/static/images/default-comic.jpg' }}" 
+                                                             alt="{{ comic.title }}" 
+                                                             class="img-fluid">
+                                                        <div class="comic-overlay">
+                                                            <div class="comic-actions">
+                                                                <a href="{{ url_for('creator.comic_edit', comic_id=comic.id) }}" 
+                                                                   class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </a>
+                                                                <a href="{{ url_for('creator.new_chapter', comic_id=comic.id) }}" 
+                                                                   class="btn btn-sm btn-success">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="comic-info">
+                                                        <h6 class="comic-title">{{ comic.title }}</h6>
+                                                        <p class="comic-subtitle">
+                                                            {{ comic.chapters.count() }} chapters • 
+                                                            {{ comic.status.title() }}
+                                                        </p>
+                                                        <div class="comic-stats">
+                                                            <span class="stat">
+                                                                <i class="fas fa-eye"></i>
+                                                                {{ comic.total_views }}
+                                                            </span>
+                                                            <span class="stat">
+                                                                <i class="fas fa-star"></i>
+                                                                {{ comic.average_rating() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No comics in this series yet</h5>
+                                        <p class="text-muted">Start by adding your first comic to this series</p>
+                                        <a href="{{ url_for('creator.new_comic') }}?series_id={{ series.id }}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                            Add First Comic
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+// Mobile menu functionality is now handled by the unified mobile menu in base.html
+</script>
+{% endblock %} 
