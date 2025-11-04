@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Comic - AmarKatha{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/creator.css') }}">
+<script>
+    // Add class to body for creator pages
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('creator-page');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="creator-container">
+
+    
+
+    
+    <!-- Content Wrapper -->
+    <div class="creator-content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h5>Creator Tools</h5>
+            </div>
+            <div class="sidebar-menu">
+                <a href="{{ url_for('creator.dashboard') }}" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('creator.new_comic') }}" class="sidebar-item active">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Comic</span>
+                </a>
+                <a href="{{ url_for('creator.new_series') }}" class="sidebar-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>New Series</span>
+                </a>
+                <a href="{{ url_for('creator.profile') }}" class="sidebar-item">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('creator.schedule') }}" class="sidebar-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedule</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+                <!-- Header -->
+                <div class="content-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="content-title">Create New Comic</h1>
+                            <p class="content-subtitle">Start your next comic project</p>
+                        </div>
+                        <div class="header-actions">
+                            <a href="{{ url_for('creator.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Card -->
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <!-- Left Column - Basic Info -->
+                                <div class="col-lg-8">
+                                    <h5 class="card-title mb-4">
+                                        <i class="fas fa-info-circle text-primary"></i>
+                                        Comic Information
+                                    </h5>
+
+                                    <!-- Comic Title -->
+                                    <div class="form-group mb-3">
+                                        <label for="title" class="form-label">
+                                            <i class="fas fa-book"></i>
+                                            Comic Title *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control form-control-lg" 
+                                               id="title" 
+                                               name="title" 
+                                               value="{{ request.form.get('title', '') }}"
+                                               placeholder="Enter comic title"
+                                               required>
+                                        <div class="form-text">
+                                            Choose a compelling title that represents your comic
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="form-group mb-3">
+                                        <label for="description" class="form-label">
+                                            <i class="fas fa-align-left"></i>
+                                            Description
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="description" 
+                                                  name="description" 
+                                                  rows="4"
+                                                  placeholder="Describe your comic...">{{ request.form.get('description', '') }}</textarea>
+                                        <div class="form-text">
+                                            Provide an overview of your comic and what readers can expect
+                                        </div>
+                                    </div>
+
+                                    <!-- Series Selection -->
+                                    <div class="form-group mb-3">
+                                        <label for="series_id" class="form-label">
+                                            <i class="fas fa-layer-group"></i>
+                                            Series (Optional)
+                                        </label>
+                                        <select class="form-select" id="series_id" name="series_id">
+                                            <option value="">No Series (Standalone)</option>
+                                            {% for series in current_user.series %}
+                                                <option value="{{ series.id }}" 
+                                                        {{ 'selected' if request.args.get('series_id')|int == series.id or request.form.get('series_id')|int == series.id }}>
+                                                    {{ series.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="form-text">
+                                            Add this comic to an existing series, or leave as standalone
+                                        </div>
+                                    </div>
+
+                                    <!-- Genre, Status, and Content Type Row -->
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label for="genre" class="form-label">
+                                                    <i class="fas fa-tags"></i>
+                                                    Genre
+                                                </label>
+                                                <select class="form-select" id="genre" name="genre">
+                                                    <option value="">Select Genre</option>
+                                                    <option value="Shonen" {{ 'selected' if request.form.get('genre') == 'Shonen' }}>Shonen</option>
+                                                    <option value="Shojo" {{ 'selected' if request.form.get('genre') == 'Shojo' }}>Shojo</option>
+                                                    <option value="Seinen" {{ 'selected' if request.form.get('genre') == 'Seinen' }}>Seinen</option>
+                                                    <option value="Josei" {{ 'selected' if request.form.get('genre') == 'Josei' }}>Josei</option>
+                                                    <option value="Romance" {{ 'selected' if request.form.get('genre') == 'Romance' }}>Romance</option>
+                                                    <option value="Drama" {{ 'selected' if request.form.get('genre') == 'Drama' }}>Drama</option>
+                                                    <option value="Comedy" {{ 'selected' if request.form.get('genre') == 'Comedy' }}>Comedy</option>
+                                                    <option value="Action" {{ 'selected' if request.form.get('genre') == 'Action' }}>Action</option>
+                                                    <option value="Adventure" {{ 'selected' if request.form.get('genre') == 'Adventure' }}>Adventure</option>
+                                                    <option value="Fantasy" {{ 'selected' if request.form.get('genre') == 'Fantasy' }}>Fantasy</option>
+                                                    <option value="Sci-Fi" {{ 'selected' if request.form.get('genre') == 'Sci-Fi' }}>Sci-Fi</option>
+                                                    <option value="Horror" {{ 'selected' if request.form.get('genre') == 'Horror' }}>Horror</option>
+                                                    <option value="Mystery" {{ 'selected' if request.form.get('genre') == 'Mystery' }}>Mystery</option>
+                                                    <option value="Thriller" {{ 'selected' if request.form.get('genre') == 'Thriller' }}>Thriller</option>
+                                                    <option value="Slice of Life" {{ 'selected' if request.form.get('genre') == 'Slice of Life' }}>Slice of Life</option>
+                                                    <option value="Historical" {{ 'selected' if request.form.get('genre') == 'Historical' }}>Historical</option>
+                                                    <option value="Sports" {{ 'selected' if request.form.get('genre') == 'Sports' }}>Sports</option>
+                                                    <option value="Music" {{ 'selected' if request.form.get('genre') == 'Music' }}>Music</option>
+                                                    <option value="Food" {{ 'selected' if request.form.get('genre') == 'Food' }}>Food</option>
+                                                    <option value="Educational" {{ 'selected' if request.form.get('genre') == 'Educational' }}>Educational</option>
+                                                    <option value="Other" {{ 'selected' if request.form.get('genre') == 'Other' }}>Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label for="status" class="form-label">
+                                                    <i class="fas fa-signal"></i>
+                                                    Status
+                                                </label>
+                                                <select class="form-select" id="status" name="status">
+                                                    <option value="ongoing" {{ 'selected' if request.form.get('status') == 'ongoing' }}>Ongoing</option>
+                                                    <option value="completed" {{ 'selected' if request.form.get('status') == 'completed' }}>Completed</option>
+                                                    <option value="hiatus" {{ 'selected' if request.form.get('status') == 'hiatus' }}>Hiatus</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group mb-3">
+                                                <label for="content_type" class="form-label">
+                                                    <i class="fas fa-palette"></i>
+                                                    Content Type
+                                                </label>
+                                                <select class="form-select" id="content_type" name="content_type">
+                                                    <option value="comic" {{ 'selected' if request.form.get('content_type') == 'comic' }}>Comic</option>
+                                                    <option value="story" {{ 'selected' if request.form.get('content_type') == 'story' }}>Story</option>
+                                                    <option value="mixed" {{ 'selected' if request.form.get('content_type') == 'mixed' }}>Mixed</option>
+                                                    <option value="standalone" {{ 'selected' if request.form.get('content_type') == 'standalone' }}>Standalone</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Schedule -->
+                                    <div class="form-group mb-3">
+                                        <label for="schedule" class="form-label">
+                                            <i class="fas fa-calendar"></i>
+                                            Update Schedule (Optional)
+                                        </label>
+                                        <select class="form-select" id="schedule" name="schedule">
+                                            <option value="">No Schedule</option>
+                                            <option value="weekly" {{ 'selected' if request.form.get('schedule') == 'weekly' }}>Weekly</option>
+                                            <option value="biweekly" {{ 'selected' if request.form.get('schedule') == 'biweekly' }}>Bi-weekly</option>
+                                            <option value="monthly" {{ 'selected' if request.form.get('schedule') == 'monthly' }}>Monthly</option>
+                                            <option value="irregular" {{ 'selected' if request.form.get('schedule') == 'irregular' }}>Irregular</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Set a publishing schedule to help readers know when to expect updates
+                                        </div>
+                                    </div>
+
+                                    <!-- Content Upload Options -->
+                                    <h5 class="card-title mb-3 mt-4">
+                                        <i class="fas fa-cloud-upload-alt text-primary"></i>
+                                        Comic Content Upload
+                                    </h5>
+                                    <p class="text-muted small">Choose one method to provide your initial content. You can always add or edit pages later.</p>
+
+                                    <!-- Upload type selector -->
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Select Upload Type</label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="upload_type" id="uploadImages" value="images" checked>
+                                            <label class="form-check-label" for="uploadImages">Images</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="upload_type" id="uploadPdf" value="pdf">
+                                            <label class="form-check-label" for="uploadPdf">PDF</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Image upload -->
+                                    <div class="mb-3" id="imagesInputGroup">
+                                        <label class="form-label">Comic Pages (Images)</label>
+                                        <input type="file" class="form-control" name="pages" accept="image/*" multiple>
+                                        <div class="form-text">Select one or more images (PNG, JPG, JPEG, GIF).</div>
+                                    </div>
+
+                                    <!-- PDF upload -->
+                                    <div class="mb-3" id="pdfInputGroup" style="display:none;">
+                                        <label class="form-label">Comic as PDF</label>
+                                        <input type="file" class="form-control" name="pdf_file" accept="application/pdf">
+                                    </div>
+                                </div>
+
+                                <!-- Right Column - Cover Image -->
+                                <div class="col-lg-4">
+                                    <h5 class="card-title mb-4">
+                                        <i class="fas fa-image text-primary"></i>
+                                        Cover Image
+                                    </h5>
+
+                                    <div class="cover-upload-area">
+                                        <div class="upload-preview" id="coverPreview">
+                                            <div class="upload-placeholder">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Upload Comic Cover</p>
+                                                <small>PNG, JPG, JPEG, GIF up to 5MB</small>
+                                            </div>
+                                        </div>
+                                        <input type="file" 
+                                               class="form-control" 
+                                               id="cover_image" 
+                                               name="cover_image" 
+                                               accept="image/*"
+                                               style="display: none;">
+                                        <button type="button" 
+                                                class="btn btn-outline-primary btn-sm mt-2" 
+                                                onclick="document.getElementById('cover_image').click()">
+                                            <i class="fas fa-upload"></i>
+                                            Choose Image
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-lightbulb"></i>
+                                            <strong>Tip:</strong> A good comic cover should:
+                                            <ul class="mb-0 mt-2">
+                                                <li>Be visually appealing</li>
+                                                <li>Represent the comic's theme</li>
+                                                <li>Have good contrast</li>
+                                                <li>Be at least 400x600px</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{{ url_for('creator.dashboard') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i>
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-plus-circle"></i>
+                                            Create Comic
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+// Cover image preview functionality
+document.getElementById('cover_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('coverPreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Cover Preview">`;
+            preview.classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = `
+            <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Upload Comic Cover</p>
+                <small>PNG, JPG, JPEG, GIF up to 5MB</small>
+            </div>
+        `;
+        preview.classList.remove('has-image');
+    }
+});
+
+// Toggle upload inputs based on radio selection
+document.querySelectorAll('input[name="upload_type"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        if (this.value === 'images') {
+            document.getElementById('imagesInputGroup').style.display = 'block';
+            document.getElementById('pdfInputGroup').style.display = 'none';
+        } else {
+            document.getElementById('imagesInputGroup').style.display = 'none';
+            document.getElementById('pdfInputGroup').style.display = 'block';
+        }
+    });
+});
+
+// Auto-fill genre, status, content type based on selected series
+function setSelectValue(selectId, value) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    for (const opt of sel.options) {
+        if (opt.value === value) {
+            sel.value = value;
+            break;
+        }
+    }
+}
+
+function fetchSeriesDefaults(seriesId) {
+    if (!seriesId) return;
+    fetch(`/creator/series/${seriesId}/defaults`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) return;
+            if (data.genre) setSelectValue('genre', data.genre);
+            if (data.status) setSelectValue('status', data.status);
+            if (data.content_type) setSelectValue('content_type', data.content_type);
+            if (data.schedule) setSelectValue('schedule', data.schedule);
+        })
+        .catch(() => {});
+}
+
+document.getElementById('series_id').addEventListener('change', function () {
+    const val = this.value;
+    if (val) {
+        fetchSeriesDefaults(val);
+    }
+});
+
+// Trigger fetch on page load if series preselected via query param
+const preselectedSeries = document.getElementById('series_id').value;
+if (preselectedSeries) {
+    fetchSeriesDefaults(preselectedSeries);
+}
+
+// Mobile menu functionality is now handled by the unified mobile menu in base.html
+</script>
+{% endblock %} 

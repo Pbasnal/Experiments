@@ -1,0 +1,172 @@
+# ========== .NET IGNORE RULES ==========
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.cache
+*.swp
+*~.*
+*.nupkg
+
+# Visual Studio files
+*.csproj.user
+*.vbproj.user
+*.sln
+*.sln.DotSettings.user
+*.vssscc
+*.vspscc
+.vs/
+_ReSharper.*/
+*.resharper
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet
+[Nn]u[Gg]et/
+*.nupkg
+packages/
+!packages.config
+
+# Azure Functions
+func/
+azfunc/
+
+# Rider
+.idea/
+*.sln.iml
+
+# ========== SCALA IGNORE RULES ==========
+
+# sbt build artifacts
+target/
+project/target/
+project/project/
+lib_managed/
+src_managed/
+dist/
+classes/
+out/
+
+# Logs, caches, temp files
+log/
+tmp/
+.cache/
+
+# IDE & editor settings
+# IntelliJ IDEA / Android Studio
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code / Metals / Bloop / BSP
+.vscode/
+.metals/
+.bloop/
+.bsp/
+
+# Eclipse / Scala IDE
+.classpath
+.project
+.settings/
+.scalaide/
+
+# ENSIME
+.ensime
+.ensime_cache/
+
+# ========== COMMON IGNORE RULES ==========
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+Icon
+._*
+
+# Runtime artifacts
+threaddump*.txt
+*.log
+*.pid
+
+# Unity (if applicable)
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Python (if applicable)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+
+# Docker
+docker-compose.override.yml
+
+# ========== CUSTOM IGNORE RULES ==========
+# Add any project-specific ignores here
+
+# Export directories
+export/
+
+# Script outputs
+outputs/
+
+# Credentials (should never be committed)
+*.json
+!package.json
+!project.json
+!tsconfig.json
+!*.config.json
+google_credentials.json
+client_secret.json
+saved.json

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=1
+    command: python run.py --https --port 5002
+    ports:
+      - "5000:5000"  # HTTP (redirect)
+      - "5002:5002"  # HTTPS
+    volumes:
+      - .:/app
+      - /app/venv
+      - /app/__pycache__
+      - ./ssl:/app/ssl:ro  # SSL certificates
+    stdin_open: true
+    tty: true 

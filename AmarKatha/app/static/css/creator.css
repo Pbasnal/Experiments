@@ -1,0 +1,782 @@
+/* Creator Dashboard Styles - Supports Light and Dark Modes */
+
+        /* CSS Variables for Theme Support */
+        :root {
+            /* Layout Variables */
+            --navbar-height: 59px;
+            
+            /* Light Theme */
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --accent-color: #f59e0b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #2563eb;
+            
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-elevated: #ffffff;
+            
+            --border-color: #d1d5db;
+            --border-light: #e5e7eb;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            --transition: all 0.2s ease-in-out;
+        }
+
+[data-theme="dark"] {
+    /* Dark Theme */
+    --primary-color: #818cf8;
+    --secondary-color: #a78bfa;
+    --accent-color: #fbbf24;
+    --success-color: #34d399;
+    --warning-color: #fbbf24;
+    --danger-color: #f87171;
+    --info-color: #60a5fa;
+    
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --bg-elevated: #1f2937;
+    
+    --border-color: #374151;
+    --border-light: #4b5563;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Base Creator Styles */
+.creator-container {
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+    color: var(--text-primary);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make navbar sticky for creator pages */
+body.creator-page .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    background-color: var(--bg-elevated);
+    box-shadow: var(--shadow-md);
+    height: var(--navbar-height);
+    min-height: var(--navbar-height);
+    padding: 0.5rem 0; /* Compact padding for creator pages */
+}
+
+/* Content Wrapper */
+.creator-content-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - var(--navbar-height));
+    padding-top: var(--navbar-height); /* Account for fixed navbar height */
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: var(--bg-elevated);
+    border-right: 1px solid var(--border-color);
+    height: calc(100vh - var(--navbar-height)); /* Subtract navbar height */
+    position: sticky;
+    top: 0; /* Stick to the top of the content wrapper */
+    width: 280px;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.sidebar-menu {
+    padding: 1rem 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+    border-left: 3px solid transparent;
+}
+
+.sidebar-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.sidebar-item.active {
+    background-color: var(--bg-tertiary);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+
+.sidebar-item i {
+    margin-right: 0.75rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    min-height: calc(100vh - var(--navbar-height));
+    position: relative;
+    overflow-y: auto;
+}
+
+/* Content Header */
+.content-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.content-title {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+}
+
+.content-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* Card Styles */
+.card {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.card-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-title i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+    color: var(--text-primary);
+}
+
+/* Form Styles */
+.form-label {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.form-control {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    background-color: var(--bg-primary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-select {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.form-select:focus {
+    background-color: var(--bg-primary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+.form-text {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-control-lg {
+    font-size: 1.1rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-primary {
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Cover Upload Area */
+.cover-upload-area {
+    text-align: center;
+}
+
+.upload-preview {
+    width: 100%;
+    height: 300px;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-tertiary);
+    transition: var(--transition);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.upload-preview:hover {
+    border-color: var(--primary-color);
+    background-color: var(--bg-secondary);
+}
+
+.upload-preview.has-image {
+    border: none;
+    background-color: transparent;
+}
+
+.upload-placeholder {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.upload-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+
+.upload-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: var(--radius-md);
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--info-color);
+    border-left: 4px solid var(--info-color);
+}
+
+.alert-info i {
+    margin-right: 0.5rem;
+}
+
+.alert-info ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.alert-info li {
+    color: var(--text-secondary);
+}
+
+/* Comic Card Styles */
+.comic-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+    background: var(--bg-elevated);
+}
+
+.comic-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.comic-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.comic-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comic-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.comic-card:hover .comic-overlay {
+    opacity: 1;
+}
+
+.comic-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.comic-info {
+    padding: 1rem;
+}
+
+.comic-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.comic-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.comic-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.stat {
+    color: var(--text-muted);
+}
+
+.stat i {
+    margin-right: 0.25rem;
+    color: var(--primary-color);
+}
+
+/* Stat Item Styles */
+.stat-item h4 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.stat-item small {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Mobile Responsive */
+@media (max-width: 991.98px) {
+    .creator-content-wrapper {
+        flex-direction: column;
+        padding-top: 0; /* Remove padding on mobile */
+    }
+    
+    .sidebar {
+        display: none; /* Hide sidebar on mobile - use unified mobile menu instead */
+    }
+    
+    .main-content {
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .creator-container {
+        padding-top: 0; /* Remove padding on mobile since sidebar is fixed */
+    }
+    
+    .content-title {
+        font-size: 1.5rem;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .header-actions .btn {
+        width: 100%;
+    }
+    
+    /* Mobile menu toggle removed - using unified mobile menu from base.html */
+    
+    /* Mobile overlay removed - using unified mobile menu from base.html */
+}
+
+@media (max-width: 767.98px) {
+    .main-content {
+        padding: 0.75rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .upload-preview {
+        height: 250px;
+    }
+    
+    .comic-image {
+        height: 150px;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+    }
+    
+    .upload-preview {
+        height: 200px;
+    }
+    
+    .upload-placeholder i {
+        font-size: 2rem;
+    }
+    
+    .upload-placeholder p {
+        font-size: 0.9rem;
+    }
+    
+    .upload-placeholder small {
+        font-size: 0.8rem;
+    }
+}
+
+/* Dark Mode Specific Adjustments */
+[data-theme="dark"] .form-control {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .form-select {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .upload-preview {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .upload-preview:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(96, 165, 250, 0.1);
+    color: var(--info-color);
+}
+
+[data-theme="dark"] .alert-info li {
+    color: var(--text-secondary);
+}
+
+/* Mobile menu toggle removed - using unified mobile menu from base.html */
+
+/* Mobile overlay removed - using unified mobile menu from base.html */
+
+/* Additional Mobile Improvements */
+@media (max-width: 575.98px) {
+    .main-content {
+        padding: 0.5rem;
+        margin-top: calc(var(--navbar-height) + 1rem);
+    }
+    
+    .content-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .content-title {
+        font-size: 1.25rem;
+    }
+    
+    .content-subtitle {
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .form-control-lg {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .upload-preview {
+        height: 180px;
+    }
+    
+    .upload-placeholder i {
+        font-size: 1.5rem;
+    }
+    
+    .upload-placeholder p {
+        font-size: 0.8rem;
+    }
+    
+    .upload-placeholder small {
+        font-size: 0.7rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .form-control,
+    .form-select {
+        border-width: 2px;
+    }
+    
+    .btn {
+        border-width: 2px;
+    }
+    
+    .card {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .card:hover {
+        transform: none;
+    }
+    
+    .comic-card:hover {
+        transform: none;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: amarkatha_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-amarkatha}
+      POSTGRES_USER: ${POSTGRES_USER:-amarkatha_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-amarkatha_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-amarkatha_user} -d ${POSTGRES_DB:-amarkatha}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - amarkatha_network
+
+  # Flask Application
+  web:
+    build: .
+    container_name: amarkatha_web
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-amarkatha_user}:${POSTGRES_PASSWORD:-amarkatha_password}@postgres:5432/${POSTGRES_DB:-amarkatha}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - UPLOAD_FOLDER=/app/app/static/uploads
+      - MAX_CONTENT_LENGTH=${MAX_CONTENT_LENGTH:-16777216}
+    ports:
+      - "5000:5000"  # HTTP
+      - "5002:5002"  # HTTPS
+    volumes:
+      - ./app/static/uploads:/app/app/static/uploads
+      - ./logs:/app/logs
+      - ./google_credentials.json:/app/google_credentials.json:ro
+      - ./credentials.json:/app/credentials.json:ro
+      - ./client_secret.json:/app/client_secret.json:ro
+      - ./ssl:/app/ssl:ro  # SSL certificates
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - amarkatha_network
+
+  # Redis for caching (optional, for future use)
+  redis:
+    image: redis:7-alpine
+    container_name: amarkatha_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - amarkatha_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  amarkatha_network:
+    driver: bridge 

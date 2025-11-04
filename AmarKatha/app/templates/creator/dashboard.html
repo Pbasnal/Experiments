@@ -1,0 +1,1033 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<script>
+    // Add class to body for creator pages
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('creator-page');
+    });
+</script>
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-container {
+        min-height: calc(100vh - 200px);
+        padding: 2rem 0;
+    }
+
+    /* Desktop Layout */
+    .dashboard-desktop {
+        display: block;
+    }
+
+    .dashboard-mobile {
+        display: none;
+    }
+
+    /* Header Section */
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: var(--radius-xl);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .dashboard-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-text {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .stat-trend {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+    }
+
+    .stat-trend.positive {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .stat-trend.negative {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--primary-color);
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .action-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        text-decoration: none;
+    }
+
+    .action-btn i {
+        font-size: 1.25rem;
+    }
+
+    /* Content Sections */
+    .content-section {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .content-type-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .type-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .type-badge.comic { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); }
+    .type-badge.story { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+    .type-badge.mixed { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+    .type-badge.standalone { background: rgba(139, 92, 246, 0.1); color: var(--secondary-color); }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .content-card {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .content-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .card-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    /* Background (blurred & tinted) layer */
+    .card-image .card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(10px);
+        transform: scale(1.1);
+    }
+
+    /* Dark tint over the blurred bg */
+    .card-image::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 0;
+    }
+
+    /* Foreground fitted layer */
+    .card-image .card-foreground {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        z-index: 1;
+        transition: var(--transition);
+    }
+
+    .content-card:hover .card-image .card-foreground {
+        transform: scale(1.05);
+    }
+
+    .content-type-label {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .card-content {
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .card-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-stats {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: var(--radius-md);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-lg);
+        border: 2px dashed var(--border-color);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-description {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    /* Activity Feed */
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-lg);
+        transition: var(--transition);
+    }
+
+    .activity-item:hover {
+        background: var(--border-light);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Layout */
+    @media (max-width: 768px) {
+        .dashboard-desktop {
+            display: none;
+        }
+
+        .dashboard-mobile {
+            display: block;
+        }
+
+        .dashboard-container {
+            padding: 1rem 0;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+        }
+
+        .quick-actions {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .content-section {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .content-type-badges {
+            justify-content: flex-start;
+        }
+    }
+
+    /* Mobile-specific styles */
+    .mobile-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .mobile-stats {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .mobile-stat {
+        min-width: 120px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .mobile-stat-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .mobile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .mobile-action {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .mobile-action:hover {
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+    }
+
+    .mobile-section {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .mobile-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mobile-content-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-md);
+        margin-bottom: 0.75rem;
+    }
+
+    .mobile-content-image {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-md);
+        object-fit: cover;
+    }
+
+    .mobile-content-info {
+        flex: 1;
+    }
+
+    .mobile-content-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .mobile-content-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .mobile-activity-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-md);
+        margin-bottom: 0.5rem;
+    }
+
+    .mobile-activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .mobile-activity-content {
+        flex: 1;
+    }
+
+    .mobile-activity-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        margin-bottom: 0.125rem;
+    }
+
+    .mobile-activity-time {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Desktop Layout -->
+    <div class="dashboard-desktop">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1>Creator Dashboard</h1>
+            <p class="welcome-text">Welcome back, {{ current_user.username }}! Here's what's happening with your content.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <span class="stat-trend positive">+12%</span>
+                </div>
+                <div class="stat-value">{{ stats.total_views }}</div>
+                <div class="stat-label">Total Views</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span class="stat-trend positive">+8%</span>
+                </div>
+                <div class="stat-value">{{ stats.total_followers }}</div>
+                <div class="stat-label">Followers</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="stat-trend positive">+5%</span>
+                </div>
+                <div class="stat-value">{{ stats.avg_rating }}</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <span class="stat-trend positive">+3</span>
+                </div>
+                <div class="stat-value">{{ stats.total_content }}</div>
+                <div class="stat-label">Content Pieces</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <span class="stat-trend positive">+15%</span>
+                </div>
+                <div class="stat-value">{{ stats.total_comments }}</div>
+                <div class="stat-label">Comments</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span class="stat-trend positive">+20%</span>
+                </div>
+                <div class="stat-value">{{ stats.recent_views }}</div>
+                <div class="stat-label">Views This Week</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h2>
+            <div class="action-grid">
+                <a href="{{ url_for('creator.new_comic') }}" class="action-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>New Comic</span>
+                </a>
+                <a href="{{ url_for('creator.new_series') }}" class="action-btn">
+                    <i class="fas fa-book-open"></i>
+                    <span>New Series</span>
+                </a>
+                <a href="{{ url_for('creator.profile') }}" class="action-btn">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+                <a href="{{ url_for('creator.schedule') }}" class="action-btn">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>View Schedule</span>
+                </a>
+                <a href="#" class="action-btn">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Content Overview -->
+        <div class="content-section">
+            <div class="content-header">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open"></i>
+                    Your Content
+                </h2>
+                <div class="content-type-badges">
+                    <span class="type-badge comic">{{ content_by_type.comic }} Comics</span>
+                    <span class="type-badge story">{{ content_by_type.story }} Stories</span>
+                    <span class="type-badge mixed">{{ content_by_type.mixed }} Mixed</span>
+                    <span class="type-badge standalone">{{ content_by_type.standalone }} Standalone</span>
+                </div>
+            </div>
+            
+            {% if comics %}
+            <div class="content-grid">
+                {% for comic in comics %}
+                <div class="content-card">
+                    <div class="card-image">
+                        {% set comic_img = url_for('static', filename=comic.cover_image) if comic.cover_image else '/static/default-cover.jpg' %}
+                        <img class="card-bg" src="{{ comic_img }}" alt="bg {{ comic.title }}">
+                        <img class="card-foreground" src="{{ comic_img }}" alt="{{ comic.title }}">
+                        <div class="content-type-label" style="z-index:2;">{{ comic.content_type.title() }}</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ comic.title }}</h3>
+                        <p class="card-subtitle">{{ comic.genre or 'No genre' }}</p>
+                        {% if comic.series %}
+                        <p class="card-subtitle">📚 {{ comic.series.name }}</p>
+                        {% endif %}
+                        <div class="card-stats">
+                            <span class="card-stat">
+                                <i class="fas fa-eye"></i>
+                                {{ comic.total_views }} views
+                            </span>
+                            <span class="card-stat">
+                                <i class="fas fa-star"></i>
+                                {{ comic.average_rating() }}★
+                            </span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{ url_for('creator.comic_edit', comic_id=comic.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                            <a href="{{ url_for('creator.new_chapter', comic_id=comic.id) }}" class="btn btn-sm btn-primary">Add Chapter</a>
+                            <form method="POST" action="{{ url_for('creator.delete_comic', comic_id=comic.id) }}" style="display:inline;" onsubmit="return confirm('Delete this comic permanently?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3 class="empty-title">No content yet</h3>
+                <p class="empty-description">Start creating your first comic or story!</p>
+                <a href="{{ url_for('creator.new_comic') }}" class="btn btn-primary">Create Your First Comic</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Series Overview -->
+        {% if series %}
+        <div class="content-section">
+            <div class="content-header">
+                <h2 class="section-title">
+                    <i class="fas fa-layer-group"></i>
+                    Your Series
+                </h2>
+            </div>
+            <div class="content-grid">
+                {% for series_item in series %}
+                <div class="content-card">
+                    <div class="card-image">
+                        {% set series_img = url_for('static', filename=series_item.cover_image) if series_item.cover_image else '/static/default-series.jpg' %}
+                        <img class="card-bg" src="{{ series_img }}" alt="bg {{ series_item.name }}">
+                        <img class="card-foreground" src="{{ series_img }}" alt="{{ series_item.name }}">
+                        <div class="content-type-label" style="z-index:2;">{{ series_item.status.title() }}</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ series_item.name }}</h3>
+                        <p class="card-subtitle">{{ series_item.description[:100] }}{% if series_item.description|length > 100 %}...{% endif %}</p>
+                        <div class="card-stats">
+                            <span class="card-stat">
+                                <i class="fas fa-book"></i>
+                                {{ series_item.comics.count() }} comics
+                            </span>
+                            <span class="card-stat">
+                                <i class="fas fa-tag"></i>
+                                {{ series_item.genre or 'No genre' }}
+                            </span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{ url_for('creator.series_detail', series_id=series_item.id) }}" class="btn btn-sm btn-outline-primary">View Series</a>
+                            <a href="{{ url_for('creator.series_edit', series_id=series_item.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                            <a href="{{ url_for('creator.new_comic') }}?series_id={{ series_item.id }}" class="btn btn-sm btn-primary">Add Comic</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Activity -->
+        {% if recent_activities %}
+        <div class="content-section">
+            <div class="content-header">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Recent Activity
+                </h2>
+            </div>
+            <div class="activity-list">
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        {% if activity.type == 'chapter_created' %}
+                            <i class="fas fa-file-alt"></i>
+                        {% elif activity.type == 'comment_received' %}
+                            <i class="fas fa-comment"></i>
+                        {% elif activity.type == 'rating_received' %}
+                            <i class="fas fa-star"></i>
+                        {% endif %}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">{{ activity.title }}</div>
+                        <div class="activity-subtitle">{{ activity.subtitle }}</div>
+                        <div class="activity-time">{{ activity.time.strftime('%b %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    <a href="{{ activity.url }}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="dashboard-mobile">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Creator Dashboard</h1>
+            <p style="opacity: 0.9; margin: 0;">Welcome back, {{ current_user.username }}!</p>
+        </div>
+
+        <!-- Mobile Stats -->
+        <div class="mobile-stats">
+            <div class="mobile-stat">
+                <div class="mobile-stat-value">{{ stats.total_views }}</div>
+                <div class="mobile-stat-label">Views</div>
+            </div>
+            <div class="mobile-stat">
+                <div class="mobile-stat-value">{{ stats.total_followers }}</div>
+                <div class="mobile-stat-label">Followers</div>
+            </div>
+            <div class="mobile-stat">
+                <div class="mobile-stat-value">{{ stats.avg_rating }}</div>
+                <div class="mobile-stat-label">Rating</div>
+            </div>
+            <div class="mobile-stat">
+                <div class="mobile-stat-value">{{ stats.total_content }}</div>
+                <div class="mobile-stat-label">Content</div>
+            </div>
+        </div>
+
+        <!-- Mobile Actions -->
+        <div class="mobile-actions">
+            <a href="{{ url_for('creator.new_comic') }}" class="mobile-action">
+                <i class="fas fa-plus"></i>
+                <span>New Comic</span>
+            </a>
+            <a href="{{ url_for('creator.new_series') }}" class="mobile-action">
+                <i class="fas fa-book-open"></i>
+                <span>New Series</span>
+            </a>
+            <a href="{{ url_for('creator.profile') }}" class="mobile-action">
+                <i class="fas fa-user-edit"></i>
+                <span>Edit Profile</span>
+            </a>
+            <a href="{{ url_for('creator.schedule') }}" class="mobile-action">
+                <i class="fas fa-calendar-alt"></i>
+                <span>View Schedule</span>
+            </a>
+        </div>
+
+        <!-- Mobile Content -->
+        {% if comics %}
+        <div class="mobile-section">
+            <h3 class="mobile-section-title">
+                <i class="fas fa-book-open"></i>
+                Your Content
+            </h3>
+            {% for comic in comics %}
+            <div class="mobile-content-item">
+                {% set comic_img_m = url_for('static', filename=comic.cover_image) if comic.cover_image else '/static/default-cover.jpg' %}
+                <img class="card-bg" src="{{ comic_img_m }}" alt="bg {{ comic.title }}" class="mobile-content-image">
+                <img class="card-foreground" src="{{ comic_img_m }}" alt="{{ comic.title }}" class="mobile-content-image">
+                <div class="mobile-content-info">
+                    <div class="mobile-content-title">{{ comic.title }}</div>
+                    <div class="mobile-content-subtitle">{{ comic.genre or 'No genre' }} • {{ comic.total_views }} views</div>
+                </div>
+                <div class="card-actions">
+                    <a href="{{ url_for('creator.comic_edit', comic_id=comic.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ url_for('creator.new_chapter', comic_id=comic.id) }}" class="btn btn-sm btn-primary">Add Chapter</a>
+                    <form method="POST" action="{{ url_for('creator.delete_comic', comic_id=comic.id) }}" style="display:inline;" onsubmit="return confirm('Delete this comic permanently?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Mobile Series -->
+        {% if series %}
+        <div class="mobile-section">
+            <h3 class="mobile-section-title">
+                <i class="fas fa-layer-group"></i>
+                Your Series
+            </h3>
+            {% for series_item in series %}
+            <div class="mobile-content-item">
+                {% set series_img = url_for('static', filename=series_item.cover_image) if series_item.cover_image else '/static/default-series.jpg' %}
+                <img class="card-bg" src="{{ series_img }}" alt="bg {{ series_item.name }}" class="mobile-content-image">
+                <img class="card-foreground" src="{{ series_img }}" alt="{{ series_item.name }}" class="mobile-content-image">
+                <div class="mobile-content-info">
+                    <div class="mobile-content-title">{{ series_item.name }}</div>
+                    <div class="mobile-content-subtitle">{{ series_item.comics.count() }} comics • {{ series_item.status.title() }}</div>
+                </div>
+                <a href="{{ url_for('creator.series_detail', series_id=series_item.id) }}" class="btn btn-sm btn-primary">View</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Mobile Activity -->
+        {% if recent_activities %}
+        <div class="mobile-section">
+            <h3 class="mobile-section-title">
+                <i class="fas fa-clock"></i>
+                Recent Activity
+            </h3>
+            {% for activity in recent_activities %}
+            <div class="mobile-activity-item">
+                <div class="mobile-activity-icon">
+                    {% if activity.type == 'chapter_created' %}
+                        <i class="fas fa-file-alt"></i>
+                    {% elif activity.type == 'comment_received' %}
+                        <i class="fas fa-comment"></i>
+                    {% elif activity.type == 'rating_received' %}
+                        <i class="fas fa-star"></i>
+                    {% endif %}
+                </div>
+                <div class="mobile-activity-content">
+                    <div class="mobile-activity-title">{{ activity.title }}</div>
+                    <div class="mobile-activity-time">{{ activity.time.strftime('%b %d, %Y') }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
