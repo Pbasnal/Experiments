@@ -13,7 +13,6 @@
 # Visual Studio files
 *.csproj.user
 *.vbproj.user
-*.sln
 *.sln.DotSettings.user
 *.vssscc
 *.vspscc
@@ -100,9 +99,7 @@ Temp/
 Obj/
 Build/
 Builds/
-*.csproj
 *.unityproj
-*.sln
 *.suo
 *.tmp
 *.user
@@ -162,7 +159,6 @@ export/
 outputs/
 
 # Credentials (should never be committed)
-*.json
 !package.json
 !project.json
 !tsconfig.json
