@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.docker
+
+# IDE
+.idea/
+.vs/
+.vscode/
+*.sln.iml
+
+# Build output
+bin/
+obj/
+out/
+
+# Dependencies
+**/node_modules/
+**/packages/
+
+# Misc
+README.md
+LICENSE
+*.log
+
+
+
+
+
+
