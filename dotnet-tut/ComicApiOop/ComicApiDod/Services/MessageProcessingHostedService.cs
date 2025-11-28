@@ -1,3 +1,4 @@
+using ComicApiDod.Models;
 using ComicApiDod.SimpleQueue;
 
 namespace ComicApiDod.Services;
@@ -10,16 +11,19 @@ public class MessageProcessingHostedService : IHostedService
 {
     private readonly SimpleMessageBus _messageBus;
     private readonly SimpleMap _map;
+    private readonly ComicVisibilityService _comicVisibilityService;
     private readonly ILogger<MessageProcessingHostedService> _logger;
     private readonly List<Task> _processingTasks;
 
     public MessageProcessingHostedService(
         SimpleMessageBus messageBus,
         SimpleMap map,
+        ComicVisibilityService comicVisibilityService,
         ILogger<MessageProcessingHostedService> logger)
     {
         _messageBus = messageBus;
         _map = map;
+        _comicVisibilityService = comicVisibilityService;
         _logger = logger;
         _processingTasks = new List<Task>();
     }
@@ -28,14 +32,11 @@ public class MessageProcessingHostedService : IHostedService
     {
         _logger.LogInformation("Message Processing Hosted Service is starting.");
 
-        // Register queues here for different message types
-        // Example: _messageBus.RegisterQueue<YourMessageType>(new SimpleQueue<YourMessageType>());
-        
-        // Start batch listeners here
-        // Example: _processingTasks.Add(_messageBus.StartBatchListener<YourMessageType>(
-        //     batchSize: 10,
-        //     callback: ProcessYourMessageBatch,
-        //     cancellationToken: cancellationToken));
+        _messageBus.RegisterQueue<VisibilityComputationRequest>(new SimpleQueue<VisibilityComputationRequest>(_map));
+        _processingTasks.Add(_messageBus.StartBatchListener<VisibilityComputationRequest>(
+             batchSize: 10,
+             callback: _comicVisibilityService.ComputeVisibilities,
+             cancellationToken: cancellationToken));
 
         _logger.LogInformation("Message Processing Hosted Service started successfully.");
         
@@ -65,26 +66,6 @@ public class MessageProcessingHostedService : IHostedService
 
         _logger.LogInformation("Message Processing Hosted Service stopped.");
     }
-
-    // Example callback method for processing messages
-    // private void ProcessYourMessageBatch(int batchSize, YourMessageType?[] messages)
-    // {
-    //     _logger.LogDebug("Processing batch of {BatchSize} messages", batchSize);
-    //     
-    //     for (int i = 0; i < batchSize; i++)
-    //     {
-    //         if (messages[i] != null)
-    //         {
-    //             var message = messages[i]!;
-    //             
-    //             // Process the message
-    //             var response = ProcessMessage(message);
-    //             
-    //             // Store the response in the map
-    //             _mapService.Add(response);
-    //         }
-    //     }
-    // }
 }
 
 

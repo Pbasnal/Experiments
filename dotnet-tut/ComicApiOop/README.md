@@ -16,7 +16,7 @@
 docker-compose up -d
 
 # For DOD API
-docker-compose -f docker-compose.dod.yml up -d
+docker-compose -f docker-compose.dod.yml up -d --build --force-recreate
 ```
 
 2. Run k6 load test:

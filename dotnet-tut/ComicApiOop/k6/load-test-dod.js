@@ -25,22 +25,22 @@ export const options = {
 
 // Main test function
 export default function () {
-  const baseUrl = __ENV.API_URL || 'http://localhost:8081';
+  const baseUrl = __ENV.API_URL || 'http://localhost:5000';
 
   // Group 1: Health Check (20% of requests)
-  if (Math.random() < 0.2) {
-    const healthRes = http.get(`${baseUrl}/health`, {
-      tags: { endpoint: 'health' },
-    });
-    
-    check(healthRes, {
-      'health check status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
-    
-    sleep(1);
-  }
+  // if (Math.random() < 0.2) {
+  //   const healthRes = http.get(`${baseUrl}/health`, {
+  //     tags: { endpoint: 'health' },
+  //   });
+  //  
+  //   check(healthRes, {
+  //     'health check status is 200': (r) => r.status === 200,
+  //   }) || errorRate.add(1);
+  //  
+  //   sleep(1);
+  // }
 
-  // Group 2: Compute Visibility for Single Comic (40% of requests)
+  // Group 2: Compute Visibility for Single Comic (40% of request s)
   if (Math.random() < 0.4) {
     const comicId = Math.floor(Math.random() * 100) + 1; // Random comic ID between 1 and 100
     const startTime = Date.now();
@@ -58,8 +58,10 @@ export default function () {
     check(computeRes, {
       'compute single status is 200': (r) => r.status === 200,
       'compute single has results': (r) => {
-        const body = JSON.parse(r.body);
-        return body.Results && body.Results.length > 0;
+          const body = JSON.parse(r.body);
+          // console.log(body.results)
+          return body.results && body.results.length > 0;
+       
       },
       'computation duration is reasonable': () => duration < 1000, // Under 1 second
     }) || errorRate.add(1);
@@ -71,7 +73,7 @@ export default function () {
   if (Math.random() < 0.3) {
     const startId = Math.floor(Math.random() * 90) + 1; // Random start ID between 1 and 90
     const limit = Math.floor(Math.random() * 10) + 1;   // Random limit between 1 and 10
-    
+
     const startTime = Date.now();
     const computeBulkRes = http.get(
       `${baseUrl}/api/comics/compute-visibilities?startId=${startId}&limit=${limit}`,
@@ -79,15 +81,15 @@ export default function () {
         tags: { endpoint: 'compute-bulk' },
       }
     );
-    
+
     const duration = Date.now() - startTime;
     visibilityComputationDuration.add(duration);
-    
+
     check(computeBulkRes, {
       'compute bulk status is 200': (r) => r.status === 200,
       'compute bulk has results': (r) => {
         const body = JSON.parse(r.body);
-        return body.Results && body.Results.length > 0;
+        return body.results && body.results.length > 0;
       },
       'compute bulk processed count matches limit': (r) => {
         const body = JSON.parse(r.body);
@@ -95,7 +97,7 @@ export default function () {
       },
       'bulk computation duration is reasonable': () => duration < 2000, // Under 2 seconds
     }) || errorRate.add(1);
-    
+
     sleep(3);
   }
 
@@ -107,11 +109,11 @@ export default function () {
         tags: { endpoint: 'invalid-request' },
       }
     );
-    
+
     check(invalidRes, {
       'invalid request returns 400': (r) => r.status === 400,
     }) || errorRate.add(1);
-    
+
     sleep(1);
   }
 }

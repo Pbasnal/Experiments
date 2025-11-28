@@ -22,15 +22,15 @@ public class SimpleQueueTests
     [Test]
     public async Task BatchDequeue_EnqueueMessages_CallbackReceivesMessages()
     {
-        
+
         ConcurrentBag<string> processedMessages = new ConcurrentBag<string>();
         int processedCount = 0;
         Random random = new Random();
 
         SimpleMessageBus SimpleMessageBus = new SimpleMessageBus(_mockMessageBusLogger.Object);
-        
+        SimpleMap simpleMap = new SimpleMap(_mockMapLogger.Object);
         // Arrange
-        SimpleMessageBus.RegisterQueue<string>(new SimpleQueue<string>());
+        SimpleMessageBus.RegisterQueue<string>(new SimpleQueue<string>(simpleMap));
 
         List<String> messagesToEnqueue = new List<string>();
         for (int i = 0; i < 150; i++)
@@ -42,7 +42,7 @@ public class SimpleQueueTests
         var tcs = new TaskCompletionSource<bool>();
 
         // Setup callback to process messages
-        void ProcessBatch(int batchSize, string?[] messages)
+        Task<IValue[]> ProcessBatch(int batchSize, string?[] messages)
         {
             Console.WriteLine($"Number of dequeued messages: {batchSize}");
             for (int i = 0; i < batchSize; i++)
@@ -59,6 +59,7 @@ public class SimpleQueueTests
             {
                 tcs.TrySetResult(true);
             }
+            return Task.Run(()=> new IValue[0]);
         }
 
         // Start batch dequeue in a separate task
@@ -117,21 +118,26 @@ public class SimpleQueueTests
         // To add random delay between requests. 
         // So that some requests are batched to max size and some not
         Random random = new Random();
-        
-        var messageBus = new SimpleMessageBus(_mockMessageBusLogger.Object);
-        messageBus.RegisterQueue<TestRequestObj>(new SimpleQueue<TestRequestObj>());
         SimpleMap simpleMap = new SimpleMap(_mockMapLogger.Object);
-        
-        void ProcessBatch(int batchSize, TestRequestObj?[] messages)
+        var messageBus = new SimpleMessageBus(_mockMessageBusLogger.Object);
+        messageBus.RegisterQueue<TestRequestObj>(new SimpleQueue<TestRequestObj>(simpleMap));
+
+
+        Task<IValue[]> ProcessBatch(int batchSize, TestRequestObj?[] messages)
         {
             Console.WriteLine($"Number of dequeued messages: {batchSize}");
-            for (int i = 0; i < batchSize; i++)
+            return Task.Run(() =>
             {
-                if (messages[i] != null)
+                IValue[] result = new IValue[batchSize];
+                for (int i = 0; i < batchSize; i++)
                 {
-                    simpleMap.Add(new TestObj(messages[i]!.Id, messages[i]!.Value * 2));
+                    if (messages[i] != null)
+                    {
+                        result[i] = new TestObj(messages[i]!.Id, messages[i]!.Value * 2);
+                    }
                 }
-            }
+                return result;
+            });
         }
 
         // Start the queue listener
@@ -146,7 +152,7 @@ public class SimpleQueueTests
             if (random.NextInt64(100) % 10 == 0) await Task.Delay(20);
         }
 
-        
+
         int numberOfResponses = 0;
         while (numberOfResponses < requests.Count)
         {

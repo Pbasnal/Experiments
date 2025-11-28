@@ -34,13 +34,13 @@ public class SimpleMessageBus
         }
     }
 
-    public Task StartBatchListener<T>(int batchSize, Action<int, T?[]> callback, CancellationToken cancellationToken = default)
+    public Task StartBatchListener<T>(int batchSize, Func<int, List<T?>, Task<IValue[]>> callback, CancellationToken cancellationToken = default)
     {
         var messageType = typeof(T);
         var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _activeListeners[messageType] = cts;
 
-        _logger.LogInformation("Starting batch listener for type {TypeName} with batch size {BatchSize}", 
+        _logger.LogInformation("Starting batch listener for type {TypeName} with batch size {BatchSize}",
             messageType.Name, batchSize);
 
         return Task.Run(async () =>

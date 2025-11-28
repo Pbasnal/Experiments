@@ -44,7 +44,7 @@ public class SimpleMap
     /// </summary>
     public void Add(IValue value)
     {
-        _map[value.Id] = value;
+        _map.AddOrUpdate(value.Id, value, (k, v) => v);
         _logger.LogDebug("Added value of type {ValueType} with ID {Id}", value.GetType().Name, value.Id);
     }
 

@@ -53,7 +53,7 @@ MetricsConfiguration.ConfigureMetrics(app);
 RouteConfiguration.ConfigureRoutes(app);
 
 // Apply database migrations
-if (app.Environment.IsEnvironment("Docker"))
+// if (app.Environment.IsEnvironment("Docker"))
 {
     app.Logger.LogInformation("Running in Docker environment. Applying database migrations...");
     try

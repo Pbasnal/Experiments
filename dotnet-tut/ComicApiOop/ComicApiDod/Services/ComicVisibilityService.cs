@@ -1,7 +1,9 @@
 using ComicApiDod.Data;
 using ComicApiDod.Models;
+using ComicApiDod.SimpleQueue;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace ComicApiDod.Services;
@@ -43,6 +45,161 @@ public class ComicVisibilityService
         _logger = logger;
     }
 
+    public Task<IValue[]> ComputeVisibilities(int numOfRequest, List<VisibilityComputationRequest?> reqs)
+    {
+        var sw = Stopwatch.StartNew();
+        string computationStatus = "success";
+
+        List<Task<IValue>> responses = new List<Task<IValue>>();
+
+        foreach (var req in reqs)
+        {
+            if (req != null)
+            {
+                responses.Add(ComputeVisibilitiesAsync(req));
+            }
+        }
+
+        var t = responses.ToArray();
+        return Task.WhenAll(t);
+    }
+
+    public async Task<IValue> ComputeVisibilitiesAsync(VisibilityComputationRequest req)
+    {
+        var sw = Stopwatch.StartNew();
+        string computationStatus = "success";
+        long startId = req.StartId;
+        int limit = req.Limit;
+
+        try
+        {
+            // Validate input
+            if (startId < 1 || limit < 1 || limit > 20) return null;
+
+            _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
+                limit);
+
+            var startTime = DateTime.UtcNow;
+
+            // Step 1: Get comic IDs (batch query)
+            var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(_db, (int)startId, limit);
+
+            if (comicIds.Length == 0)
+            {
+                computationStatus = "no_comics_found";
+                return null;
+            }
+
+            _logger.LogInformation("Found {Count} comics to process", comicIds.Length);
+
+            // Step 2: Process each comic (in DOD, we process data in batches)
+            var results = new List<ComicVisibilityResult>();
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var comicId in comicIds)
+            {
+                try
+                {
+                    _logger.LogInformation("Processing comic ID: {ComicId}", comicId);
+
+                    // Fetch all data for this comic
+                    var batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(_db, comicId);
+
+                    // Compute visibilities using pure functions
+                    var computedVisibilities = VisibilityProcessor.ComputeVisibilities(
+                        batchData,
+                        DateTime.UtcNow);
+
+                    // Save to database
+                    if (computedVisibilities.Length > 0)
+                    {
+                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(_db, computedVisibilities);
+                    }
+
+                    results.Add(new ComicVisibilityResult
+                    {
+                        ComicId = comicId,
+                        Success = true,
+                        ComputationTime = DateTime.UtcNow,
+                        ComputedVisibilities = computedVisibilities
+                    });
+
+                    processedCount++;
+                }
+                catch (Exception ex)
+                {
+                    failedCount++;
+                    computationStatus = "partial_failure";
+                    _logger.LogError(ex, "Error processing comic {ComicId}", comicId);
+                    results.Add(new ComicVisibilityResult
+                    {
+                        ComicId = comicId,
+                        Success = false,
+                        ErrorMessage = ex.Message,
+                        ComputationTime = DateTime.UtcNow,
+                        ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
+                    });
+                }
+            }
+
+            var endTime = DateTime.UtcNow;
+            var duration = endTime - startTime;
+
+            _logger.LogInformation(
+                "Completed processing. Success: {Success}, Failed: {Failed}, Duration: {Duration}s",
+                processedCount, failedCount, duration.TotalSeconds);
+
+            // Update Prometheus metrics
+            ComputeVisibilityDuration
+                .WithLabels(computationStatus)
+                .Observe(duration.TotalSeconds);
+
+            ComputeVisibilityCounter
+                .WithLabels(computationStatus)
+                .Inc();
+
+            ComputedComicsGauge
+                .WithLabels("processed")
+                .Set(processedCount);
+
+            ComputedComicsGauge
+                .WithLabels("failed")
+                .Set(failedCount);
+
+            return new VisibilityComputationResponse
+            {
+                Id = req.Id,
+                StartId = startId,
+                Limit = limit,
+                ProcessedSuccessfully = processedCount,
+                Failed = failedCount,
+                DurationInSeconds = duration.TotalSeconds,
+                NextStartId = startId + limit,
+                Results = results.ToArray()
+            };
+        }
+        catch (Exception ex)
+        {
+            computationStatus = "total_failure";
+            _logger.LogError(ex, "Error during bulk visibility computation");
+
+            // Update Prometheus metrics for total failure
+            ComputeVisibilityCounter
+                .WithLabels(computationStatus)
+                .Inc();
+
+            return null;
+        }
+        finally
+        {
+            sw.Stop();
+            ComputeVisibilityDuration
+                .WithLabels(computationStatus)
+                .Observe(sw.Elapsed.TotalSeconds);
+        }
+    }
+
     public async Task<IResult> ComputeVisibilitiesAsync(long startId, int limit)
     {
         var sw = Stopwatch.StartNew();
@@ -55,7 +212,8 @@ public class ComicVisibilityService
             if (limit < 1) return Results.BadRequest("limit must be greater than 0");
             if (limit > 20) return Results.BadRequest("limit cannot exceed 20 comics");
 
-            _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId, limit);
+            _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
+                limit);
 
             var startTime = DateTime.UtcNow;
 

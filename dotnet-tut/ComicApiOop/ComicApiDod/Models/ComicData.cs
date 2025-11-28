@@ -1,3 +1,5 @@
+using ComicApiDod.SimpleQueue;
+
 namespace ComicApiDod.Models;
 
 // Pure data structures - no behavior, just data
@@ -168,13 +170,27 @@ public class ComicBatchData
 /// <summary>
 /// Request/Response DTOs
 /// </summary>
-public class VisibilityComputationRequest
+public class VisibilityComputationRequest : IValue
 {
-    public int StartId { get; set; }
+    public long StartId { get; set; }
     public int Limit { get; set; }
+
+    public int Id { get; set; }
+
+    public VisibilityComputationRequest(long startId, int limit)
+    {
+        StartId = startId;
+        Limit = limit;
+        Id = Guid.NewGuid().GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return $"[{Id}] {StartId} -> {Limit}";
+    }
 }
 
-public class VisibilityComputationResponse
+public class VisibilityComputationResponse : IValue
 {
     public long StartId { get; set; }
     public int Limit { get; set; }
@@ -183,6 +199,8 @@ public class VisibilityComputationResponse
     public double DurationInSeconds { get; set; }
     public long NextStartId { get; set; }
     public ComicVisibilityResult[] Results { get; set; } = Array.Empty<ComicVisibilityResult>();
+
+    public int Id { get; set; }
 }
 
 public class ComicVisibilityResult

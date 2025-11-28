@@ -1,6 +1,6 @@
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS ComicBookDb;
-USE ComicBookDb;
+CREATE DATABASE IF NOT EXISTS comicdb;
+USE comicdb;
 
 -- Create Publishers table
 CREATE TABLE IF NOT EXISTS Publishers (

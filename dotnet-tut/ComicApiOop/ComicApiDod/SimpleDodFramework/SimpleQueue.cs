@@ -15,6 +15,13 @@ public class SimpleQueue<T> : ISimpleQueue
 
     private int _batchDequeueTimeoutMs = 10;
 
+    private SimpleMap SimpleMap;
+
+    public SimpleQueue(SimpleMap simpleMap)
+    {
+        this.SimpleMap = simpleMap;
+    }
+
     public void Enqueue(T item)
     {
         _queue.Enqueue(item);
@@ -40,7 +47,7 @@ public class SimpleQueue<T> : ISimpleQueue
         return message;
     }
 
-    public async Task BatchDequeue(int batchSize, Action<int, T?[]> callback)
+    public async Task<List<IValue>> BatchDequeue(int batchSize, Func<int, List<T?>, Task<IValue[]>> callback)
     {
         if (batchSize <= 0) batchSize = 10;
 
@@ -49,7 +56,7 @@ public class SimpleQueue<T> : ISimpleQueue
 
         long nextTick = 0;
 
-        T?[] messageBatch = new T?[batchSize];
+        List<T?> messageBatch = new List<T?>(batchSize);
 
         while (true)
         {
@@ -59,10 +66,21 @@ public class SimpleQueue<T> : ISimpleQueue
             // if the service goes down after dequeue but before processing the message.
             while (numberOfDequeuedMsgs < batchSize && _queue.Count > 0)
             {
-                messageBatch[numberOfDequeuedMsgs++] = Dequeue();
+                messageBatch.Add(Dequeue());
             }
 
-            if (numberOfDequeuedMsgs > 0) callback(numberOfDequeuedMsgs, messageBatch);
+            if (messageBatch.Count > 0)
+            {
+                IValue[] responses = await callback(numberOfDequeuedMsgs, messageBatch);
+                for (int i = 0; i < responses.Length; i++)
+                {
+                    if (responses[i] != null)
+                    {
+                        SimpleMap.Add(responses[i]);
+                    }
+                }
+                messageBatch.Clear();
+            }
 
             nextTick += period.Ticks;
             var delay = nextTick - sw.Elapsed.Ticks;

@@ -140,6 +140,7 @@ cover/
 *.db
 *.sqlite
 *.sqlite3
+*.mysql.sock
 
 # SSL certificates
 *.pem
