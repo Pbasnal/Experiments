@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "745534845144",
+    "project_id": "indiecomic-bff8c",
+    "storage_bucket": "indiecomic-bff8c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745534845144:android:f1f95ceb63ff7d358ba7ad",
+        "android_client_info": {
+          "package_name": "org.basnalcorp.indiecomicapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "745534845144-s2f7547hcis83p5heg0lh8dnkjiovrfa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAk1JQszQG1QwXiFIZbkeAIoxKXRpXSZms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745534845144-s2f7547hcis83p5heg0lh8dnkjiovrfa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
