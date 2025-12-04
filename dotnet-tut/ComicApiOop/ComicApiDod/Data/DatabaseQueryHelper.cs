@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using ComicApiDod.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -69,14 +71,17 @@ public static class DatabaseQueryHelper
             .ToArrayAsync();
 
         // Fetch tags
-        var tags = await db.Tags
-            .Where(t => t.Id == comicId)
-            .Select(t => new TagData
-            {
-                Id = t.Id,
-                Name = t.Name
-            })
-            .ToArrayAsync();
+        var tags = (await db.ComicTags
+            .Where(c => comicId == c.ComicsId)
+            .Join(db.Tags,
+                ct => ct.TagsId,
+                t => t.Id,
+                (ct, t) => new TagData
+                {
+                    Id = ct.ComicsId,
+                    Name = t.Name
+                })
+            .ToArrayAsync());
 
         // Fetch content rating
         var contentRating = await db.ContentRatings
@@ -165,12 +170,183 @@ public static class DatabaseQueryHelper
         };
     }
 
+    public static async Task<IDictionary<long, ComicBatchData>> GetComicBatchDataAsync(ComicDbContext db,
+        long[] comicIds)
+    {
+        ISet<long> sortedComicIds = new SortedSet<long>(comicIds);
+        // Fetch comic details
+        IDictionary<long, ComicBookData> comicEntities = await db.Comics
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(c => new ComicBookData
+            {
+                Id = c.Id,
+                Title = c.Title,
+                PublisherId = c.PublisherId,
+                GenreId = c.GenreId,
+                ThemeId = c.ThemeId,
+                TotalChapters = c.TotalChapters,
+                LastUpdateTime = c.LastUpdateTime,
+                AverageRating = c.AverageRating
+            }).ToDictionaryAsync(c => c.Id, c => c);
+
+        if (comicEntities == null || comicEntities.Count == 0)
+        {
+            throw new InvalidOperationException($"Comic with ID {comicIds} not found.");
+        }
+
+        // Fetch chapters
+        IDictionary<long, List<ChapterData>> chapters = await db.Chapters
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(ch => new ChapterData
+            {
+                Id = ch.Id,
+                ComicId = ch.ComicId,
+                ChapterNumber = ch.ChapterNumber,
+                ReleaseTime = ch.ReleaseTime,
+                IsFree = ch.IsFree
+            })
+            .GroupBy(c => c.ComicId)
+            .ToDictionaryAsync(c => c.Key, c => c.ToList());
+
+        // Fetch tags
+        IDictionary<long, List<TagData>> tags = new ConcurrentDictionary<long, List<TagData>>();
+        try
+        {
+            tags = (await db.ComicTags
+                    .Where(c => sortedComicIds.Contains(c.ComicsId))
+                    .Join(db.Tags,
+                        ct => ct.TagsId,
+                        t => t.Id,
+                        (ct, t) => new TagData
+                        {
+                            Id = ct.ComicsId,
+                            Name = t.Name
+                        })
+                    .ToListAsync())
+                .GroupBy(c => c.Id)
+                .ToDictionary(c => c.Key, c => c.ToList());
+        }
+        catch (Exception Ex)
+        {
+            Console.WriteLine(Ex.Message);
+        }
+
+        // Fetch content rating
+        IDictionary<long, ContentRatingData> contentRating = new ConcurrentDictionary<long, ContentRatingData>();
+
+        contentRating = await db.ContentRatings
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(cr => new ContentRatingData
+            {
+                Id = cr.Id,
+                ComicId = cr.ComicId,
+                AgeRating = cr.AgeRating,
+                ContentFlags = cr.ContentFlags,
+                ContentWarning = cr.ContentWarning,
+                RequiresParentalGuidance = cr.RequiresParentalGuidance
+            })
+            .ToDictionaryAsync(c => c.ComicId, c => c);
+
+        // Fetch pricing
+        IDictionary<long, List<PricingData>> regionalPricing = await db.ComicPricings
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(p => new PricingData
+            {
+                Id = p.Id,
+                ComicId = p.ComicId,
+                RegionCode = p.RegionCode,
+                BasePrice = p.BasePrice,
+                IsFreeContent = p.IsFreeContent,
+                IsPremiumContent = p.IsPremiumContent,
+                DiscountStartDate = p.DiscountStartDate,
+                DiscountEndDate = p.DiscountEndDate,
+                DiscountPercentage = p.DiscountPercentage ?? 0
+            })
+            .GroupBy(c => c.ComicId)
+            .ToDictionaryAsync(c => c.Key, c => c.ToList());
+
+        // Fetch geographic rules
+        IDictionary<long, List<GeographicRuleData>> geographicRules = await db.GeographicRules
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(gr => new GeographicRuleData
+            {
+                Id = gr.Id,
+                ComicId = gr.ComicId,
+                CountryCodes = gr.CountryCodes.ToArray(),
+                LicenseStartDate = gr.LicenseStartDate,
+                LicenseEndDate = gr.LicenseEndDate,
+                LicenseType = gr.LicenseType,
+                IsVisible = gr.IsVisible,
+                LastUpdated = gr.LastUpdated
+            })
+            .GroupBy(c => c.ComicId)
+            .ToDictionaryAsync(c => c.Key, c => c.ToList());
+
+        // Fetch customer segment rules
+        IDictionary<long, List<CustomerSegmentRuleData>> segmentRules = await db.CustomerSegmentRules
+            .Where(c => sortedComicIds.Contains(c.Id))
+            .Select(csr => new CustomerSegmentRuleData
+            {
+                Id = csr.Id,
+                ComicId = csr.ComicId,
+                SegmentId = csr.SegmentId,
+                IsVisible = csr.IsVisible,
+                LastUpdated = csr.LastUpdated
+            })
+            .GroupBy(c => c.ComicId)
+            .ToDictionaryAsync(c => c.Key, c => c.ToList());
+
+        ISet<long> sortedSegmentIds =
+            segmentRules.Values.SelectMany(s => s.Select(cs => cs.SegmentId)).ToImmutableSortedSet();
+
+        // Fetch customer segments
+        IDictionary<long, CustomerSegmentData> segments = await db.CustomerSegments
+            .Where(cs => sortedSegmentIds.Contains(cs.Id))
+            .Select(cs => new CustomerSegmentData
+            {
+                Id = cs.Id,
+                Name = cs.Name,
+                IsPremium = cs.IsPremium,
+                IsActive = cs.IsActive
+            })
+            .ToDictionaryAsync(c => c.Id, c => c);
+
+        IDictionary<long, ComicBatchData> comicBatchData = new Dictionary<long, ComicBatchData>();
+        foreach (var comicId in comicEntities.Keys)
+        {
+            CustomerSegmentData[] comicSegments = segmentRules.ContainsKey(comicId)
+                ? segmentRules[comicId].Select(sr => sr.Id)
+                    .Where(srid => segments.ContainsKey(srid))
+                    .Select(srid => segments[srid]).ToArray()
+                : [];
+
+            if (!comicEntities.ContainsKey(comicId)) continue;
+
+            comicBatchData.Add(comicId, new ComicBatchData
+            {
+                ComicId = comicId,
+                Comic = comicEntities[comicId],
+                Chapters = chapters.ContainsKey(comicId) ? chapters[comicId].ToArray() : [],
+                Tags = tags.ContainsKey(comicId) ? tags[comicId].ToArray() : [],
+                ContentRating = contentRating.ContainsKey(comicId) ? contentRating[comicId] : null,
+                RegionalPricing = regionalPricing.ContainsKey(comicId) ? regionalPricing[comicId].ToArray() : [],
+                GeographicRules = geographicRules.ContainsKey(comicId) ? geographicRules[comicId].ToArray() : [],
+                SegmentRules = segmentRules.ContainsKey(comicId) ? segmentRules[comicId].ToArray() : [],
+                Segments = comicSegments
+            });
+        }
+
+// Construct and return batch data
+        return comicBatchData;
+    }
+
     /// <summary>
     /// Saves computed visibility data to the database in a batch
     /// </summary>
     /// <param name="db">Database context</param>
     /// <param name="computedVisibilities">Array of computed visibility data to save</param>
-    public static async Task SaveComputedVisibilitiesAsync(ComicDbContext db, ComputedVisibilityData[] computedVisibilities)
+    public static async Task SaveComputedVisibilitiesAsync(ComicDbContext db,
+        ComputedVisibilityData[] computedVisibilities)
     {
         // Convert or map ComputedVisibilityData to ComputedVisibility entity
         var entities = computedVisibilities.Select(cv => new ComputedVisibility

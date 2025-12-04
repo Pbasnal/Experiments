@@ -51,7 +51,7 @@ public class SimpleQueue<T> : ISimpleQueue
     {
         if (batchSize <= 0) batchSize = 10;
 
-        var period = TimeSpan.FromMilliseconds(10);
+        var period = TimeSpan.FromMilliseconds(500);
         Stopwatch sw = Stopwatch.StartNew();
 
         long nextTick = 0;
@@ -66,7 +66,11 @@ public class SimpleQueue<T> : ISimpleQueue
             // if the service goes down after dequeue but before processing the message.
             while (numberOfDequeuedMsgs < batchSize && _queue.Count > 0)
             {
-                messageBatch.Add(Dequeue());
+                T? msg = Dequeue();
+                if (msg != null)
+                {
+                    messageBatch.Add(msg);
+                }
             }
 
             if (messageBatch.Count > 0)
@@ -79,6 +83,7 @@ public class SimpleQueue<T> : ISimpleQueue
                         SimpleMap.Add(responses[i]);
                     }
                 }
+
                 messageBatch.Clear();
             }
 

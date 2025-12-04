@@ -20,7 +20,8 @@ public class ComicDbContext : DbContext
     public DbSet<Publisher> Publishers { get; set; } = null!;
     public DbSet<Genre> Genres { get; set; } = null!;
     public DbSet<Theme> Themes { get; set; } = null!;
-    public DbSet<ComicTag> Tags { get; set; } = null!;
+    public DbSet<ComicTag> ComicTags { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<GeographicRule> GeographicRules { get; set; } = null!;
     public DbSet<CustomerSegmentRule> CustomerSegmentRules { get; set; } = null!;
     public DbSet<CustomerSegment> CustomerSegments { get; set; } = null!;
@@ -37,12 +38,15 @@ public class ComicDbContext : DbContext
             entity.Property(e => e.Title).IsRequired().HasMaxLength(255);
         });
 
-        modelBuilder.Entity<Chapter>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-        });
+        modelBuilder.Entity<Chapter>(entity => { entity.HasKey(e => e.Id); });
 
         modelBuilder.Entity<ComicTag>(entity =>
+        {
+            entity.HasKey(e => e.ComicsId);
+            entity.Property(e => e.TagsId).IsRequired();
+        });
+        
+        modelBuilder.Entity<Tag>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
@@ -78,10 +82,7 @@ public class ComicDbContext : DbContext
                 .HasMaxLength(1000);
         });
 
-        modelBuilder.Entity<CustomerSegmentRule>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-        });
+        modelBuilder.Entity<CustomerSegmentRule>(entity => { entity.HasKey(e => e.Id); });
 
         modelBuilder.Entity<CustomerSegment>(entity =>
         {
@@ -141,6 +142,12 @@ public class Theme
 }
 
 public class ComicTag
+{
+    public long ComicsId { get; set; }
+    public long TagsId { get; set; }
+}
+
+public class Tag
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -220,5 +227,3 @@ public class ComputedVisibility
     public ContentFlag ContentFlags { get; set; }
     public string ContentWarning { get; set; } = string.Empty;
 }
-
-

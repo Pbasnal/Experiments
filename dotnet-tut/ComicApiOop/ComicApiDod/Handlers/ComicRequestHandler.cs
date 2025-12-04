@@ -50,6 +50,11 @@ public static class ComicRequestHandler
 
             int timeout = 10000;
             Task.Delay(timeout, tkn);
+            
+            RequestCounter
+                .WithLabels("compute_visibilities", status)
+                .Inc();
+            
             Task<VisibilityComputationResponse> responseTask = WaitForResponse(simpleMap, request, tkn);
             if (await Task.WhenAny(responseTask, Task.Delay(timeout)) == responseTask)
             {
@@ -61,12 +66,7 @@ public static class ComicRequestHandler
                 tknSrc.Cancel();
                 response = null;
             }
-
-
-            RequestCounter
-                .WithLabels("compute_visibilities", status)
-                .Inc();
-
+            
             RequestProcessLatency
                 .WithLabels("compute_visibilities", status)
                 .Observe(sw.Elapsed.TotalSeconds);

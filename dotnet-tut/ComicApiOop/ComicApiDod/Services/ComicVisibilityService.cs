@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Prometheus;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ComicApiDod.utils;
 
 namespace ComicApiDod.Services;
 
@@ -20,7 +21,7 @@ public class ComicVisibilityService
         new HistogramConfiguration
         {
             Buckets = Histogram.ExponentialBuckets(0.01, 2, 10),
-            LabelNames = new[] { "status" }
+            LabelNames = new[] { "type", "status" }
         });
 
     private static readonly Counter ComputeVisibilityCounter = Metrics.CreateCounter(
@@ -28,16 +29,12 @@ public class ComicVisibilityService
         "Total number of visibility computations",
         new CounterConfiguration
         {
-            LabelNames = new[] { "status" }
+            LabelNames = new[] { "type", "status" }
         });
 
-    private static readonly Gauge ComputedComicsGauge = Metrics.CreateGauge(
-        "comic_visibility_computed_comics",
-        "Number of comics processed in the last computation",
-        new GaugeConfiguration
-        {
-            LabelNames = new[] { "status" }
-        });
+    private static readonly Gauge RequestsInBatch = Metrics.CreateGauge(
+        "comic_visibility_request_count_in_batch",
+        "Number of requests in the current request batch");
 
     public ComicVisibilityService(ComicDbContext db, ILogger<ComicVisibilityService> logger)
     {
@@ -49,27 +46,50 @@ public class ComicVisibilityService
     {
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
-
-        List<Task<IValue>> responses = new List<Task<IValue>>();
-
-        foreach (var req in reqs)
+        try
         {
-            if (req != null)
+            if (reqs.Count > 1)
+            {
+                reqs.Sort((v1, v2) =>
+                {
+                    if (v1 == null && v2 == null) return 0;
+                    if (v1 == null) return 1;
+                    if (v2 == null) return -1;
+                    return v1.StartId.CompareTo(v2.StartId);
+                });
+
+                Utils.PrintCollection(reqs);
+            }
+
+            RequestsInBatch.Set(reqs.Count);
+
+            List<Task<IValue>> responses = new List<Task<IValue>>();
+
+
+            foreach (var req in reqs)
             {
                 responses.Add(ComputeVisibilitiesAsync(req));
             }
-        }
 
-        var t = responses.ToArray();
-        return Task.WhenAll(t);
+            var t = responses.ToArray();
+            return Task.WhenAll(t);
+        }
+        finally
+        {
+            ComputeVisibilityDuration
+                .WithLabels("batch_process", computationStatus)
+                .Observe(sw.Elapsed.TotalSeconds);
+        }
     }
 
     public async Task<IValue> ComputeVisibilitiesAsync(VisibilityComputationRequest req)
     {
+        Stopwatch swForReqE2e = Stopwatch.StartNew();
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
         long startId = req.StartId;
         int limit = req.Limit;
+        var startTime = DateTime.UtcNow;
 
         try
         {
@@ -79,10 +99,12 @@ public class ComicVisibilityService
             _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
                 limit);
 
-            var startTime = DateTime.UtcNow;
-
             // Step 1: Get comic IDs (batch query)
+            sw.Restart();
             var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(_db, (int)startId, limit);
+            ComputeVisibilityDuration
+                .WithLabels("fetch_comics", computationStatus)
+                .Observe(sw.Elapsed.TotalSeconds);
 
             if (comicIds.Length == 0)
             {
@@ -97,24 +119,40 @@ public class ComicVisibilityService
             int processedCount = 0;
             int failedCount = 0;
 
+            sw.Restart();
+            IDictionary<long, ComicBatchData> allComicsBatchData =
+                await DatabaseQueryHelper.GetComicBatchDataAsync(_db, comicIds);
+            ComputeVisibilityDuration
+                .WithLabels("fetch_all_comics_data", computationStatus)
+                .Observe(sw.Elapsed.TotalSeconds);
+
             foreach (var comicId in comicIds)
             {
                 try
                 {
+                    ComicBatchData batchData = allComicsBatchData[comicId];
                     _logger.LogInformation("Processing comic ID: {ComicId}", comicId);
 
                     // Fetch all data for this comic
-                    var batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(_db, comicId);
 
                     // Compute visibilities using pure functions
+                    sw.Restart();
                     var computedVisibilities = VisibilityProcessor.ComputeVisibilities(
                         batchData,
                         DateTime.UtcNow);
+                    ComputeVisibilityDuration
+                        .WithLabels("compute_visibility", computationStatus)
+                        .Observe(sw.Elapsed.TotalSeconds);
+
 
                     // Save to database
                     if (computedVisibilities.Length > 0)
                     {
+                        sw.Restart();
                         await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(_db, computedVisibilities);
+                        ComputeVisibilityDuration
+                            .WithLabels("save_visibility", computationStatus)
+                            .Observe(sw.Elapsed.TotalSeconds);
                     }
 
                     results.Add(new ComicVisibilityResult
@@ -152,20 +190,12 @@ public class ComicVisibilityService
 
             // Update Prometheus metrics
             ComputeVisibilityDuration
-                .WithLabels(computationStatus)
+                .WithLabels("visibility_computation", computationStatus)
                 .Observe(duration.TotalSeconds);
 
             ComputeVisibilityCounter
-                .WithLabels(computationStatus)
+                .WithLabels("visibility_computation", computationStatus)
                 .Inc();
-
-            ComputedComicsGauge
-                .WithLabels("processed")
-                .Set(processedCount);
-
-            ComputedComicsGauge
-                .WithLabels("failed")
-                .Set(failedCount);
 
             return new VisibilityComputationResponse
             {
@@ -186,17 +216,17 @@ public class ComicVisibilityService
 
             // Update Prometheus metrics for total failure
             ComputeVisibilityCounter
-                .WithLabels(computationStatus)
+                .WithLabels("visibility_computation_count", computationStatus)
                 .Inc();
 
             return null;
         }
         finally
         {
-            sw.Stop();
+            swForReqE2e.Stop();
             ComputeVisibilityDuration
-                .WithLabels(computationStatus)
-                .Observe(sw.Elapsed.TotalSeconds);
+                .WithLabels("visibility_computation", computationStatus)
+                .Observe(swForReqE2e.Elapsed.TotalSeconds);
         }
     }
 
@@ -294,14 +324,6 @@ public class ComicVisibilityService
             ComputeVisibilityCounter
                 .WithLabels(computationStatus)
                 .Inc();
-
-            ComputedComicsGauge
-                .WithLabels("processed")
-                .Set(processedCount);
-
-            ComputedComicsGauge
-                .WithLabels("failed")
-                .Set(failedCount);
 
             return Results.Ok(new VisibilityComputationResponse
             {

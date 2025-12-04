@@ -1,1 +1,8 @@
 /build
+
+# Keystore files - NEVER commit these!
+*.jks
+*.keystore
+*.p12
+*.pfx
+keystore.properties

@@ -3,6 +3,7 @@ using System;
 using ComicApiDod.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComicApiDod.Migrations
 {
     [DbContext(typeof(ComicDbContext))]
-    partial class ComicDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130010240_correctingcolumnname")]
+    partial class correctingcolumnname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

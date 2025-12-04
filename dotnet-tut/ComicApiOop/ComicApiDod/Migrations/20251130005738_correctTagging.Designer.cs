@@ -3,6 +3,7 @@ using System;
 using ComicApiDod.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComicApiDod.Migrations
 {
     [DbContext(typeof(ComicDbContext))]
-    partial class ComicDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130005738_correctTagging")]
+    partial class correctTagging
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,14 +120,14 @@ namespace ComicApiDod.Migrations
 
             modelBuilder.Entity("ComicApiDod.Data.ComicTag", b =>
                 {
-                    b.Property<long>("ComicsId")
+                    b.Property<long>("ComicId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<long>("TagsId")
+                    b.Property<long>("TagId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("ComicsId");
+                    b.HasKey("ComicId");
 
                     b.ToTable("ComicTags");
                 });
