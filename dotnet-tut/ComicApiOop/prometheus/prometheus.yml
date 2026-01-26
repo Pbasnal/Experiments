@@ -16,3 +16,8 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  - job_name: 'comic-api-oop'
+    static_configs:
+      - targets: [ 'host.docker.internal:5000' ]  # For Windows/Mac
+      # - targets: ['172.17.0.1:5000']  # For Linux, use host IP
+    metrics_path: '/metrics'

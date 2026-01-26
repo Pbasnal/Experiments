@@ -1,5 +1,6 @@
 using ComicApiDod.Models;
 using ComicApiDod.SimpleQueue;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ComicApiDod.Services;
 
@@ -10,17 +11,17 @@ namespace ComicApiDod.Services;
 public class MessageProcessingHostedService : IHostedService
 {
     private readonly SimpleMessageBus _messageBus;
-    private readonly ComicVisibilityService _comicVisibilityService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<MessageProcessingHostedService> _logger;
     private readonly List<Task> _processingTasks;
 
     public MessageProcessingHostedService(
         SimpleMessageBus messageBus,
-        ComicVisibilityService comicVisibilityService,
+        IServiceScopeFactory serviceScopeFactory,
         ILogger<MessageProcessingHostedService> logger)
     {
         _messageBus = messageBus;
-        _comicVisibilityService = comicVisibilityService;
+        _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
         _processingTasks = new List<Task>();
     }
@@ -30,9 +31,18 @@ public class MessageProcessingHostedService : IHostedService
         _logger.LogInformation("Message Processing Hosted Service is starting.");
 
         _messageBus.RegisterQueue<VisibilityComputationRequest>(new SimpleQueue<VisibilityComputationRequest>());
+        
+        // Create a wrapper callback that creates a scope for each batch
+        async Task<IValue[]> ProcessBatchWithScope(int batchSize, List<VisibilityComputationRequest?> messages)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var comicVisibilityService = scope.ServiceProvider.GetRequiredService<ComicVisibilityService>();
+            return await comicVisibilityService.ComputeVisibilities(batchSize, messages);
+        }
+        
         _processingTasks.Add(_messageBus.StartBatchListener<VisibilityComputationRequest>(
              batchSize: 10,
-             callback: _comicVisibilityService.ComputeVisibilities,
+             callback: ProcessBatchWithScope,
              cancellationToken: cancellationToken));
 
         _logger.LogInformation("Message Processing Hosted Service started successfully.");

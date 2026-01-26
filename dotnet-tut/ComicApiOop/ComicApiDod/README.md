@@ -65,18 +65,391 @@ ComicApiDod/
 
 ## Running the API
 
+### Option 1: Using Docker Compose (Recommended)
+
+The easiest way to start the service with all dependencies (MySQL, Prometheus, Grafana) is using Docker Compose:
+
 ```bash
-# Restore dependencies
-dotnet restore
+# Start all services (MySQL, API, Prometheus, Grafana)
+docker-compose -f docker-compose.dod.yml up -d --build
 
-# Build the project
-dotnet build
+# View logs
+docker-compose -f docker-compose.dod.yml logs -f comic-api-dod
 
-# Run the API
-dotnet run
+# Stop all services
+docker-compose -f docker-compose.dod.yml down
 ```
 
-The API will be available at `http://localhost:5000` (or as configured).
+**What happens when you start:**
+1. **MySQL Database**: Starts and automatically initializes with schema and seed data
+   - Database: `comicdb`
+   - User: `comicuser`
+   - Password: `comicpass`
+   - Port: `3306`
+   - Seed data is automatically loaded from `mysql/init/seed/SeedData.sql`
+
+2. **ComicApiDod Service**: Starts after MySQL is healthy
+   - Port: `8081` (mapped from container port `8080`)
+   - Automatically runs database migrations on startup
+   - Registers message queues and starts background processing
+
+3. **Monitoring Services**: Prometheus and Grafana start for metrics collection
+
+**Service URLs:**
+- API: `http://localhost:8081`
+- Health Check: `http://localhost:8081/health`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000` (admin/admin)
+
+### Option 2: Running Locally (Development)
+
+For local development without Docker:
+
+```bash
+# 1. Ensure MySQL is running locally
+# Create database and user:
+mysql -u root -p
+CREATE DATABASE comicdb;
+CREATE USER 'comicuser'@'localhost' IDENTIFIED BY 'comicpass';
+GRANT ALL PRIVILEGES ON comicdb.* TO 'comicuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# 2. Update connection string in appsettings.Development.json:
+# ConnectionStrings__DefaultConnection=Server=localhost;Port=3306;Database=comicdb;User=comicuser;Password=comicpass;
+
+# 3. Run database migrations
+dotnet ef database update --project ComicApiDod.csproj
+
+# 4. Seed the database (optional - if you have seed data)
+mysql -u comicuser -pcomicpass comicdb < mysql/init/seed/SeedData.sql
+
+# 5. Restore dependencies
+dotnet restore
+
+# 6. Build the project
+dotnet build
+
+# 7. Run the API
+dotnet run --project ComicApiDod.csproj
+```
+
+The API will be available at `http://localhost:5000` (or as configured in `appsettings.Development.json`).
+
+### Option 3: Hybrid Approach - Dependencies in Docker, API in IDE Debug Mode
+
+This approach is ideal for debugging endpoints in your IDE while using containerized dependencies:
+
+```bash
+# 1. Start MySQL first (required for API)
+docker-compose -f docker-compose.dod.yml up -d mysql
+
+# 2. Wait for MySQL to be healthy, then start monitoring services
+# Note: Prometheus may show warnings about API not being available, but it will still work
+docker-compose -f docker-compose.dod.yml up -d prometheus grafana node_exporter
+
+# Verify dependencies are running
+docker-compose -f docker-compose.dod.yml ps
+
+# Alternative: Start all dependencies at once (Prometheus will retry API connection)
+docker-compose -f docker-compose.dod.yml up -d mysql prometheus grafana node_exporter
+```
+
+**Note:** Prometheus is configured to scrape metrics from `comic-api-dod:8080`. When running the API locally in your IDE, Prometheus won't be able to scrape metrics (this is fine for debugging). If you want metrics collection while debugging, you can temporarily update `prometheus/prometheus.yml`:
+
+```yaml
+scrape_configs:
+  - job_name: 'comic-api-oop'
+    static_configs:
+      - targets: ['host.docker.internal:5000']  # For Windows/Mac
+      # - targets: ['172.17.0.1:5000']  # For Linux, use host IP
+    metrics_path: '/metrics'
+```
+
+Then restart Prometheus: `docker-compose -f docker-compose.dod.yml restart prometheus`
+
+**What this starts:**
+- **MySQL**: Available at `localhost:3306` (same credentials as Docker setup)
+- **Prometheus**: Available at `http://localhost:9090`
+- **Grafana**: Available at `http://localhost:3000`
+- **Node Exporter**: Available at `http://localhost:9100`
+
+**Configuration for IDE Debugging:**
+
+1. **Update `appsettings.Development.json`** (already configured):
+   ```json
+   {
+     "ConnectionStrings": {
+       "DefaultConnection": "Server=localhost;Port=3306;Database=comicdb;User=comicuser;Password=comicpass;"
+     }
+   }
+   ```
+
+2. **Set up launch configuration in your IDE:**
+
+   **JetBrains Rider:**
+   
+   **Method 1: Using Run/Debug Configuration (Recommended)**
+   1. Click on the run configuration dropdown (top toolbar, next to the green play button)
+   2. Select "Edit Configurations..." (or press `Alt+Shift+F10` then `0`)
+   3. In the Run/Debug Configurations dialog:
+      - Select your configuration (or create a new one by clicking `+` → `.NET Executable`)
+      - Set **Executable**: Browse to `ComicApiDod/bin/Debug/net8.0/ComicApiDod.dll`
+      - Set **Working directory**: `ComicApiDod` folder
+      - In the **Environment variables** section, click `+` and add:
+        - **Name**: `ASPNETCORE_ENVIRONMENT`
+        - **Value**: `Development`
+   4. Click **OK** to save
+   5. The environment variable will now be set when you run/debug from Rider
+   
+   **Method 2: Using launchSettings.json**
+   1. Navigate to `ComicApiDod/Properties/launchSettings.json` (create if it doesn't exist)
+   2. Add or update the configuration:
+   ```json
+   {
+     "profiles": {
+       "ComicApiDod": {
+         "commandName": "Project",
+         "environmentVariables": {
+           "ASPNETCORE_ENVIRONMENT": "Development"
+         },
+         "applicationUrl": "http://localhost:5000"
+       }
+     }
+   }
+   ```
+   3. Rider will automatically pick up these settings
+   
+   **Method 3: Quick Set via Environment Variables**
+   - Right-click on the project in Solution Explorer
+   - Select **Run** → **Edit Configurations...**
+   - Add environment variable as described in Method 1
+   
+   **Verification:**
+   - Set a breakpoint in `ProgramDod.cs` and check `Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")` or check the logs for "Development" environment
+   - Ensure `appsettings.Development.json` is being loaded (check logs for configuration source)
+
+   **VS Code:**
+   - Create/update `.vscode/launch.json`:
+   ```json
+   {
+     "version": "0.2.0",
+     "configurations": [
+       {
+         "name": ".NET Core Launch (ComicApiDod)",
+         "type": "coreclr",
+         "request": "launch",
+         "preLaunchTask": "build",
+         "program": "${workspaceFolder}/ComicApiDod/bin/Debug/net8.0/ComicApiDod.dll",
+         "args": [],
+         "cwd": "${workspaceFolder}/ComicApiDod",
+         "stopAtEntry": false,
+         "env": {
+           "ASPNETCORE_ENVIRONMENT": "Development"
+         },
+         "sourceFileMap": {
+           "/Views": "${workspaceFolder}/Views"
+         }
+       }
+     ]
+   }
+   ```
+
+3. **Run database migrations** (if needed):
+   ```bash
+   dotnet ef database update --project ComicApiDod.csproj
+   ```
+
+4. **Start debugging in your IDE:**
+   - Set breakpoints in your code (e.g., `ComicRequestHandler.cs`, `ComicVisibilityService.cs`)
+   - Press F5 or click "Start Debugging"
+   - The API will start on `http://localhost:5000` (or configured port)
+
+5. **Test endpoints with debugging:**
+   ```bash
+   # Health check
+   curl http://localhost:5000/health
+   
+   # Compute visibilities (will hit your breakpoints)
+   curl "http://localhost:5000/api/comics/compute-visibilities?startId=1&limit=5"
+   ```
+
+**Benefits of this approach:**
+- ✅ Full IDE debugging support (breakpoints, step-through, variable inspection)
+- ✅ Hot reload/Edit and Continue support
+- ✅ No need to rebuild Docker images for code changes
+- ✅ Faster development cycle
+- ✅ All dependencies still containerized and isolated
+
+**Stopping dependencies:**
+```bash
+# Stop only dependencies (API is running in IDE)
+docker-compose -f docker-compose.dod.yml stop mysql prometheus grafana node_exporter
+
+# Or stop and remove containers
+docker-compose -f docker-compose.dod.yml down
+```
+
+**Troubleshooting:**
+
+- **Connection refused to MySQL:**
+  - Verify MySQL container is running: `docker ps | grep mysql`
+  - Check MySQL is listening on port 3306: `docker-compose -f docker-compose.dod.yml ps mysql`
+  - Verify connection string uses `localhost:3306` (not `mysql`)
+
+- **Port already in use:**
+  - If port 5000 is in use, update `appsettings.Development.json` or `launchSettings.json` to use a different port
+  - Or stop any other services using that port
+
+- **Database not found:**
+  - Ensure MySQL container initialized properly: `docker-compose -f docker-compose.dod.yml logs mysql`
+  - Run migrations: `dotnet ef database update --project ComicApiDod.csproj`
+
+## Seed Data
+
+### Automatic Seeding (Docker)
+
+When using Docker Compose, seed data is automatically inserted when MySQL starts for the first time:
+- Seed script location: `mysql/init/seed/SeedData.sql`
+- The script runs automatically via the MySQL initialization process
+- Data includes sample comics, publishers, genres, chapters, pricing, and visibility rules
+
+### Manual Seeding
+
+If you need to manually insert seed data:
+
+```bash
+# Using Docker MySQL container
+docker exec -i comic_mysql mysql -u comicuser -pcomicpass comicdb < mysql/init/seed/SeedData.sql
+
+# Or using local MySQL
+mysql -u comicuser -pcomicpass comicdb < mysql/init/seed/SeedData.sql
+```
+
+### Verifying Seed Data
+
+Check that data was inserted correctly:
+
+```bash
+# Using Docker
+docker exec -it comic_mysql mysql -u comicuser -pcomicpass comicdb -e "SELECT COUNT(*) FROM Comics;"
+
+# Or using local MySQL
+mysql -u comicuser -pcomicpass comicdb -e "SELECT COUNT(*) FROM Comics;"
+```
+
+### Resetting the Database
+
+To start fresh with seed data:
+
+```bash
+# Stop services
+docker-compose -f docker-compose.dod.yml down
+
+# Remove MySQL volume (this deletes all data)
+docker volume rm comicapi_dod_mysql_data
+
+# Start again (will re-seed automatically)
+docker-compose -f docker-compose.dod.yml up -d --build
+```
+
+## Testing the Service
+
+### 1. Health Check
+
+Verify the service is running:
+
+```bash
+curl http://localhost:8081/health
+```
+
+Expected response:
+```json
+{
+  "status": "Healthy",
+  "timestamp": "2025-01-26T..."
+}
+```
+
+### 2. Compute Visibilities Endpoint
+
+Test the main endpoint:
+
+```bash
+# Compute visibilities for comics starting from ID 1, limit 5
+curl "http://localhost:8081/api/comics/compute-visibilities?startId=1&limit=5"
+```
+
+This endpoint:
+- Enqueues a visibility computation request
+- Processes it asynchronously using the SimpleQueue framework
+- Returns the computed visibility results
+
+### 3. View Logs
+
+Monitor service activity:
+
+```bash
+# View all logs
+docker-compose -f docker-compose.dod.yml logs -f
+
+# View only API logs
+docker-compose -f docker-compose.dod.yml logs -f comic-api-dod
+
+# View MySQL logs
+docker-compose -f docker-compose.dod.yml logs -f mysql
+```
+
+### 4. Check Database
+
+Verify data in the database:
+
+```bash
+# Connect to MySQL
+docker exec -it comic_mysql mysql -u comicuser -pcomicpass comicdb
+
+# Run queries
+SELECT * FROM Comics LIMIT 5;
+SELECT * FROM ComputedVisibilities LIMIT 5;
+```
+
+## Troubleshooting
+
+### Service Won't Start
+
+1. **Check MySQL is healthy:**
+   ```bash
+   docker-compose -f docker-compose.dod.yml ps
+   ```
+
+2. **View error logs:**
+   ```bash
+   docker-compose -f docker-compose.dod.yml logs comic-api-dod
+   ```
+
+3. **Verify connection string** in `docker-compose.dod.yml` matches MySQL credentials
+
+### Database Migration Issues
+
+If migrations fail:
+```bash
+# Manually run migrations
+docker exec -it comic-api-dod dotnet ef database update --project ComicApiDod.csproj
+```
+
+### Seed Data Not Loading
+
+1. **Check MySQL initialization logs:**
+   ```bash
+   docker-compose -f docker-compose.dod.yml logs mysql
+   ```
+
+2. **Verify seed file exists:**
+   ```bash
+   ls -la mysql/init/seed/SeedData.sql
+   ```
+
+3. **Manually run seed script** (see Manual Seeding above)
 
 ## API Endpoints
 
