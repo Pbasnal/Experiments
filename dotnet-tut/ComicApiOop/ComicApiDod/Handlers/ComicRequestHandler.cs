@@ -3,9 +3,6 @@ using ComicApiDod.Services;
 using ComicApiDod.SimpleQueue;
 using Prometheus;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ComicApiDod.Handlers;
 
@@ -32,7 +29,6 @@ public static class ComicRequestHandler
         long startId,
         int limit,
         SimpleMessageBus bus,
-        SimpleMap simpleMap,
         ComicVisibilityService comicVisibilityService)
     {
         var sw = Stopwatch.StartNew();
@@ -49,33 +45,26 @@ public static class ComicRequestHandler
             VisibilityComputationResponse response;
 
             int timeout = 10000;
-            Task.Delay(timeout, tkn);
-            
+            await Task.Delay(timeout, tkn);
+
             RequestCounter
                 .WithLabels("compute_visibilities", status)
                 .Inc();
-            
-            Task<VisibilityComputationResponse> responseTask = WaitForResponse(simpleMap, request, tkn);
-            if (await Task.WhenAny(responseTask, Task.Delay(timeout)) == responseTask)
-            {
-                response = responseTask.Result;
-            }
-            else
-            {
-                status = "timeout";
-                tknSrc.Cancel();
-                response = null;
-            }
-            
+
+            // Await the TCS directly - no polling, no map lookup!
+            response = await request.ResponseSrc.Task
+                .WaitAsync(TimeSpan.FromMilliseconds(10000), tknSrc.Token); // Built-in timeout support
+
             RequestProcessLatency
                 .WithLabels("compute_visibilities", status)
                 .Observe(sw.Elapsed.TotalSeconds);
-            if (status == "timeout")
-            {
-                return Results.Problem();
-            }
 
             return Results.Ok(response);
+        }
+        catch (TimeoutException ex)
+        {
+            tknSrc.Cancel();
+            return Results.Problem();
         }
         catch
         {
@@ -90,18 +79,6 @@ public static class ComicRequestHandler
 
             throw;
         }
-    }
-
-    private static async Task<VisibilityComputationResponse> WaitForResponse(SimpleMap simpleMap,
-        VisibilityComputationRequest request, CancellationToken tkn)
-    {
-        VisibilityComputationResponse? response = null;
-        while (!tkn.IsCancellationRequested && !simpleMap.Find(request.Id, out response))
-        {
-            await Task.Delay(10);
-        }
-
-        return response;
     }
 
     //public static async Task<IResult> HandleComputeVisibilities(
@@ -142,53 +119,4 @@ public static class ComicRequestHandler
     //        throw;
     //    }
     //}
-
-    public static async Task<IResult> HandleAsyncVisibility(
-        long comicId,
-        string? region,
-        string? segment,
-        SimpleMessageBus messageBus,
-        SimpleMap map)
-    {
-        // Generate a unique request ID
-        var requestId = Guid.NewGuid().GetHashCode();
-
-        // Create the request
-        var request = new ComicRequest
-        {
-            RequestId = requestId,
-            ComicId = comicId,
-            Region = region,
-            CustomerSegment = segment
-        };
-
-        // Enqueue the request for processing
-        messageBus.Enqueue(request);
-
-        // Poll for the response (with timeout)
-        var timeout = DateTime.UtcNow.AddSeconds(5);
-        while (DateTime.UtcNow < timeout)
-        {
-            if (map.Find<ComicResponse>(requestId, out var response))
-            {
-                // Remove the response from the map to free memory
-                map.Remove(requestId);
-
-                // Return the response
-                return Results.Ok(new ComicResponseDto
-                {
-                    ComicId = response!.ComicId,
-                    IsVisible = response.IsVisible,
-                    CurrentPrice = response.CurrentPrice,
-                    ContentFlags = response.ContentFlags,
-                    ProcessedAt = response.ProcessedAt
-                });
-            }
-
-            // Wait a bit before checking again
-            await Task.Delay(10);
-        }
-
-        return Results.StatusCode(408); // Request Timeout
-    }
 }

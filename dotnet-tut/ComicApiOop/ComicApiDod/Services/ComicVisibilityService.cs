@@ -68,6 +68,7 @@ public class ComicVisibilityService
 
             foreach (var req in reqs)
             {
+                // req.ResponseSrc.TrySetResult(ComputeVisibilitiesAsync(req));
                 responses.Add(ComputeVisibilitiesAsync(req));
             }
 
@@ -197,7 +198,7 @@ public class ComicVisibilityService
                 .WithLabels("visibility_computation", computationStatus)
                 .Inc();
 
-            return new VisibilityComputationResponse
+            VisibilityComputationResponse response = new()
             {
                 Id = req.Id,
                 StartId = startId,
@@ -208,6 +209,10 @@ public class ComicVisibilityService
                 NextStartId = startId + limit,
                 Results = results.ToArray()
             };
+
+            req.ResponseSrc.TrySetResult(response);
+
+            return response;
         }
         catch (Exception ex)
         {

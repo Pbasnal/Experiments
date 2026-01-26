@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using NUnit.Framework;
 using ComicApiDod.SimpleQueue;
 using Microsoft.Extensions.Logging;
@@ -10,13 +10,11 @@ namespace ComicApiTests;
 public class SimpleQueueTests
 {
     private Mock<ILogger<SimpleMessageBus>> _mockMessageBusLogger;
-    private Mock<ILogger<SimpleMap>> _mockMapLogger;
 
     [SetUp]
     public void Setup()
     {
         _mockMessageBusLogger = new Mock<ILogger<SimpleMessageBus>>();
-        _mockMapLogger = new Mock<ILogger<SimpleMap>>();
     }
 
     [Test]
@@ -28,9 +26,8 @@ public class SimpleQueueTests
         Random random = new Random();
 
         SimpleMessageBus SimpleMessageBus = new SimpleMessageBus(_mockMessageBusLogger.Object);
-        SimpleMap simpleMap = new SimpleMap(_mockMapLogger.Object);
         // Arrange
-        SimpleMessageBus.RegisterQueue<string>(new SimpleQueue<string>(simpleMap));
+        SimpleMessageBus.RegisterQueue<string>(new SimpleQueue<string>());
 
         List<String> messagesToEnqueue = new List<string>();
         for (int i = 0; i < 150; i++)
@@ -42,10 +39,10 @@ public class SimpleQueueTests
         var tcs = new TaskCompletionSource<bool>();
 
         // Setup callback to process messages
-        Task<IValue[]> ProcessBatch(int batchSize, string?[] messages)
+        Task<IValue[]> ProcessBatch(int batchSize, List<string?> messages)
         {
             Console.WriteLine($"Number of dequeued messages: {batchSize}");
-            for (int i = 0; i < batchSize; i++)
+            for (int i = 0; i < messages.Count; i++)
             {
                 if (messages[i] != null)
                 {
@@ -89,54 +86,33 @@ public class SimpleQueueTests
             Assert.Contains(message, processedMessages.ToArray(), "Message was not processed");
         }
     }
-
-    [Test]
-    public async Task SimpleMapTest()
-    {
-        SimpleMap simpleMap = new SimpleMap(_mockMapLogger.Object);
-
-        TestObj testObj1 = new TestObj(5);
-        TestObj testObj2 = new TestObj(10);
-        TestObj testObj3 = new TestObj(15);
-
-        simpleMap.Add(testObj1);
-        simpleMap.Add(testObj2);
-        simpleMap.Add(testObj3);
-
-        Assert.That(simpleMap.Find(testObj1.Id, out TestObj? testObjR1), Is.EqualTo(true), "Test object not found");
-        Assert.That(simpleMap.Find(testObj2.Id, out TestObj? testObjR2), Is.EqualTo(true), "Test object not found");
-        Assert.That(simpleMap.Find(testObj3.Id, out TestObj? testObjR3), Is.EqualTo(true), "Test object not found");
-
-        Assert.That(testObjR1, Is.EqualTo(testObj1));
-        Assert.That(testObjR2, Is.EqualTo(testObj2));
-        Assert.That(testObjR3, Is.EqualTo(testObj3));
-    }
-
+    
     [Test]
     public async Task SimpleRequestResponseFlowTest()
     {
         // To add random delay between requests. 
         // So that some requests are batched to max size and some not
         Random random = new Random();
-        SimpleMap simpleMap = new SimpleMap(_mockMapLogger.Object);
         var messageBus = new SimpleMessageBus(_mockMessageBusLogger.Object);
-        messageBus.RegisterQueue<TestRequestObj>(new SimpleQueue<TestRequestObj>(simpleMap));
+        messageBus.RegisterQueue<TestRequestObj>(new SimpleQueue<TestRequestObj>());
 
 
-        Task<IValue[]> ProcessBatch(int batchSize, TestRequestObj?[] messages)
+        Task<IValue[]> ProcessBatch(int batchSize, List<TestRequestObj?> messages)
         {
             Console.WriteLine($"Number of dequeued messages: {batchSize}");
             return Task.Run(() =>
             {
-                IValue[] result = new IValue[batchSize];
-                for (int i = 0; i < batchSize; i++)
+                for (int i = 0; i < messages.Count; i++)
                 {
                     if (messages[i] != null)
                     {
-                        result[i] = new TestObj(messages[i]!.Id, messages[i]!.Value * 2);
+                        var request = messages[i]!;
+                        var response = new TestResponseObj(request.Id, request.Value * 2);
+                        // Set the result on the TaskCompletionSource instead of returning for SimpleMap
+                        request.ResponseSrc.TrySetResult(response);
                     }
                 }
-                return result;
+                return new IValue[0];
             });
         }
 
@@ -152,18 +128,15 @@ public class SimpleQueueTests
             if (random.NextInt64(100) % 10 == 0) await Task.Delay(20);
         }
 
+        // Await all responses using TaskCompletionSource - no polling needed!
+        var responseTasks = requests.Select(r => r.ResponseSrc.Task).ToArray();
+        var responses = await Task.WhenAll(responseTasks);
 
-        int numberOfResponses = 0;
-        while (numberOfResponses < requests.Count)
+        // Assert all responses
+        for (int i = 0; i < requests.Count; i++)
         {
-            foreach (var request in requests)
-            {
-                if (simpleMap.Find(request.Id, out TestObj? responseObj))
-                {
-                    Assert.That(responseObj!.Value, Is.EqualTo(request.Value * 2));
-                    numberOfResponses++;
-                }
-            }
+            Assert.That(responses[i].Value, Is.EqualTo(requests[i].Value * 2), 
+                $"Response value should be double the request value for request {i}");
         }
     }
 
@@ -182,11 +155,13 @@ public class SimpleQueueTests
     {
         public int Id { get; }
         public int Value { get; set; }
+        public TaskCompletionSource<TestResponseObj> ResponseSrc { get; set; }
 
         public TestRequestObj(int value)
         {
             this.Value = value;
             this.Id = GetHashCode();
+            this.ResponseSrc = new TaskCompletionSource<TestResponseObj>();
         }
     }
 
@@ -205,6 +180,18 @@ public class SimpleQueueTests
         {
             this.Value = value;
             this.Id = id;
+        }
+    }
+
+    public class TestResponseObj : IValue
+    {
+        public int Id { get; }
+        public int Value { get; set; }
+
+        public TestResponseObj(int id, int value)
+        {
+            this.Id = id;
+            this.Value = value;
         }
     }
 }

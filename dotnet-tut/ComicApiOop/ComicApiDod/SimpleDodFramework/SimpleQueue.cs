@@ -15,13 +15,6 @@ public class SimpleQueue<T> : ISimpleQueue
 
     private int _batchDequeueTimeoutMs = 10;
 
-    private SimpleMap SimpleMap;
-
-    public SimpleQueue(SimpleMap simpleMap)
-    {
-        this.SimpleMap = simpleMap;
-    }
-
     public void Enqueue(T item)
     {
         _queue.Enqueue(item);
@@ -75,15 +68,7 @@ public class SimpleQueue<T> : ISimpleQueue
 
             if (messageBatch.Count > 0)
             {
-                IValue[] responses = await callback(numberOfDequeuedMsgs, messageBatch);
-                for (int i = 0; i < responses.Length; i++)
-                {
-                    if (responses[i] != null)
-                    {
-                        SimpleMap.Add(responses[i]);
-                    }
-                }
-
+                await callback(numberOfDequeuedMsgs, messageBatch);
                 messageBatch.Clear();
             }
 

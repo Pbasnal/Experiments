@@ -10,19 +10,16 @@ namespace ComicApiDod.Services;
 public class MessageProcessingHostedService : IHostedService
 {
     private readonly SimpleMessageBus _messageBus;
-    private readonly SimpleMap _map;
     private readonly ComicVisibilityService _comicVisibilityService;
     private readonly ILogger<MessageProcessingHostedService> _logger;
     private readonly List<Task> _processingTasks;
 
     public MessageProcessingHostedService(
         SimpleMessageBus messageBus,
-        SimpleMap map,
         ComicVisibilityService comicVisibilityService,
         ILogger<MessageProcessingHostedService> logger)
     {
         _messageBus = messageBus;
-        _map = map;
         _comicVisibilityService = comicVisibilityService;
         _logger = logger;
         _processingTasks = new List<Task>();
@@ -32,7 +29,7 @@ public class MessageProcessingHostedService : IHostedService
     {
         _logger.LogInformation("Message Processing Hosted Service is starting.");
 
-        _messageBus.RegisterQueue<VisibilityComputationRequest>(new SimpleQueue<VisibilityComputationRequest>(_map));
+        _messageBus.RegisterQueue<VisibilityComputationRequest>(new SimpleQueue<VisibilityComputationRequest>());
         _processingTasks.Add(_messageBus.StartBatchListener<VisibilityComputationRequest>(
              batchSize: 10,
              callback: _comicVisibilityService.ComputeVisibilities,

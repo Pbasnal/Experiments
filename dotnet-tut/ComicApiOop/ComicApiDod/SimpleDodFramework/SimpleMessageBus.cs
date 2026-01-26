@@ -1,3 +1,5 @@
+using ComicApiDod.Models;
+
 namespace ComicApiDod.SimpleQueue;
 
 public class SimpleMessageBus

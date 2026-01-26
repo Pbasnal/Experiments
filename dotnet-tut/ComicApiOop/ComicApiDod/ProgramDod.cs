@@ -35,7 +35,6 @@ builder.Services.AddDbContext<ComicDbContext>(options =>
 builder.Services.AddScoped<ComicVisibilityService>();
 
 // Add Simple DOD Framework services as Singletons
-builder.Services.AddSingleton<SimpleMap>();
 builder.Services.AddSingleton<SimpleMessageBus>();
 
 // Add hosted service for background message processing

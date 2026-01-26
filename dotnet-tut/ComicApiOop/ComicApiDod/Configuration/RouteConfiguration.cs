@@ -27,14 +27,8 @@ public static class RouteConfiguration
 
     private static void ConfigureComicEndpoints(WebApplication app)
     {
-        // Main endpoint: Compute visibilities using DOD approach
         app.MapGet("/api/comics/compute-visibilities", ComicRequestHandler.HandleComputeVisibilities)
             .WithName("ComputeVisibilities")
-            .WithOpenApi();
-
-        // Example endpoint using the Simple DOD Framework
-        app.MapGet("/api/comics/{comicId}/async-visibility", ComicRequestHandler.HandleAsyncVisibility)
-            .WithName("AsyncComicVisibility")
             .WithOpenApi();
     }
 
