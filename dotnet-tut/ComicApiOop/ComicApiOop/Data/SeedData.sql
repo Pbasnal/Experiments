@@ -155,11 +155,10 @@ SELECT
         ELSE 'US,GB,JP,KR,CN,DE,FR'          -- Global release
     END as CountryCodes,
     '2024-01-01' as LicenseStartDate,
-    '2025-12-31' as LicenseEndDate,
+    '2027-12-31' as LicenseEndDate,
     CASE 
         WHEN c.Id % 3 = 0 THEN 0  -- Full
-        WHEN c.Id % 3 = 1 THEN 1  -- PreviewOnly
-        ELSE 2                     -- NoAccess
+        ELSE 1                     -- PreviewOnly
     END as LicenseType
 FROM Comics c;
 

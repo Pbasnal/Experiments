@@ -284,7 +284,7 @@ public static class DatabaseQueryHelper
 
         // Fetch customer segment rules
         IDictionary<long, List<CustomerSegmentRuleData>> segmentRules = await db.CustomerSegmentRules
-            .Where(c => sortedComicIds.Contains(c.Id))
+            .Where(c => sortedComicIds.Contains(c.ComicId))
             .Select(csr => new CustomerSegmentRuleData
             {
                 Id = csr.Id,
@@ -315,7 +315,7 @@ public static class DatabaseQueryHelper
         foreach (var comicId in comicEntities.Keys)
         {
             CustomerSegmentData[] comicSegments = segmentRules.ContainsKey(comicId)
-                ? segmentRules[comicId].Select(sr => sr.Id)
+                ? segmentRules[comicId].Select(sr => sr.SegmentId)
                     .Where(srid => segments.ContainsKey(srid))
                     .Select(srid => segments[srid]).ToArray()
                 : [];

@@ -134,7 +134,14 @@ public class ComicVisibilityService
                     ComicBatchData batchData = allComicsBatchData[comicId];
                     _logger.LogInformation("Processing comic ID: {ComicId}", comicId);
 
-                    // Fetch all data for this comic
+                    // Diagnostic logging to identify why visibilities might be empty
+                    _logger.LogInformation(
+                        "Comic {ComicId} data: GeographicRules={GeoCount}, SegmentRules={SegmentCount}, Segments={SegmentsCount}, Chapters={ChaptersCount}",
+                        comicId,
+                        batchData.GeographicRules.Length,
+                        batchData.SegmentRules.Length,
+                        batchData.Segments.Length,
+                        batchData.Chapters.Length);
 
                     // Compute visibilities using pure functions
                     sw.Restart();
@@ -144,6 +151,11 @@ public class ComicVisibilityService
                     ComputeVisibilityDuration
                         .WithLabels("compute_visibility", computationStatus)
                         .Observe(sw.Elapsed.TotalSeconds);
+
+                    _logger.LogInformation(
+                        "Comic {ComicId} computed {VisibilityCount} visibilities",
+                        comicId,
+                        computedVisibilities.Length);
 
 
                     // Save to database
