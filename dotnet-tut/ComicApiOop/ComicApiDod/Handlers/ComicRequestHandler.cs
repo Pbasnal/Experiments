@@ -34,6 +34,31 @@ public static class ComicRequestHandler
         var sw = Stopwatch.StartNew();
         string status = "success";
 
+        // Validate input parameters upfront
+        if (startId < 1)
+        {
+            status = "bad_request";
+            RequestCounter
+                .WithLabels("compute_visibilities", status)
+                .Inc();
+            RequestProcessLatency
+                .WithLabels("compute_visibilities", status)
+                .Observe(sw.Elapsed.TotalSeconds);
+            return Results.BadRequest("startId must be greater than 0");
+        }
+
+        if (limit < 1 || limit > 20)
+        {
+            status = "bad_request";
+            RequestCounter
+                .WithLabels("compute_visibilities", status)
+                .Inc();
+            RequestProcessLatency
+                .WithLabels("compute_visibilities", status)
+                .Observe(sw.Elapsed.TotalSeconds);
+            return Results.BadRequest("limit must be between 1 and 20");
+        }
+
         CancellationTokenSource tknSrc = new CancellationTokenSource();
         CancellationToken tkn = tknSrc.Token;
 
@@ -41,18 +66,13 @@ public static class ComicRequestHandler
         {
             VisibilityComputationRequest request = new(startId, limit);
             bus.Enqueue(request);
-            int numberOfResponses = 0;
-            VisibilityComputationResponse response;
-
-            int timeout = 10000;
-            await Task.Delay(timeout, tkn);
 
             RequestCounter
                 .WithLabels("compute_visibilities", status)
                 .Inc();
 
             // Await the TCS directly - no polling, no map lookup!
-            response = await request.ResponseSrc.Task
+            VisibilityComputationResponse response = await request.ResponseSrc.Task
                 .WaitAsync(TimeSpan.FromMilliseconds(10000), tknSrc.Token); // Built-in timeout support
 
             RequestProcessLatency
@@ -64,9 +84,20 @@ public static class ComicRequestHandler
         catch (TimeoutException ex)
         {
             tknSrc.Cancel();
-            return Results.Problem();
+            status = "timeout";
+            RequestCounter
+                .WithLabels("compute_visibilities", status)
+                .Inc();
+            RequestProcessLatency
+                .WithLabels("compute_visibilities", status)
+                .Observe(sw.Elapsed.TotalSeconds);
+            return Results.Problem(
+                detail: "Request timed out after 10 seconds",
+                title: "Request Timeout",
+                statusCode: 504
+            );
         }
-        catch
+        catch (Exception ex)
         {
             status = "failure";
             RequestCounter
@@ -77,7 +108,11 @@ public static class ComicRequestHandler
                 .WithLabels("compute_visibilities", status)
                 .Observe(sw.Elapsed.TotalSeconds);
 
-            throw;
+            return Results.Problem(
+                detail: ex.Message,
+                title: "Internal Server Error",
+                statusCode: 500
+            );
         }
     }
 

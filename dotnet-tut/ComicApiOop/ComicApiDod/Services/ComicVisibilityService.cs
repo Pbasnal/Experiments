@@ -94,8 +94,24 @@ public class ComicVisibilityService
 
         try
         {
-            // Validate input
-            if (startId < 1 || limit < 1 || limit > 20) return null;
+            // Note: Validation is now done in the handler, but we keep this as a safety check
+            if (startId < 1 || limit < 1 || limit > 20)
+            {
+                computationStatus = "validation_failed";
+                var errorResponse = new VisibilityComputationResponse
+                {
+                    Id = req.Id,
+                    StartId = startId,
+                    Limit = limit,
+                    ProcessedSuccessfully = 0,
+                    Failed = 0,
+                    DurationInSeconds = 0,
+                    NextStartId = startId,
+                    Results = Array.Empty<ComicVisibilityResult>()
+                };
+                req.ResponseSrc.TrySetResult(errorResponse);
+                return errorResponse;
+            }
 
             _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
                 limit);
@@ -106,11 +122,28 @@ public class ComicVisibilityService
             ComputeVisibilityDuration
                 .WithLabels("fetch_comics", computationStatus)
                 .Observe(sw.Elapsed.TotalSeconds);
-
+            DateTime endTime;
+            TimeSpan duration;
             if (comicIds.Length == 0)
             {
                 computationStatus = "no_comics_found";
-                return null;
+                endTime = DateTime.UtcNow;
+                duration = endTime - startTime;
+
+                var noComicsResponse = new VisibilityComputationResponse
+                {
+                    Id = req.Id,
+                    StartId = startId,
+                    Limit = limit,
+                    ProcessedSuccessfully = 0,
+                    Failed = 0,
+                    DurationInSeconds = duration.TotalSeconds,
+                    NextStartId = startId,
+                    Results = Array.Empty<ComicVisibilityResult>()
+                };
+
+                req.ResponseSrc.TrySetResult(noComicsResponse);
+                return noComicsResponse;
             }
 
             _logger.LogInformation("Found {Count} comics to process", comicIds.Length);
@@ -194,8 +227,8 @@ public class ComicVisibilityService
                 }
             }
 
-            var endTime = DateTime.UtcNow;
-            var duration = endTime - startTime;
+            endTime = DateTime.UtcNow;
+            duration = endTime - startTime;
 
             _logger.LogInformation(
                 "Completed processing. Success: {Success}, Failed: {Failed}, Duration: {Duration}s",
@@ -236,7 +269,31 @@ public class ComicVisibilityService
                 .WithLabels("visibility_computation_count", computationStatus)
                 .Inc();
 
-            return null;
+            // Always set a response, even on failure
+            var errorResponse = new VisibilityComputationResponse
+            {
+                Id = req.Id,
+                StartId = startId,
+                Limit = limit,
+                ProcessedSuccessfully = 0,
+                Failed = 1,
+                DurationInSeconds = swForReqE2e.Elapsed.TotalSeconds,
+                NextStartId = startId,
+                Results = new[]
+                {
+                    new ComicVisibilityResult
+                    {
+                        ComicId = startId,
+                        Success = false,
+                        ErrorMessage = ex.Message,
+                        ComputationTime = DateTime.UtcNow,
+                        ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
+                    }
+                }
+            };
+
+            req.ResponseSrc.TrySetResult(errorResponse);
+            return errorResponse;
         }
         finally
         {

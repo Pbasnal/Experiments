@@ -235,7 +235,7 @@ public static class DatabaseQueryHelper
         IDictionary<long, ContentRatingData> contentRating = new ConcurrentDictionary<long, ContentRatingData>();
 
         contentRating = await db.ContentRatings
-            .Where(c => sortedComicIds.Contains(c.Id))
+            .Where(c => sortedComicIds.Contains(c.ComicId))
             .Select(cr => new ContentRatingData
             {
                 Id = cr.Id,
@@ -249,7 +249,7 @@ public static class DatabaseQueryHelper
 
         // Fetch pricing
         IDictionary<long, List<PricingData>> regionalPricing = await db.ComicPricings
-            .Where(c => sortedComicIds.Contains(c.Id))
+            .Where(c => sortedComicIds.Contains(c.ComicId))
             .Select(p => new PricingData
             {
                 Id = p.Id,
@@ -267,7 +267,7 @@ public static class DatabaseQueryHelper
 
         // Fetch geographic rules
         IDictionary<long, List<GeographicRuleData>> geographicRules = await db.GeographicRules
-            .Where(c => sortedComicIds.Contains(c.Id))
+            .Where(c => sortedComicIds.Contains(c.ComicId))
             .Select(gr => new GeographicRuleData
             {
                 Id = gr.Id,
@@ -341,6 +341,7 @@ public static class DatabaseQueryHelper
     }
 
     /// <summary>
+    /// 
     /// Saves computed visibility data to the database in a batch
     /// </summary>
     /// <param name="db">Database context</param>

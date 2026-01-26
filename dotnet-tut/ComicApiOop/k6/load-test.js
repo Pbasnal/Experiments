@@ -105,7 +105,7 @@ export default function () {
   // Group 4: Invalid Requests (10% of requests)
   if (Math.random() < 0.1) {
     const invalidRes = http.get(
-      `${baseUrl}/api/comics/compute-visibilities?startId=0&limit=100`,
+      `${baseUrl}/api/comics/compute-visibilities?startId=1&limit=100`,
       {
         tags: { endpoint: 'invalid-request' },
       }
