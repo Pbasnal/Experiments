@@ -3,9 +3,14 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+  - job_name: 'comic-api-dod'
+    static_configs:
+      - targets: [ 'comic-api-dod:8080' ]
+    metrics_path: '/metrics'
+    
   - job_name: 'comic-api-oop'
     static_configs:
-      - targets: ['comic-api-dod:8080']
+      - targets: ['api:8080']
     metrics_path: '/metrics'
 
   - job_name: 'node_exporter'
