@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Prometheus;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices.JavaScript;
 using ComicApiDod.utils;
 
 namespace ComicApiDod.Services;
@@ -53,35 +54,48 @@ public class ComicVisibilityService
         string computationStatus = "success";
         try
         {
-            if (reqs.Count > 1)
-            {
-                reqs.Sort((v1, v2) =>
-                {
-                    if (v1 == null && v2 == null) return 0;
-                    if (v1 == null) return 1;
-                    if (v2 == null) return -1;
-                    return v1.StartId.CompareTo(v2.StartId);
-                });
-
-                Utils.PrintCollection(reqs);
-            }
+            SortRequests(reqs);
 
             RequestsInBatch.Set(reqs.Count);
             _metrics.RecordBatchProcessing(reqs.Count, TimeSpan.Zero, "started");
 
             List<Task> responses = new List<Task>();
+            bool[] isReqValid = ValidateAllRequests(reqs, out IResult?[] validationResults);
 
-            foreach (var req in reqs)
+            List<VisibilityComputationRequest> validatedRequests = FilterValidRequests(reqs, isReqValid,
+                out IDictionary<int, int> originalIndices);
+
+            long[][] allComicIds = GenerateAllComicIds(validatedRequests);
+            ComicBatchData[][] comicBatchData = await FetchBatchDataForComics(allComicIds);
+
+            ComicVisibilityResult[][] visibilityResults = ComputeVisibility(comicBatchData);
+            await SaveComputedVisibility(visibilityResults);
+
+            for (int i = 0; i < reqs.Count; i++)
             {
-                if (req != null)
+                if (isReqValid[i] && visibilityResults[originalIndices[i]] != null)
                 {
-                    // responses.Add(ComputeVisibilitiesAsync(req));
-                    responses.Add(ComputeVisibilitiesAsync(req));
+                    reqs[i].ResponseSrc.TrySetResult(new VisibilityComputationResponse
+                    {
+                        Id = reqs[i].Id,
+                        StartId = reqs[i].StartId,
+                        Limit = reqs[i].Limit,
+                        NextStartId = reqs[i].StartId + reqs[i].Limit,
+                        Results = visibilityResults[originalIndices[i]]
+                    });
+                }
+                else if (reqs[i] != null)
+                {
+                    reqs[i].ResponseSrc.TrySetResult(new VisibilityComputationResponse
+                    {
+                        Id = reqs[i].Id,
+                        StartId = reqs[i].StartId,
+                        Limit = reqs[i].Limit,
+                        NextStartId = reqs[i].StartId + reqs[i].Limit,
+                        Results = []
+                    });
                 }
             }
-
-            await Task.WhenAll(responses);
-            computationStatus = "success";
         }
         catch (Exception ex)
         {
@@ -99,396 +113,174 @@ public class ComicVisibilityService
         }
     }
 
-    // public async Task<IValue> ComputeVisibilitiesAsync(VisibilityComputationRequest req)
-    // {
-    //     // Create a new DbContext instance for this concurrent operation
-    //     // This prevents threading issues when multiple requests are processed concurrently
-    //     await using var db = _dbFactory.CreateDbContext();
-    //
-    //     Stopwatch swForReqE2e = Stopwatch.StartNew();
-    //     var sw = Stopwatch.StartNew();
-    //     string computationStatus = "success";
-    //     long startId = req.StartId;
-    //     int limit = req.Limit;
-    //     var startTime = DateTime.UtcNow;
-    //
-    //     try
-    //     {
-    //         // Note: Validation is now done in the handler, but we keep this as a safety check
-    //         if (startId < 1 || limit < 1 || limit > 20)
-    //         {
-    //             computationStatus = "validation_failed";
-    //             var errorResponse = new VisibilityComputationResponse
-    //             {
-    //                 Id = req.Id,
-    //                 StartId = startId,
-    //                 Limit = limit,
-    //                 ProcessedSuccessfully = 0,
-    //                 Failed = 0,
-    //                 DurationInSeconds = 0,
-    //                 NextStartId = startId,
-    //                 Results = Array.Empty<ComicVisibilityResult>()
-    //             };
-    //             req.ResponseSrc.TrySetResult(errorResponse);
-    //             return errorResponse;
-    //         }
-    //
-    //         _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
-    //             limit);
-    //
-    //         // Step 1: Get comic IDs (batch query)
-    //         sw.Restart();
-    //         var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(db, (int)startId, limit);
-    //         ComputeVisibilityDuration
-    //             .WithLabels("fetch_comics", computationStatus)
-    //             .Observe(sw.Elapsed.TotalSeconds);
-    //         DateTime endTime;
-    //         TimeSpan duration;
-    //         if (comicIds.Length == 0)
-    //         {
-    //             computationStatus = "no_comics_found";
-    //             endTime = DateTime.UtcNow;
-    //             duration = endTime - startTime;
-    //
-    //             var noComicsResponse = new VisibilityComputationResponse
-    //             {
-    //                 Id = req.Id,
-    //                 StartId = startId,
-    //                 Limit = limit,
-    //                 ProcessedSuccessfully = 0,
-    //                 Failed = 0,
-    //                 DurationInSeconds = duration.TotalSeconds,
-    //                 NextStartId = startId,
-    //                 Results = Array.Empty<ComicVisibilityResult>()
-    //             };
-    //
-    //             req.ResponseSrc.TrySetResult(noComicsResponse);
-    //             return noComicsResponse;
-    //         }
-    //
-    //         _logger.LogInformation("Found {Count} comics to process", comicIds.Length);
-    //
-    //         // Step 2: Fetch all data for batch (DOD: fetch all data first)
-    //         sw.Restart();
-    //         IDictionary<long, ComicBatchData> allComicsBatchData =
-    //             await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicIds);
-    //         var dataFetchDuration = sw.Elapsed;
-    //         _metrics.RecordDataFetch("fetch_all_comics_data", dataFetchDuration);
-    //         ComputeVisibilityDuration
-    //             .WithLabels("fetch_all_comics_data", computationStatus)
-    //             .Observe(dataFetchDuration.TotalSeconds);
-    //
-    //         // Step 3: Process all comics together using bulk processor (True DOD approach)
-    //         sw.Restart();
-    //         var computationTime = DateTime.UtcNow;
-    //         var bulkResult = BulkVisibilityProcessor.ProcessBatch(allComicsBatchData, computationTime);
-    //         var computationDuration = sw.Elapsed;
-    //
-    //         _metrics.RecordComputation(
-    //             bulkResult.ComicIds.Length,
-    //             bulkResult.ProcessingStats.TotalVisibilities,
-    //             computationDuration);
-    //
-    //         ComputeVisibilityDuration
-    //             .WithLabels("compute_visibility", computationStatus)
-    //             .Observe(computationDuration.TotalSeconds);
-    //
-    //         _logger.LogInformation(
-    //             "Bulk processed {Count} comics: {Success} success, {Failed} failed, {TotalVisibilities} total visibilities in {Duration}ms",
-    //             bulkResult.ComicIds.Length,
-    //             bulkResult.ProcessingStats.SuccessCount,
-    //             bulkResult.ProcessingStats.FailedCount,
-    //             bulkResult.ProcessingStats.TotalVisibilities,
-    //             computationDuration.TotalMilliseconds);
-    //
-    //         // Step 4: Save all visibilities in one bulk operation (more efficient than per-comic saves)
-    //         var allVisibilities = BulkVisibilityProcessor.FlattenVisibilities(bulkResult);
-    //         int processedCount = bulkResult.ProcessingStats.SuccessCount;
-    //         int failedCount = bulkResult.ProcessingStats.FailedCount;
-    //
-    //         if (allVisibilities.Length > 0)
-    //         {
-    //             sw.Restart();
-    //             await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(db, allVisibilities);
-    //             var saveDuration = sw.Elapsed;
-    //
-    //             _metrics.RecordSave("bulk", allVisibilities.Length, saveDuration);
-    //             ComputeVisibilityDuration
-    //                 .WithLabels("save_visibility", computationStatus)
-    //                 .Observe(saveDuration.TotalSeconds);
-    //         }
-    //
-    //         // Step 5: Build results from bulk processing
-    //         var results = new List<ComicVisibilityResult>();
-    //         foreach (var comicId in comicIds)
-    //         {
-    //             var visibilities =
-    //                 bulkResult.VisibilitiesByComic.GetValueOrDefault(comicId, Array.Empty<ComputedVisibilityData>());
-    //             var error = bulkResult.ProcessingStats.Errors.FirstOrDefault(e => e.ComicId == comicId);
-    //
-    //             _metrics.RecordComputedVisibilities(comicId, visibilities.Length);
-    //
-    //             if (visibilities.Length == 0 && error == null)
-    //             {
-    //                 _logger.LogWarning(
-    //                     "Comic {ComicId} has no computed visibilities. This may indicate missing or invalid rules.",
-    //                     comicId);
-    //             }
-    //
-    //             results.Add(new ComicVisibilityResult
-    //             {
-    //                 ComicId = comicId,
-    //                 Success = visibilities.Length > 0 && error == null,
-    //                 ErrorMessage = error?.ErrorMessage ?? (visibilities.Length == 0
-    //                     ? "No visibilities computed - missing or invalid geographic/segment rules"
-    //                     : null),
-    //                 ComputationTime = computationTime,
-    //                 ComputedVisibilities = visibilities
-    //             });
-    //         }
-    //
-    //         endTime = DateTime.UtcNow;
-    //         duration = endTime - startTime;
-    //
-    //         _logger.LogInformation(
-    //             "Completed processing. Success: {Success}, Failed: {Failed}, Duration: {Duration}s, Throughput: {Throughput} comics/sec",
-    //             processedCount, failedCount, duration.TotalSeconds,
-    //             duration.TotalSeconds > 0 ? processedCount / duration.TotalSeconds : 0);
-    //
-    //         // Record batch-level metrics
-    //         _metrics.RecordBatchProcessing(comicIds.Length, duration, computationStatus);
-    //         _metrics.RecordThroughput(processedCount, bulkResult.ProcessingStats.TotalVisibilities, duration);
-    //
-    //         // Update Prometheus metrics
-    //         ComputeVisibilityDuration
-    //             .WithLabels("visibility_computation", computationStatus)
-    //             .Observe(duration.TotalSeconds);
-    //
-    //         ComputeVisibilityCounter
-    //             .WithLabels("visibility_computation", computationStatus)
-    //             .Inc();
-    //
-    //         VisibilityComputationResponse response = new()
-    //         {
-    //             Id = req.Id,
-    //             StartId = startId,
-    //             Limit = limit,
-    //             ProcessedSuccessfully = processedCount,
-    //             Failed = failedCount,
-    //             DurationInSeconds = duration.TotalSeconds,
-    //             NextStartId = startId + limit,
-    //             Results = results.ToArray()
-    //         };
-    //
-    //         req.ResponseSrc.TrySetResult(response);
-    //
-    //         return response;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         computationStatus = "total_failure";
-    //         _logger.LogError(ex, "Error during bulk visibility computation");
-    //
-    //         _metrics.RecordError(ex.GetType().Name, "computation");
-    //
-    //         // Update Prometheus metrics for total failure
-    //         ComputeVisibilityCounter
-    //             .WithLabels("visibility_computation_count", computationStatus)
-    //             .Inc();
-    //
-    //         // Always set a response, even on failure
-    //         var errorResponse = new VisibilityComputationResponse
-    //         {
-    //             Id = req.Id,
-    //             StartId = startId,
-    //             Limit = limit,
-    //             ProcessedSuccessfully = 0,
-    //             Failed = 1,
-    //             DurationInSeconds = swForReqE2e.Elapsed.TotalSeconds,
-    //             NextStartId = startId,
-    //             Results = new[]
-    //             {
-    //                 new ComicVisibilityResult
-    //                 {
-    //                     ComicId = startId,
-    //                     Success = false,
-    //                     ErrorMessage = ex.Message,
-    //                     ComputationTime = DateTime.UtcNow,
-    //                     ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
-    //                 }
-    //             }
-    //         };
-    //
-    //         req.ResponseSrc.TrySetResult(errorResponse);
-    //         return errorResponse;
-    //     }
-    //     finally
-    //     {
-    //         swForReqE2e.Stop();
-    //         ComputeVisibilityDuration
-    //             .WithLabels("visibility_computation", computationStatus)
-    //             .Observe(swForReqE2e.Elapsed.TotalSeconds);
-    //     }
-    // }
-
-    private async Task ComputeVisibilitiesAsync(VisibilityComputationRequest req)
+    private static List<VisibilityComputationRequest> FilterValidRequests(List<VisibilityComputationRequest?> reqs,
+        bool[] isReqValid,
+        out IDictionary<int, int> originalIndices)
     {
-        long startId = req.StartId;
-        int limit = req.Limit;
-
-        if (!ValidateRequest(startId, limit, out IResult? validationResult))
+        originalIndices = new Dictionary<int, int>(reqs.Count);
+        List<VisibilityComputationRequest> validatedReqs = new List<VisibilityComputationRequest>();
+        for (int i = 0; i < reqs.Count; i++)
         {
-            _logger.LogError("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
-                limit);
-            req.ResponseSrc.TrySetResult(null);
-            return;
+            if (isReqValid[i])
+            {
+                validatedReqs.Add(reqs[i]);
+                originalIndices.Add(i, validatedReqs.Count - 1);
+            }
         }
 
-        // Create a new DbContext instance for this operation
-        await using var db = _dbFactory.CreateDbContext();
+        return validatedReqs;
+    }
 
-        var sw = Stopwatch.StartNew();
-        string computationStatus = "success";
+    private void SortRequests(List<VisibilityComputationRequest?> reqs)
+    {
+        if (reqs.Count <= 1) return;
 
-        try
+        reqs.Sort((v1, v2) =>
         {
-            _logger.LogInformation("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
-                limit);
+            if (v1 == null && v2 == null) return 0;
+            if (v1 == null) return 1;
+            if (v2 == null) return -1;
+            return v1.StartId.CompareTo(v2.StartId);
+        });
 
-            DateTime startTime = DateTime.UtcNow;
+        Utils.PrintCollection(reqs);
+    }
 
-            // Step 1: Get comic IDs (batch query)
-            long[] comicIds = await DatabaseQueryHelper.GetComicIdsAsync(db, (int)startId, limit);
-
-            if (comicIds.Length == 0)
+    private bool[] ValidateAllRequests(List<VisibilityComputationRequest?> reqs,
+        out IResult?[] validationResults)
+    {
+        validationResults = new IResult?[reqs.Count];
+        bool[] isValid = new bool[reqs.Count];
+        for (int i = 0; i < reqs.Count; i++)
+        {
+            if (reqs[i] == null)
             {
-                computationStatus = "no_comics_found";
-                _logger.LogError("No comics found between {StartId}, limit {Limit}", startId,
-                    limit);
-                req.ResponseSrc.TrySetResult(null);
-
-                return;
+                validationResults[i] = Results.BadRequest("Req is  null");
+                isValid[i] = false;
             }
-
-            _logger.LogInformation("Found {Count} comics to process", comicIds.Length);
-
-            // Step 2: Process each comic (in DOD, we process data in batches)
-            List<ComicVisibilityResult> results = new();
-            int processedCount = 0;
-            int failedCount = 0;
-
-            foreach (var comicId in comicIds)
+            else if (!ValidateRequest(reqs[i].StartId, reqs[i].Limit, out IResult? validationResult))
             {
-                try
+                validationResults[i] = validationResult;
+                isValid[i] = false;
+            }
+            else
+            {
+                validationResults[i] = null;
+                isValid[i] = true;
+            }
+        }
+
+        return isValid;
+    }
+
+    private long[][] GenerateAllComicIds(List<VisibilityComputationRequest> reqs)
+    {
+        long[][] allComicIds = new long[reqs.Count][];
+        for (int i = 0; i < reqs.Count; i++)
+        {
+            allComicIds[i] = new long[reqs[i].Limit];
+            for (int j = 0; j < reqs[i].Limit; j++) allComicIds[i][j] = reqs[i].StartId + j;
+        }
+
+        return allComicIds;
+    }
+
+    private async Task<ComicBatchData[][]> FetchBatchDataForComics(long[][] allComicIds)
+    {
+        await using ComicDbContext db = _dbFactory.CreateDbContext();
+        long[] comicIds = allComicIds.SelectMany(i => i).ToArray();
+        IDictionary<long, ComicBatchData> batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicIds);
+
+        ComicBatchData[][] comicBatchDataArrays = new ComicBatchData[allComicIds.Length][];
+
+        for (int i = 0; i < allComicIds.Length; i++)
+        {
+            comicBatchDataArrays[i] = new ComicBatchData[allComicIds[i].Length];
+            for (int j = 0; j < allComicIds[i].Length; j++)
+            {
+                if (batchData.ContainsKey(allComicIds[i][j]))
                 {
-                    _logger.LogInformation("Processing comic ID: {ComicId}", comicId);
-
-                    // Fetch all data for this comic
-                    var batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicId);
-
-                    // Compute visibilities using pure functions
-                    var computedVisibilities = VisibilityProcessor.ComputeVisibilities(
-                        batchData,
-                        DateTime.UtcNow);
-
-                    // Save to database
-                    if (computedVisibilities.Length > 0)
-                    {
-                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(db, computedVisibilities);
-                    }
-
-                    results.Add(new ComicVisibilityResult
-                    {
-                        ComicId = comicId,
-                        Success = computedVisibilities.Length > 0, // Mark as failed if no visibilities computed
-                        ErrorMessage = computedVisibilities.Length == 0
-                            ? "No visibilities computed - missing or invalid geographic/segment rules"
-                            : null,
-                        ComputationTime = DateTime.UtcNow,
-                        ComputedVisibilities = computedVisibilities
-                    });
-
-                    if (computedVisibilities.Length > 0)
-                    {
-                        processedCount++;
-                    }
-                    else
-                    {
-                        failedCount++;
-                        computationStatus = "partial_failure";
-                        _logger.LogWarning(
-                            "Comic {ComicId} has no computed visibilities. This may indicate missing or invalid rules. " +
-                            "GeographicRules={GeoCount}, SegmentRules={SegmentCount}, Segments={SegmentsCount}",
-                            comicId,
-                            batchData.GeographicRules.Length,
-                            batchData.SegmentRules.Length,
-                            batchData.Segments.Length);
-                    }
+                    comicBatchDataArrays[i][j] = batchData[allComicIds[i][j]];
                 }
-                catch (Exception ex)
+                else
+                {
+                    comicBatchDataArrays[i][j] = null;
+                }
+            }
+        }
+
+        return comicBatchDataArrays;
+    }
+
+    private ComicVisibilityResult[][] ComputeVisibility(ComicBatchData[][] comicBatchData)
+    {
+        ComicVisibilityResult[][] results = new ComicVisibilityResult[comicBatchData.Length][];
+
+        int processedCount = 0;
+        int failedCount = 0;
+        string computationStatus = "success";
+        DateTime computationTime = DateTime.UtcNow;
+        for (int i = 0; i < comicBatchData.Length; i++)
+        {
+            results[i] = new ComicVisibilityResult[comicBatchData[i].Length];
+            for (int j = 0; j < comicBatchData[i].Length; j++)
+            {
+                ComicBatchData batchData = comicBatchData[i][j];
+                if (batchData == null)
+                {
+                    results[i][j] = null;
+                    continue;
+                }
+
+                ComputedVisibilityData[] computedVisibilities = VisibilityProcessor.ComputeVisibilities(
+                    comicBatchData[i][j],
+                    computationTime);
+                if (computedVisibilities.Length > 0)
+                {
+                    processedCount++;
+                }
+                else
                 {
                     failedCount++;
                     computationStatus = "partial_failure";
-                    _logger.LogError(ex, "Error processing comic {ComicId}", comicId);
-                    results.Add(new ComicVisibilityResult
-                    {
-                        ComicId = comicId,
-                        Success = false,
-                        ErrorMessage = ex.Message,
-                        ComputationTime = DateTime.UtcNow,
-                        ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
-                    });
+                    _logger.LogWarning(
+                        "Comic {ComicId} has no computed visibilities. This may indicate missing or invalid rules. " +
+                        "GeographicRules={GeoCount}, SegmentRules={SegmentCount}, Segments={SegmentsCount}",
+                        batchData.ComicId,
+                        batchData.GeographicRules.Length,
+                        batchData.SegmentRules.Length,
+                        batchData.Segments.Length);
                 }
+
+                results[i][j] = new ComicVisibilityResult
+                {
+                    ComicId = batchData.ComicId,
+                    Success = computedVisibilities.Length > 0,
+                    ErrorMessage = computedVisibilities.Length == 0
+                        ? "No visibilities computed - missing or invalid geographic/segment rules"
+                        : null,
+                    ComputationTime = computationTime,
+                    ComputedVisibilities = computedVisibilities
+                };
             }
-
-            var endTime = DateTime.UtcNow;
-            var duration = endTime - startTime;
-
-            _logger.LogInformation(
-                "Completed processing. Success: {Success}, Failed: {Failed}, Duration: {Duration}s",
-                processedCount, failedCount, duration.TotalSeconds);
-
-            // Update Prometheus metrics
-            ComputeVisibilityDuration
-                .WithLabels("visibility_computation_count", computationStatus)
-                .Observe(duration.TotalSeconds);
-
-            ComputeVisibilityCounter
-                .WithLabels("visibility_computation_count", computationStatus)
-                .Inc();
-
-            req.ResponseSrc.TrySetResult(new VisibilityComputationResponse
-            {
-                StartId = startId,
-                Limit = limit,
-                ProcessedSuccessfully = processedCount,
-                Failed = failedCount,
-                DurationInSeconds = duration.TotalSeconds,
-                NextStartId = startId + limit,
-                Results = results.ToArray()
-            });
         }
-        catch (Exception ex)
-        {
-            computationStatus = "total_failure";
-            _logger.LogError(ex, "Error during bulk visibility computation");
 
-            // Update Prometheus metrics for total failure
-            ComputeVisibilityCounter
-                .WithLabels("visibility_computation_count", computationStatus)
-                .Inc();
-            req.ResponseSrc.TrySetResult(null);
-        }
-        finally
-        {
-            sw.Stop();
-            ComputeVisibilityDuration
-                .WithLabels("visibility_computation", computationStatus)
-                .Observe(sw.Elapsed.TotalSeconds);
-        }
+        return results;
     }
 
-    private static bool ValidateRequest(long startId,
+    private async Task SaveComputedVisibility(ComicVisibilityResult[][] visibilityResults)
+    {
+        ComputedVisibilityData[] visibilityResultsToSave = visibilityResults
+            .SelectMany(results => results
+                .Where(res => res is { ComputedVisibilities: not null })
+                .SelectMany(res => res.ComputedVisibilities))
+            .ToArray();
+
+        await using ComicDbContext db = _dbFactory.CreateDbContext();
+        await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(db, visibilityResultsToSave);
+    }
+
+    private bool ValidateRequest(long startId,
         int limit,
         out IResult? validationResult)
     {
@@ -496,18 +288,24 @@ public class ComicVisibilityService
         if (startId < 1)
         {
             validationResult = Results.BadRequest("startId must be greater than 0");
+            _logger.LogError("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
+                limit);
             return false;
         }
 
         if (limit < 1)
         {
             validationResult = Results.BadRequest("limit must be greater than 0");
+            _logger.LogError("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
+                limit);
             return false;
         }
 
         if (limit > 20)
         {
             validationResult = Results.BadRequest("limit cannot exceed 20 comics");
+            _logger.LogError("Computing visibility for comics starting from ID {StartId}, limit {Limit}", startId,
+                limit);
             return false;
         }
 
