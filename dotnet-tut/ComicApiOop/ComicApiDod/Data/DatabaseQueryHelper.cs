@@ -38,7 +38,7 @@ public static class DatabaseQueryHelper
     public static async Task<ComicBatchData> GetComicBatchDataAsync(ComicDbContext db, long comicId)
     {
         // Use Include() to fetch all related data efficiently (like OOP version)
-        var comic = await db.Comics
+        ComicBook? comic = await db.Comics
             .Where(c => c.Id == comicId)
             .Include(c => c.Chapters)
             .Include(c => c.ContentRating)
@@ -305,7 +305,6 @@ public static class DatabaseQueryHelper
     }
 
     /// <summary>
-    /// 
     /// Saves computed visibility data to the database in a batch
     /// </summary>
     /// <param name="db">Database context</param>
@@ -313,6 +312,9 @@ public static class DatabaseQueryHelper
     public static async Task SaveComputedVisibilitiesAsync(ComicDbContext db,
         ComputedVisibilityData[] computedVisibilities)
     {
+        if (computedVisibilities.Length == 0)
+            return;
+
         // Convert or map ComputedVisibilityData to ComputedVisibility entity
         var entities = computedVisibilities.Select(cv => new ComputedVisibility
         {
@@ -337,6 +339,46 @@ public static class DatabaseQueryHelper
         }).ToList();
 
         // Add or update range
+        db.ComputedVisibilities.AddRange(entities);
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Bulk save all visibilities from multiple comics in a single operation
+    /// More efficient than saving per-comic
+    /// </summary>
+    /// <param name="db">Database context</param>
+    /// <param name="allVisibilities">All computed visibilities from batch</param>
+    public static async Task SaveComputedVisibilitiesBulkAsync(ComicDbContext db,
+        ComputedVisibilityData[] allVisibilities)
+    {
+        if (allVisibilities.Length == 0)
+            return;
+
+        // Use bulk insert for better performance
+        var entities = allVisibilities.Select(cv => new ComputedVisibility
+        {
+            ComicId = cv.ComicId,
+            CountryCode = cv.CountryCode ?? string.Empty,
+            CustomerSegmentId = cv.CustomerSegmentId,
+            FreeChaptersCount = cv.FreeChaptersCount,
+            LastChapterReleaseTime = cv.LastChapterReleaseTime,
+            GenreId = cv.GenreId,
+            PublisherId = cv.PublisherId,
+            AverageRating = cv.AverageRating,
+            SearchTags = cv.SearchTags ?? string.Empty,
+            IsVisible = cv.IsVisible,
+            ComputedAt = cv.ComputedAt,
+            LicenseType = cv.LicenseType,
+            CurrentPrice = cv.CurrentPrice,
+            IsFreeContent = cv.IsFreeContent,
+            IsPremiumContent = cv.IsPremiumContent,
+            AgeRating = cv.AgeRating,
+            ContentFlags = cv.ContentFlags,
+            ContentWarning = cv.ContentWarning ?? string.Empty
+        }).ToList();
+
+        // Bulk insert - more efficient than AddRange for large datasets
         db.ComputedVisibilities.AddRange(entities);
         await db.SaveChangesAsync();
     }

@@ -16,23 +16,10 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.WriteIndented = true;
 });
 
-// Add database context
+// Add database context factory for concurrent operations (DOD approach)
+// Using factory pattern to allow concurrent operations without lifetime conflicts
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ComicDbContext>(options =>
-{
-    var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
-    options.UseMySql(connectionString, serverVersion,
-        mysqlOptions =>
-        {
-            mysqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
-        });
-});
-
-// Add DbContextFactory for concurrent operations
-builder.Services.AddPooledDbContextFactory<ComicDbContext>(options =>
+builder.Services.AddDbContextFactory<ComicDbContext>(options =>
 {
     var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
     options.UseMySql(connectionString, serverVersion,
@@ -46,6 +33,7 @@ builder.Services.AddPooledDbContextFactory<ComicDbContext>(options =>
 });
 
 // Add services
+builder.Services.AddSingleton<VisibilityMetricsService>();
 builder.Services.AddScoped<ComicVisibilityService>();
 
 // Add Simple DOD Framework services as Singletons
@@ -66,18 +54,19 @@ MetricsConfiguration.ConfigureMetrics(app);
 RouteConfiguration.ConfigureRoutes(app);
 
 // Apply database migrations
-// if (app.Environment.IsEnvironment("Docker"))
+if (app.Environment.IsEnvironment("Docker"))
 {
     app.Logger.LogInformation("Running in Docker environment. Applying database migrations...");
     try
     {
-        using (var scope = app.Services.CreateScope())
+        await using (var scope = app.Services.CreateAsyncScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<ComicDbContext>();
-            if (db.Database.GetPendingMigrations().Any())
+            var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ComicDbContext>>();
+            await using var db = await dbFactory.CreateDbContextAsync();
+            if ((await db.Database.GetPendingMigrationsAsync()).Any())
             {
                 app.Logger.LogInformation("Applying pending migrations...");
-                db.Database.Migrate();
+                await db.Database.MigrateAsync();
                 app.Logger.LogInformation("Migrations applied successfully.");
             }
             else
