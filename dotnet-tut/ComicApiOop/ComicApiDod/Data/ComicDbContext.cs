@@ -36,14 +36,37 @@ public class ComicDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(255);
+            entity.HasMany(e => e.Chapters)
+                .WithOne(c => c.Comic)
+                .HasForeignKey(c => c.ComicId);
+            entity.HasOne(e => e.ContentRating)
+                .WithOne(cr => cr.Comic)
+                .HasForeignKey<ContentRating>(cr => cr.ComicId);
+            entity.HasMany(e => e.RegionalPricing)
+                .WithOne(p => p.Comic)
+                .HasForeignKey(p => p.ComicId);
+            entity.HasMany(e => e.GeographicRules)
+                .WithOne(gr => gr.Comic)
+                .HasForeignKey(gr => gr.ComicId);
+            entity.HasMany(e => e.CustomerSegmentRules)
+                .WithOne(csr => csr.Comic)
+                .HasForeignKey(csr => csr.ComicId);
         });
 
-        modelBuilder.Entity<Chapter>(entity => { entity.HasKey(e => e.Id); });
+        modelBuilder.Entity<Chapter>(entity => 
+        { 
+            entity.HasKey(e => e.Id);
+        });
 
         modelBuilder.Entity<ComicTag>(entity =>
         {
-            entity.HasKey(e => e.ComicsId);
-            entity.Property(e => e.TagsId).IsRequired();
+            entity.HasKey(e => new { e.ComicsId, e.TagsId });
+            entity.HasOne(ct => ct.Comic)
+                .WithMany(c => c.ComicTags)
+                .HasForeignKey(ct => ct.ComicsId);
+            entity.HasOne(ct => ct.Tag)
+                .WithMany()
+                .HasForeignKey(ct => ct.TagsId);
         });
         
         modelBuilder.Entity<Tag>(entity =>
@@ -82,7 +105,13 @@ public class ComicDbContext : DbContext
                 .HasMaxLength(1000);
         });
 
-        modelBuilder.Entity<CustomerSegmentRule>(entity => { entity.HasKey(e => e.Id); });
+        modelBuilder.Entity<CustomerSegmentRule>(entity => 
+        { 
+            entity.HasKey(e => e.Id);
+            entity.HasOne(csr => csr.Segment)
+                .WithMany()
+                .HasForeignKey(csr => csr.SegmentId);
+        });
 
         modelBuilder.Entity<CustomerSegment>(entity =>
         {
@@ -112,6 +141,14 @@ public class ComicBook
     public int TotalChapters { get; set; }
     public DateTime LastUpdateTime { get; set; }
     public double AverageRating { get; set; }
+    
+    // Navigation properties for Include()
+    public List<Chapter> Chapters { get; set; } = new();
+    public ContentRating? ContentRating { get; set; }
+    public List<ComicPricing> RegionalPricing { get; set; } = new();
+    public List<GeographicRule> GeographicRules { get; set; } = new();
+    public List<CustomerSegmentRule> CustomerSegmentRules { get; set; } = new();
+    public List<ComicTag> ComicTags { get; set; } = new();
 }
 
 public class Chapter
@@ -121,6 +158,9 @@ public class Chapter
     public int ChapterNumber { get; set; }
     public DateTime ReleaseTime { get; set; }
     public bool IsFree { get; set; }
+    
+    // Navigation property
+    public ComicBook? Comic { get; set; }
 }
 
 public class Publisher
@@ -145,6 +185,10 @@ public class ComicTag
 {
     public long ComicsId { get; set; }
     public long TagsId { get; set; }
+    
+    // Navigation properties
+    public ComicBook? Comic { get; set; }
+    public Tag? Tag { get; set; }
 }
 
 public class Tag
@@ -161,6 +205,9 @@ public class ContentRating
     public ContentFlag ContentFlags { get; set; }
     public string ContentWarning { get; set; } = string.Empty;
     public bool RequiresParentalGuidance { get; set; }
+    
+    // Navigation property
+    public ComicBook? Comic { get; set; }
 }
 
 public class ComicPricing
@@ -174,6 +221,9 @@ public class ComicPricing
     public DateTime? DiscountStartDate { get; set; }
     public DateTime? DiscountEndDate { get; set; }
     public decimal? DiscountPercentage { get; set; }
+    
+    // Navigation property
+    public ComicBook? Comic { get; set; }
 }
 
 public class GeographicRule
@@ -186,6 +236,9 @@ public class GeographicRule
     public LicenseType LicenseType { get; set; }
     public bool IsVisible { get; set; }
     public DateTime LastUpdated { get; set; }
+    
+    // Navigation property
+    public ComicBook? Comic { get; set; }
 }
 
 public class CustomerSegment
@@ -203,6 +256,10 @@ public class CustomerSegmentRule
     public long SegmentId { get; set; }
     public bool IsVisible { get; set; }
     public DateTime LastUpdated { get; set; }
+    
+    // Navigation properties
+    public ComicBook? Comic { get; set; }
+    public CustomerSegment? Segment { get; set; }
 }
 
 public class ComputedVisibility
