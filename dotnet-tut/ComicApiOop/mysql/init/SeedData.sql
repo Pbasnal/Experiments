@@ -158,8 +158,7 @@ SELECT
     '2027-12-31' as LicenseEndDate,
     CASE 
         WHEN c.Id % 3 = 0 THEN 0  -- Full
-        WHEN c.Id % 3 = 1 THEN 1  -- PreviewOnly
-        ELSE 2                     -- NoAccess
+        ELSE 1                     -- PreviewOnly
     END as LicenseType
 FROM Comics c;
 

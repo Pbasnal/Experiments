@@ -1,6 +1,7 @@
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS comicdb;
-USE comicdb;
+-- Note: Database is already created by MySQL from MYSQL_DATABASE env var
+-- This script uses the database from the environment variable
+USE ComicBookDb;
 
 -- Create Publishers table
 CREATE TABLE IF NOT EXISTS Publishers (
