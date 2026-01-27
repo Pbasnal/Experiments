@@ -27,12 +27,13 @@ public class MetricsMiddleware
             await _next(context);
 
             // Record metrics after successful request
+            var status = context.Response.StatusCode.ToString();
             MetricsConfiguration.HttpRequestCounter
-                .WithLabels(method, path, context.Response.StatusCode.ToString())
+                .WithLabels(method, path, status)
                 .Inc();
 
             MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path)
+                .WithLabels(method, path, status)
                 .Observe(sw.Elapsed.TotalSeconds);
         }
         catch
@@ -43,7 +44,7 @@ public class MetricsMiddleware
                 .Inc();
 
             MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path)
+                .WithLabels(method, path, "500")
                 .Observe(sw.Elapsed.TotalSeconds);
             throw;
         }

@@ -24,12 +24,12 @@ public static class MetricsConfiguration
 
         // Create custom metrics
         HttpRequestDuration = Prometheus.Metrics.CreateHistogram(
-            "http_request_duration_seconds",
-            "Duration of HTTP requests in seconds",
+            "http_request_duration_seconds_oop",
+            "Duration of HTTP requests in seconds (OOP API)",
             new HistogramConfiguration
             {
-                Buckets = new[] { 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 25.0, 50.0, 100.0 },
-                LabelNames = new[] { "method", "endpoint" }
+                Buckets = Histogram.ExponentialBuckets(0.01, 2, 10),
+                LabelNames = new[] { "method", "endpoint", "status" }
             });
 
         DbQueryDuration = Prometheus.Metrics.CreateHistogram(
@@ -42,8 +42,8 @@ public static class MetricsConfiguration
             });
 
         HttpRequestCounter = Prometheus.Metrics.CreateCounter(
-            "http_requests_total",
-            "Total number of HTTP requests",
+            "http_requests_total_oop",
+            "Total number of HTTP requests (OOP API)",
             new CounterConfiguration
             {
                 LabelNames = new[] { "method", "endpoint", "status" }
