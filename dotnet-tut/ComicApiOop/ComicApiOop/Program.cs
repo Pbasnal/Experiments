@@ -1,4 +1,4 @@
-﻿using ComicApiOop.Data;
+using ComicApiOop.Data;
 using ComicApiOop.Models;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
@@ -52,7 +52,9 @@ var httpRequestDuration = Metrics.CreateHistogram(
     "Duration of HTTP requests in seconds",
     new HistogramConfiguration
     {
-        Buckets = Histogram.ExponentialBuckets(0.01, 2, 10),
+        // Buckets: 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 25, 50, 100
+        // This provides better granularity for typical API response times (ms to seconds)
+        Buckets = new[] { 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 25.0, 50.0, 100.0 },
         LabelNames = new[] { "method", "endpoint" }
     });
 
