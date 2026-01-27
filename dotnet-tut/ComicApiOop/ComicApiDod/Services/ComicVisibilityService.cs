@@ -11,7 +11,7 @@ namespace ComicApiDod.Services;
 
 public class ComicVisibilityService
 {
-    private readonly ComicDbContext _db;
+    private readonly IDbContextFactory<ComicDbContext> _dbFactory;
     private readonly ILogger<ComicVisibilityService> _logger;
 
     // Prometheus metrics
@@ -36,9 +36,9 @@ public class ComicVisibilityService
         "comic_visibility_request_count_in_batch",
         "Number of requests in the current request batch");
 
-    public ComicVisibilityService(ComicDbContext db, ILogger<ComicVisibilityService> logger)
+    public ComicVisibilityService(IDbContextFactory<ComicDbContext> dbFactory, ILogger<ComicVisibilityService> logger)
     {
-        _db = db;
+        _dbFactory = dbFactory;
         _logger = logger;
     }
 
@@ -85,6 +85,10 @@ public class ComicVisibilityService
 
     public async Task<IValue> ComputeVisibilitiesAsync(VisibilityComputationRequest req)
     {
+        // Create a new DbContext instance for this concurrent operation
+        // This prevents threading issues when multiple requests are processed concurrently
+        await using var db = _dbFactory.CreateDbContext();
+        
         Stopwatch swForReqE2e = Stopwatch.StartNew();
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
@@ -118,7 +122,7 @@ public class ComicVisibilityService
 
             // Step 1: Get comic IDs (batch query)
             sw.Restart();
-            var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(_db, (int)startId, limit);
+            var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(db, (int)startId, limit);
             ComputeVisibilityDuration
                 .WithLabels("fetch_comics", computationStatus)
                 .Observe(sw.Elapsed.TotalSeconds);
@@ -155,7 +159,7 @@ public class ComicVisibilityService
 
             sw.Restart();
             IDictionary<long, ComicBatchData> allComicsBatchData =
-                await DatabaseQueryHelper.GetComicBatchDataAsync(_db, comicIds);
+                await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicIds);
             ComputeVisibilityDuration
                 .WithLabels("fetch_all_comics_data", computationStatus)
                 .Observe(sw.Elapsed.TotalSeconds);
@@ -190,12 +194,23 @@ public class ComicVisibilityService
                         comicId,
                         computedVisibilities.Length);
 
+                    // Validate that visibilities were computed - empty results indicate a data or logic issue
+                    if (computedVisibilities.Length == 0)
+                    {
+                        _logger.LogWarning(
+                            "Comic {ComicId} has no computed visibilities. This may indicate missing or invalid rules. " +
+                            "GeographicRules={GeoCount}, SegmentRules={SegmentCount}, Segments={SegmentsCount}",
+                            comicId,
+                            batchData.GeographicRules.Length,
+                            batchData.SegmentRules.Length,
+                            batchData.Segments.Length);
+                    }
 
                     // Save to database
                     if (computedVisibilities.Length > 0)
                     {
                         sw.Restart();
-                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(_db, computedVisibilities);
+                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(db, computedVisibilities);
                         ComputeVisibilityDuration
                             .WithLabels("save_visibility", computationStatus)
                             .Observe(sw.Elapsed.TotalSeconds);
@@ -204,12 +219,23 @@ public class ComicVisibilityService
                     results.Add(new ComicVisibilityResult
                     {
                         ComicId = comicId,
-                        Success = true,
+                        Success = computedVisibilities.Length > 0, // Mark as failed if no visibilities computed
+                        ErrorMessage = computedVisibilities.Length == 0 
+                            ? "No visibilities computed - missing or invalid geographic/segment rules" 
+                            : null,
                         ComputationTime = DateTime.UtcNow,
                         ComputedVisibilities = computedVisibilities
                     });
 
-                    processedCount++;
+                    if (computedVisibilities.Length > 0)
+                    {
+                        processedCount++;
+                    }
+                    else
+                    {
+                        failedCount++;
+                        computationStatus = "partial_failure";
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -306,6 +332,9 @@ public class ComicVisibilityService
 
     public async Task<IResult> ComputeVisibilitiesAsync(long startId, int limit)
     {
+        // Create a new DbContext instance for this operation
+        await using var db = _dbFactory.CreateDbContext();
+        
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
 
@@ -322,7 +351,7 @@ public class ComicVisibilityService
             var startTime = DateTime.UtcNow;
 
             // Step 1: Get comic IDs (batch query)
-            var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(_db, (int)startId, limit);
+            var comicIds = await DatabaseQueryHelper.GetComicIdsAsync(db, (int)startId, limit);
 
             if (comicIds.Length == 0)
             {
@@ -344,7 +373,7 @@ public class ComicVisibilityService
                     _logger.LogInformation("Processing comic ID: {ComicId}", comicId);
 
                     // Fetch all data for this comic
-                    var batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(_db, comicId);
+                    var batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicId);
 
                     // Compute visibilities using pure functions
                     var computedVisibilities = VisibilityProcessor.ComputeVisibilities(
@@ -354,18 +383,36 @@ public class ComicVisibilityService
                     // Save to database
                     if (computedVisibilities.Length > 0)
                     {
-                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(_db, computedVisibilities);
+                        await DatabaseQueryHelper.SaveComputedVisibilitiesAsync(db, computedVisibilities);
                     }
 
                     results.Add(new ComicVisibilityResult
                     {
                         ComicId = comicId,
-                        Success = true,
+                        Success = computedVisibilities.Length > 0, // Mark as failed if no visibilities computed
+                        ErrorMessage = computedVisibilities.Length == 0 
+                            ? "No visibilities computed - missing or invalid geographic/segment rules" 
+                            : null,
                         ComputationTime = DateTime.UtcNow,
                         ComputedVisibilities = computedVisibilities
                     });
 
-                    processedCount++;
+                    if (computedVisibilities.Length > 0)
+                    {
+                        processedCount++;
+                    }
+                    else
+                    {
+                        failedCount++;
+                        computationStatus = "partial_failure";
+                        _logger.LogWarning(
+                            "Comic {ComicId} has no computed visibilities. This may indicate missing or invalid rules. " +
+                            "GeographicRules={GeoCount}, SegmentRules={SegmentCount}, Segments={SegmentsCount}",
+                            comicId,
+                            batchData.GeographicRules.Length,
+                            batchData.SegmentRules.Length,
+                            batchData.Segments.Length);
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -52,20 +52,66 @@ export default function () {
       `${baseUrl}/api/comics/compute-visibilities?startId=${comicId}&limit=1`,
       {
         tags: { endpoint: 'compute-single' },
+        timeout: '10s', // Explicit timeout
       }
     );
     
     const duration = Date.now() - startTime;
     visibilityComputationDuration.add(duration);
     
-    check(computeRes, {
+    // Helper to safely parse and handle both camelCase and PascalCase
+    const parseResponse = (r) => {
+      try {
+        return JSON.parse(r.body);
+      } catch (e) {
+        console.error(`Failed to parse response: ${r.body.substring(0, 200)}`);
+        return null;
+      }
+    };
+    
+    // Helper to get results array (handles both casing)
+    const getResults = (body) => {
+      return body?.Results || body?.results || [];
+    };
+    
+    const body = parseResponse(computeRes);
+    const results = getResults(body);
+    
+    const checks = check(computeRes, {
       'compute single status is 200': (r) => r.status === 200,
-      'compute single has results': (r) => {
-        const body = JSON.parse(r.body);
-        return body.Results && body.Results.length > 0;
+      'compute single not timeout': (r) => r.status !== 504,
+      'compute single has results': () => {
+        if (!body) return false;
+        const hasResults = results.length > 0;
+        if (!hasResults) {
+          console.warn(`No results for comicId ${comicId}. Response: ${JSON.stringify(body).substring(0, 300)}`);
+        }
+        return hasResults;
+      },
+      'compute single has computed visibilities': () => {
+        if (!body || results.length === 0) return false;
+        // Each result should have computed visibilities (handle both casing)
+        const allHaveVisibilities = results.every(result => {
+          const visibilities = result.ComputedVisibilities || result.computedVisibilities || [];
+          return visibilities.length > 0;
+        });
+        if (!allHaveVisibilities) {
+          console.warn(`Some results missing visibilities for comicId ${comicId}. Results: ${JSON.stringify(results).substring(0, 300)}`);
+        }
+        return allHaveVisibilities;
       },
       'computation duration is reasonable': () => duration < 1000, // Under 1 second
-    }) || errorRate.add(1);
+    });
+    
+    if (!checks) {
+      errorRate.add(1);
+      // Log diagnostic info on failure
+      if (computeRes.status === 504) {
+        console.error(`TIMEOUT: Request to compute visibilities timed out after ${duration}ms`);
+      } else if (computeRes.status !== 200) {
+        console.error(`API ERROR: Status ${computeRes.status}, Body: ${computeRes.body.substring(0, 500)}`);
+      }
+    }
     
     sleep(2);
   }
@@ -80,24 +126,74 @@ export default function () {
       `${baseUrl}/api/comics/compute-visibilities?startId=${startId}&limit=${limit}`,
       {
         tags: { endpoint: 'compute-bulk' },
+        timeout: '10s', // Explicit timeout
       }
     );
     
     const duration = Date.now() - startTime;
     visibilityComputationDuration.add(duration);
     
-    check(computeBulkRes, {
+    // Helper to safely parse and handle both camelCase and PascalCase
+    const parseResponse = (r) => {
+      try {
+        return JSON.parse(r.body);
+      } catch (e) {
+        console.error(`Failed to parse response: ${r.body.substring(0, 200)}`);
+        return null;
+      }
+    };
+    
+    // Helper to get results array (handles both casing)
+    const getResults = (body) => {
+      return body?.Results || body?.results || [];
+    };
+    
+    const body = parseResponse(computeBulkRes);
+    const results = getResults(body);
+    const processedSuccessfully = body?.ProcessedSuccessfully || body?.processedSuccessfully || 0;
+    
+    const checks = check(computeBulkRes, {
       'compute bulk status is 200': (r) => r.status === 200,
-      'compute bulk has results': (r) => {
-        const body = JSON.parse(r.body);
-        return body.Results && body.Results.length > 0;
+      'compute bulk not timeout': (r) => r.status !== 504,
+      'compute bulk has results': () => {
+        if (!body) return false;
+        const hasResults = results.length > 0;
+        if (!hasResults) {
+          console.warn(`No results for startId ${startId}, limit ${limit}. Response: ${JSON.stringify(body).substring(0, 300)}`);
+        }
+        return hasResults;
       },
-      'compute bulk processed count matches limit': (r) => {
-        const body = JSON.parse(r.body);
-        return body.ProcessedSuccessfully <= limit;
+      'compute bulk has computed visibilities': () => {
+        if (!body || results.length === 0) return false;
+        // Each result should have computed visibilities (handle both casing)
+        const allHaveVisibilities = results.every(result => {
+          const visibilities = result.ComputedVisibilities || result.computedVisibilities || [];
+          return visibilities.length > 0;
+        });
+        if (!allHaveVisibilities) {
+          console.warn(`Some results missing visibilities for startId ${startId}. Results: ${JSON.stringify(results).substring(0, 300)}`);
+        }
+        return allHaveVisibilities;
+      },
+      'compute bulk processed count matches limit': () => {
+        const matches = processedSuccessfully <= limit;
+        if (!matches) {
+          console.warn(`Processed count ${processedSuccessfully} exceeds limit ${limit}`);
+        }
+        return matches;
       },
       'bulk computation duration is reasonable': () => duration < 2000, // Under 2 seconds
-    }) || errorRate.add(1);
+    });
+    
+    if (!checks) {
+      errorRate.add(1);
+      // Log diagnostic info on failure
+      if (computeBulkRes.status === 504) {
+        console.error(`TIMEOUT: Bulk request timed out after ${duration}ms`);
+      } else if (computeBulkRes.status !== 200) {
+        console.error(`API ERROR: Status ${computeBulkRes.status}, Body: ${computeBulkRes.body.substring(0, 500)}`);
+      }
+    }
     
     sleep(3);
   }
@@ -105,7 +201,7 @@ export default function () {
   // Group 4: Invalid Requests (10% of requests)
   if (Math.random() < 0.1) {
     const invalidRes = http.get(
-      `${baseUrl}/api/comics/compute-visibilities?startId=1&limit=100`,
+      `${baseUrl}/api/comics/compute-visibilities?startId=0&limit=100`,
       {
         tags: { endpoint: 'invalid-request' },
       }

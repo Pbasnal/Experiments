@@ -31,6 +31,20 @@ builder.Services.AddDbContext<ComicDbContext>(options =>
         });
 });
 
+// Add DbContextFactory for concurrent operations
+builder.Services.AddPooledDbContextFactory<ComicDbContext>(options =>
+{
+    var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
+    options.UseMySql(connectionString, serverVersion,
+        mysqlOptions =>
+        {
+            mysqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
+});
+
 // Add services
 builder.Services.AddScoped<ComicVisibilityService>();
 
