@@ -45,9 +45,9 @@ public static class DatabaseQueryHelper
             .Include(c => c.RegionalPricing)
             .Include(c => c.GeographicRules)
             .Include(c => c.CustomerSegmentRules)
-                .ThenInclude(csr => csr.Segment)
+            .ThenInclude(csr => csr.Segment)
             .Include(c => c.ComicTags)
-                .ThenInclude(ct => ct.Tag)
+            .ThenInclude(ct => ct.Tag)
             .FirstOrDefaultAsync();
 
         if (comic == null)
@@ -153,22 +153,23 @@ public static class DatabaseQueryHelper
         };
     }
 
-    public static async Task<IDictionary<long, ComicBatchData>> GetComicBatchDataAsync(ComicDbContext db,
+    public static async Task<IDictionary<long, ComicBook>> GetComicBatchDataAsync(ComicDbContext db,
         long[] comicIds)
     {
-        ISet<long> sortedComicIds = new SortedSet<long>(comicIds);
-        
+        ISet<long> sortedComicIds = new HashSet<long>(comicIds);
+
         // Use Include() to fetch all related data in fewer queries (like OOP version)
-        var comics = await db.Comics
+        IList<ComicBook> comics = await db.Comics
             .Where(c => sortedComicIds.Contains(c.Id))
             .Include(c => c.Chapters)
             .Include(c => c.ContentRating)
             .Include(c => c.RegionalPricing)
             .Include(c => c.GeographicRules)
             .Include(c => c.CustomerSegmentRules)
-                .ThenInclude(csr => csr.Segment)
+            .ThenInclude(csr => csr.Segment)
             .Include(c => c.ComicTags)
-                .ThenInclude(ct => ct.Tag)
+            .ThenInclude(ct => ct.Tag)
+            .AsNoTracking()
             .ToListAsync();
 
         if (comics == null || comics.Count == 0)
@@ -176,132 +177,139 @@ public static class DatabaseQueryHelper
             throw new InvalidOperationException($"No comics found with IDs: {string.Join(", ", comicIds)}");
         }
 
-        // Get all unique segment IDs from the loaded data
-        var segmentIds = comics
-            .SelectMany(c => c.CustomerSegmentRules)
-            .Select(csr => csr.SegmentId)
-            .Distinct()
-            .ToImmutableSortedSet();
-
-        // Fetch segments (if not already loaded via Include)
-        IDictionary<long, CustomerSegmentData> segments = await db.CustomerSegments
-            .Where(cs => segmentIds.Contains(cs.Id))
-            .Select(cs => new CustomerSegmentData
-            {
-                Id = cs.Id,
-                Name = cs.Name,
-                IsPremium = cs.IsPremium,
-                IsActive = cs.IsActive
-            })
-            .ToDictionaryAsync(c => c.Id, c => c);
-
-        // Project EF entities to DOD data structures
-        IDictionary<long, ComicBatchData> comicBatchData = new Dictionary<long, ComicBatchData>();
-        
+        IDictionary<long, ComicBook> comicBookMap = new Dictionary<long, ComicBook>();
         foreach (var comic in comics)
         {
-            // Project chapters
-            var chapters = comic.Chapters.Select(ch => new ChapterData
-            {
-                Id = ch.Id,
-                ComicId = ch.ComicId,
-                ChapterNumber = ch.ChapterNumber,
-                ReleaseTime = ch.ReleaseTime,
-                IsFree = ch.IsFree
-            }).ToArray();
-
-            // Project tags
-            var tags = comic.ComicTags
-                .Where(ct => ct.Tag != null)
-                .Select(ct => new TagData
-                {
-                    Id = ct.ComicsId,
-                    Name = ct.Tag!.Name
-                })
-                .ToArray();
-
-            // Project content rating
-            ContentRatingData? contentRating = comic.ContentRating != null
-                ? new ContentRatingData
-                {
-                    Id = comic.ContentRating.Id,
-                    ComicId = comic.ContentRating.ComicId,
-                    AgeRating = comic.ContentRating.AgeRating,
-                    ContentFlags = comic.ContentRating.ContentFlags,
-                    ContentWarning = comic.ContentRating.ContentWarning,
-                    RequiresParentalGuidance = comic.ContentRating.RequiresParentalGuidance
-                }
-                : null;
-
-            // Project pricing
-            var regionalPricing = comic.RegionalPricing.Select(p => new PricingData
-            {
-                Id = p.Id,
-                ComicId = p.ComicId,
-                RegionCode = p.RegionCode,
-                BasePrice = p.BasePrice,
-                IsFreeContent = p.IsFreeContent,
-                IsPremiumContent = p.IsPremiumContent,
-                DiscountStartDate = p.DiscountStartDate,
-                DiscountEndDate = p.DiscountEndDate,
-                DiscountPercentage = p.DiscountPercentage ?? 0
-            }).ToArray();
-
-            // Project geographic rules
-            var geographicRules = comic.GeographicRules.Select(gr => new GeographicRuleData
-            {
-                Id = gr.Id,
-                ComicId = gr.ComicId,
-                CountryCodes = gr.CountryCodes.ToArray(),
-                LicenseStartDate = gr.LicenseStartDate,
-                LicenseEndDate = gr.LicenseEndDate,
-                LicenseType = gr.LicenseType,
-                IsVisible = gr.IsVisible,
-                LastUpdated = gr.LastUpdated
-            }).ToArray();
-
-            // Project segment rules
-            var segmentRules = comic.CustomerSegmentRules.Select(csr => new CustomerSegmentRuleData
-            {
-                Id = csr.Id,
-                ComicId = csr.ComicId,
-                SegmentId = csr.SegmentId,
-                IsVisible = csr.IsVisible,
-                LastUpdated = csr.LastUpdated
-            }).ToArray();
-
-            // Get segments for this comic
-            var comicSegments = segmentRules
-                .Select(sr => sr.SegmentId)
-                .Where(sid => segments.ContainsKey(sid))
-                .Select(sid => segments[sid])
-                .ToArray();
-
-            comicBatchData.Add(comic.Id, new ComicBatchData
-            {
-                ComicId = comic.Id,
-                Comic = new ComicBookData
-                {
-                    Id = comic.Id,
-                    Title = comic.Title,
-                    PublisherId = comic.PublisherId,
-                    GenreId = comic.GenreId,
-                    ThemeId = comic.ThemeId,
-                    TotalChapters = comic.TotalChapters,
-                    LastUpdateTime = comic.LastUpdateTime,
-                    AverageRating = comic.AverageRating
-                },
-                Chapters = chapters,
-                Tags = tags,
-                ContentRating = contentRating,
-                RegionalPricing = regionalPricing,
-                GeographicRules = geographicRules,
-                SegmentRules = segmentRules,
-                Segments = comicSegments
-            });
+            comicBookMap.Add(comic.Id, comic);
         }
 
-        return comicBatchData;
+        return comicBookMap;
+        // Get all unique segment IDs from the loaded data
+        // var segmentIds = comics
+        //     .SelectMany(c => c.CustomerSegmentRules)
+        //     .Select(csr => csr.SegmentId)
+        //     .Distinct()
+        //     .ToImmutableSortedSet();
+        //
+        // // Fetch segments (if not already loaded via Include)
+        // IDictionary<long, CustomerSegmentData> segments = await db.CustomerSegments
+        //     .Where(cs => segmentIds.Contains(cs.Id))
+        //     .Select(cs => new CustomerSegmentData
+        //     {
+        //         Id = cs.Id,
+        //         Name = cs.Name,
+        //         IsPremium = cs.IsPremium,
+        //         IsActive = cs.IsActive
+        //     })
+        //     .ToDictionaryAsync(c => c.Id, c => c);
+        //
+        // // Project EF entities to DOD data structures
+        // IDictionary<long, ComicBatchData> comicBatchData = new Dictionary<long, ComicBatchData>();
+        //
+        // foreach (var comic in comics)
+        // {
+        //     // Project chapters
+        //     var chapters = comic.Chapters.Select(ch => new ChapterData
+        //     {
+        //         Id = ch.Id,
+        //         ComicId = ch.ComicId,
+        //         ChapterNumber = ch.ChapterNumber,
+        //         ReleaseTime = ch.ReleaseTime,
+        //         IsFree = ch.IsFree
+        //     }).ToArray();
+        //
+        //     // Project tags
+        //     var tags = comic.ComicTags
+        //         .Where(ct => ct.Tag != null)
+        //         .Select(ct => new TagData
+        //         {
+        //             Id = ct.ComicsId,
+        //             Name = ct.Tag!.Name
+        //         })
+        //         .ToArray();
+        //
+        //     // Project content rating
+        //     ContentRatingData? contentRating = comic.ContentRating != null
+        //         ? new ContentRatingData
+        //         {
+        //             Id = comic.ContentRating.Id,
+        //             ComicId = comic.ContentRating.ComicId,
+        //             AgeRating = comic.ContentRating.AgeRating,
+        //             ContentFlags = comic.ContentRating.ContentFlags,
+        //             ContentWarning = comic.ContentRating.ContentWarning,
+        //             RequiresParentalGuidance = comic.ContentRating.RequiresParentalGuidance
+        //         }
+        //         : null;
+        //
+        //     // Project pricing
+        //     var regionalPricing = comic.RegionalPricing.Select(p => new PricingData
+        //     {
+        //         Id = p.Id,
+        //         ComicId = p.ComicId,
+        //         RegionCode = p.RegionCode,
+        //         BasePrice = p.BasePrice,
+        //         IsFreeContent = p.IsFreeContent,
+        //         IsPremiumContent = p.IsPremiumContent,
+        //         DiscountStartDate = p.DiscountStartDate,
+        //         DiscountEndDate = p.DiscountEndDate,
+        //         DiscountPercentage = p.DiscountPercentage ?? 0
+        //     }).ToArray();
+        //
+        //     // Project geographic rules
+        //     var geographicRules = comic.GeographicRules.Select(gr => new GeographicRuleData
+        //     {
+        //         Id = gr.Id,
+        //         ComicId = gr.ComicId,
+        //         CountryCodes = gr.CountryCodes.ToArray(),
+        //         LicenseStartDate = gr.LicenseStartDate,
+        //         LicenseEndDate = gr.LicenseEndDate,
+        //         LicenseType = gr.LicenseType,
+        //         IsVisible = gr.IsVisible,
+        //         LastUpdated = gr.LastUpdated
+        //     }).ToArray();
+        //
+        //     // Project segment rules
+        //     var segmentRules = comic.CustomerSegmentRules.Select(csr => new CustomerSegmentRuleData
+        //     {
+        //         Id = csr.Id,
+        //         ComicId = csr.ComicId,
+        //         SegmentId = csr.SegmentId,
+        //         IsVisible = csr.IsVisible,
+        //         LastUpdated = csr.LastUpdated
+        //     }).ToArray();
+        //
+        //     // Get segments for this comic
+        //     var comicSegments = segmentRules
+        //         .Select(sr => sr.SegmentId)
+        //         .Where(sid => segments.ContainsKey(sid))
+        //         .Select(sid => segments[sid])
+        //         .ToArray();
+        //
+        //     comicBatchData.Add(comic.Id, new ComicBatchData
+        //     {
+        //         ComicId = comic.Id,
+        //         Comic = new ComicBookData
+        //         {
+        //             Id = comic.Id,
+        //             Title = comic.Title,
+        //             PublisherId = comic.PublisherId,
+        //             GenreId = comic.GenreId,
+        //             ThemeId = comic.ThemeId,
+        //             TotalChapters = comic.TotalChapters,
+        //             LastUpdateTime = comic.LastUpdateTime,
+        //             AverageRating = comic.AverageRating
+        //         },
+        //         Chapters = chapters,
+        //         Tags = tags,
+        //         ContentRating = contentRating,
+        //         RegionalPricing = regionalPricing,
+        //         GeographicRules = geographicRules,
+        //         SegmentRules = segmentRules,
+        //         Segments = comicSegments
+        //     });
+        // }
+        //
+        // return comicBatchData;
     }
 
     /// <summary>

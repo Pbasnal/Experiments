@@ -22,7 +22,7 @@ public class VisibilityComputationService
             _logger.LogInformation($"Processing comic ID: {comicId}");
 
             // Fetch comic with all required data
-            var comic = await _dbContext.Comics
+            ComicBook? comic = await _dbContext.Comics
                 .Include(c => c.Chapters)
                 .Include(c => c.Tags)
                 .Include(c => c.Publisher)

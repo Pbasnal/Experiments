@@ -4,9 +4,6 @@ namespace ComicApiOop.Services;
 
 public static class ContentFlagService
 {
-    /// <summary>
-    /// Determines content flags based on business rules including chapter pricing and comic pricing
-    /// </summary>
     public static ContentFlag DetermineContentFlags(ContentFlag baseFlags, List<Chapter> chapters, ComicPricing? pricing)
     {
         var flags = baseFlags;
