@@ -1,5 +1,3 @@
-using ComicApiDod.Services;
-using ComicApiDod.SimpleQueue;
 using ComicApiDod.Handlers;
 using Prometheus;
 

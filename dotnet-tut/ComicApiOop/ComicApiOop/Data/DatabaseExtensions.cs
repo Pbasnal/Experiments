@@ -1,3 +1,4 @@
+using Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicApiOop.Data;

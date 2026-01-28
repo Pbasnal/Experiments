@@ -11,6 +11,12 @@ public static class MetricsConfiguration
     private static readonly Counter GcCollectionCount;
     private static readonly System.Timers.Timer MetricsUpdateTimer;
 
+    // Public metrics for database operations
+    public static readonly Counter DbQueryCountTotal;
+    public static readonly Histogram DbQueryDuration;
+    public static readonly Gauge ChangeTrackerEntities;
+    public static readonly Gauge MemoryAllocatedBytesPerOperation;
+
     static MetricsConfiguration()
     {
         HttpRequestDuration = Metrics.CreateHistogram(
@@ -52,6 +58,42 @@ public static class MetricsConfiguration
             new CounterConfiguration
             {
                 LabelNames = new[] { "api_type", "generation" }
+            });
+
+        // Database query metrics
+        DbQueryCountTotal = Metrics.CreateCounter(
+            "db_query_count_total",
+            "Total number of database queries",
+            new CounterConfiguration
+            {
+                LabelNames = new[] { "api_type", "query_type", "operation" }
+            });
+
+        DbQueryDuration = Metrics.CreateHistogram(
+            "db_query_duration_seconds",
+            "Duration of database queries in seconds",
+            new HistogramConfiguration
+            {
+                Buckets = Histogram.ExponentialBuckets(0.001, 2, 12),
+                LabelNames = new[] { "api_type", "query_type", "operation" }
+            });
+
+        // EF Core change tracker metrics
+        ChangeTrackerEntities = Metrics.CreateGauge(
+            "ef_change_tracker_entities",
+            "Number of entities being tracked by EF Core",
+            new GaugeConfiguration
+            {
+                LabelNames = new[] { "api_type", "operation" }
+            });
+
+        // Memory allocation tracking
+        MemoryAllocatedBytesPerOperation = Metrics.CreateGauge(
+            "memory_allocated_bytes_per_operation",
+            "Memory allocated per operation",
+            new GaugeConfiguration
+            {
+                LabelNames = new[] { "api_type", "operation" }
             });
 
         MetricsUpdateTimer = new System.Timers.Timer(5000); // Update every 5 seconds

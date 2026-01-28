@@ -1,5 +1,5 @@
-using ComicApiOop.Data;
 using ComicApiOop.Middleware;
+using Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
 

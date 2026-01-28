@@ -1,4 +1,4 @@
-using ComicApiDod.Models;
+using Common.Models;
 
 namespace ComicApiDod.Data;
 
@@ -98,80 +98,6 @@ public static class VisibilityProcessor
 
         return flags;
     }
-
-    // public static ComputedVisibilityData[] ComputeVisibilities(
-    //     ComicBatchData batchData,
-    //     DateTime computationTime)
-    // {
-    //     var results = new List<ComputedVisibilityData>();
-    //
-    //     // Process all combinations of geographic and segment rules
-    //     foreach (var geoRule in batchData.GeographicRules)
-    //     {
-    //         // Check geographic visibility
-    //         if (!EvaluateGeographicVisibility(geoRule, computationTime))
-    //             continue;
-    //
-    //         foreach (var segmentRule in batchData.SegmentRules)
-    //         {
-    //             // Find the segment data
-    //             var segment = Array.Find(batchData.Segments, s => s.Id == segmentRule.SegmentId);
-    //             if (segment.Id == 0) // struct default
-    //                 continue;
-    //
-    //             // Check segment visibility
-    //             if (!EvaluateSegmentVisibility(segmentRule, segment))
-    //                 continue;
-    //
-    //             // Get regional pricing
-    //             var pricing = Array.Find(
-    //                 batchData.RegionalPricing,
-    //                 p => geoRule.CountryCodes.Contains(p.RegionCode)
-    //             );
-    //
-    //             // Calculate derived values
-    //             var freeChaptersCount = CountFreeChapters(batchData.Chapters);
-    //             var lastChapterTime = GetLastChapterTime(batchData.Chapters);
-    //             var searchTags = string.Join(",", batchData.Tags.Select(t => t.Name));
-    //             var currentPrice = pricing.Id != 0
-    //                 ? CalculateCurrentPrice(pricing, computationTime)
-    //                 : 0m;
-    //
-    //             var contentFlags = DetermineContentFlags(
-    //                 batchData.ContentRating?.ContentFlags ?? ContentFlag.None,
-    //                 batchData.Chapters,
-    //                 pricing.Id != 0 ? pricing : null
-    //             );
-    //
-    //             // Create visibility data
-    //             var visibility = new ComputedVisibilityData
-    //             {
-    //                 ComicId = batchData.ComicId,
-    //                 CountryCode = geoRule.CountryCodes.FirstOrDefault() ?? string.Empty,
-    //                 CustomerSegmentId = segmentRule.SegmentId,
-    //                 FreeChaptersCount = freeChaptersCount,
-    //                 LastChapterReleaseTime = lastChapterTime,
-    //                 GenreId = batchData.Comic.GenreId,
-    //                 PublisherId = batchData.Comic.PublisherId,
-    //                 AverageRating = batchData.Comic.AverageRating,
-    //                 SearchTags = searchTags,
-    //                 IsVisible = true,
-    //                 ComputedAt = computationTime,
-    //                 LicenseType = geoRule.LicenseType,
-    //                 CurrentPrice = currentPrice,
-    //                 IsFreeContent = pricing.IsFreeContent,
-    //                 IsPremiumContent = pricing.IsPremiumContent,
-    //                 AgeRating = batchData.ContentRating?.AgeRating ?? AgeRating.AllAges,
-    //                 ContentFlags = contentFlags,
-    //                 ContentWarning = batchData.ContentRating?.ContentWarning ?? string.Empty
-    //             };
-    //
-    //             results.Add(visibility);
-    //         }
-    //     }
-    //
-    //     return results.ToArray();
-    // }
 
     public static ComputedVisibilityData[] ComputeVisibilities(
         ComicBook comicBook,

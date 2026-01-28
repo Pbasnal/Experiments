@@ -1,6 +1,7 @@
-using ComicApiDod.Models;
+using Common.SimpleDodFramework;
+using Microsoft.Extensions.Logging;
 
-namespace ComicApiDod.SimpleQueue;
+namespace Common.SimpleQueue;
 
 public class SimpleMessageBus
 {

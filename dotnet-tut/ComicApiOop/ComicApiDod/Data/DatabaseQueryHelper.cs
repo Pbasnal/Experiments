@@ -1,6 +1,6 @@
-using System.Collections.Concurrent;
-using System.Collections.Immutable;
-using ComicApiDod.Models;
+using ComicApiDod.Configuration;
+using System.Diagnostics;
+using Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicApiDod.Data;
@@ -37,7 +37,18 @@ public static class DatabaseQueryHelper
     /// <returns>Batch data containing all relevant information for visibility computation</returns>
     public static async Task<ComicBatchData> GetComicBatchDataAsync(ComicDbContext db, long comicId)
     {
+        var swTotal = Stopwatch.StartNew();
+        var memoryBefore = GC.GetTotalMemory(false);
+        var operationName = "GetComicBatchDataAsync";
+
+        // Track change tracker entities before query
+        var trackedEntitiesBefore = db.ChangeTracker.Entries().Count();
+        MetricsConfiguration.ChangeTrackerEntities
+            .WithLabels("DOD", operationName)
+            .Set(trackedEntitiesBefore);
+
         // Use Include() to fetch all related data efficiently (like OOP version)
+        var swQuery = Stopwatch.StartNew();
         ComicBook? comic = await db.Comics
             .Where(c => c.Id == comicId)
             .Include(c => c.Chapters)
@@ -49,6 +60,13 @@ public static class DatabaseQueryHelper
             .Include(c => c.ComicTags)
             .ThenInclude(ct => ct.Tag)
             .FirstOrDefaultAsync();
+        
+        MetricsConfiguration.DbQueryDuration
+            .WithLabels("DOD", "fetch_comics", operationName)
+            .Observe(swQuery.Elapsed.TotalSeconds);
+        MetricsConfiguration.DbQueryCountTotal
+            .WithLabels("DOD", "fetch_comics", operationName)
+            .Inc();
 
         if (comic == null)
         {
@@ -59,6 +77,7 @@ public static class DatabaseQueryHelper
         var segmentIds = comic.CustomerSegmentRules.Select(csr => csr.SegmentId).Distinct().ToList();
 
         // Fetch segments
+        swQuery.Restart();
         var segments = await db.CustomerSegments
             .Where(cs => segmentIds.Contains(cs.Id))
             .Select(cs => new CustomerSegmentData
@@ -69,6 +88,31 @@ public static class DatabaseQueryHelper
                 IsActive = cs.IsActive
             })
             .ToArrayAsync();
+        
+        MetricsConfiguration.DbQueryDuration
+            .WithLabels("DOD", "fetch_segments", operationName)
+            .Observe(swQuery.Elapsed.TotalSeconds);
+        MetricsConfiguration.DbQueryCountTotal
+            .WithLabels("DOD", "fetch_segments", operationName)
+            .Inc();
+
+        // Track change tracker entities after queries
+        var trackedEntitiesAfter = db.ChangeTracker.Entries().Count();
+        MetricsConfiguration.ChangeTrackerEntities
+            .WithLabels("DOD", operationName)
+            .Set(trackedEntitiesAfter);
+
+        // Track total fetch time
+        MetricsConfiguration.DbQueryDuration
+            .WithLabels("DOD", "total_fetch", operationName)
+            .Observe(swTotal.Elapsed.TotalSeconds);
+
+        // Track memory allocation
+        var memoryAfter = GC.GetTotalMemory(false);
+        var allocated = memoryAfter - memoryBefore;
+        MetricsConfiguration.MemoryAllocatedBytesPerOperation
+            .WithLabels("DOD", operationName)
+            .Set(allocated);
 
         var segmentsDict = segments.ToDictionary(s => s.Id, s => s);
 
@@ -156,9 +200,19 @@ public static class DatabaseQueryHelper
     public static async Task<IDictionary<long, ComicBook>> GetComicBatchDataAsync(ComicDbContext db,
         long[] comicIds)
     {
+        var swTotal = Stopwatch.StartNew();
+        var memoryBefore = GC.GetTotalMemory(false);
+        var operationName = "GetComicBatchDataAsync_Bulk";
         ISet<long> sortedComicIds = new HashSet<long>(comicIds);
 
+        // Track change tracker entities before query (should be 0 with AsNoTracking)
+        var trackedEntitiesBefore = db.ChangeTracker.Entries().Count();
+        MetricsConfiguration.ChangeTrackerEntities
+            .WithLabels("DOD", operationName)
+            .Set(trackedEntitiesBefore);
+
         // Use Include() to fetch all related data in fewer queries (like OOP version)
+        var swQuery = Stopwatch.StartNew();
         IList<ComicBook> comics = await db.Comics
             .Where(c => sortedComicIds.Contains(c.Id))
             .Include(c => c.Chapters)
@@ -171,6 +225,31 @@ public static class DatabaseQueryHelper
             .ThenInclude(ct => ct.Tag)
             .AsNoTracking()
             .ToListAsync();
+        
+        MetricsConfiguration.DbQueryDuration
+            .WithLabels("DOD", "fetch_comics_bulk", operationName)
+            .Observe(swQuery.Elapsed.TotalSeconds);
+        MetricsConfiguration.DbQueryCountTotal
+            .WithLabels("DOD", "fetch_comics_bulk", operationName)
+            .Inc();
+
+        // Track change tracker entities after query (should still be 0 with AsNoTracking)
+        var trackedEntitiesAfter = db.ChangeTracker.Entries().Count();
+        MetricsConfiguration.ChangeTrackerEntities
+            .WithLabels("DOD", operationName)
+            .Set(trackedEntitiesAfter);
+
+        // Track total fetch time
+        MetricsConfiguration.DbQueryDuration
+            .WithLabels("DOD", "total_fetch_bulk", operationName)
+            .Observe(swTotal.Elapsed.TotalSeconds);
+
+        // Track memory allocation
+        var memoryAfter = GC.GetTotalMemory(false);
+        var allocated = memoryAfter - memoryBefore;
+        MetricsConfiguration.MemoryAllocatedBytesPerOperation
+            .WithLabels("DOD", operationName)
+            .Set(allocated);
 
         if (comics == null || comics.Count == 0)
         {

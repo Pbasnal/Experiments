@@ -1,11 +1,9 @@
 using ComicApiDod.Data;
-using ComicApiDod.Models;
-using ComicApiDod.SimpleQueue;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
-using System.Collections.Generic;
 using System.Diagnostics;
 using ComicApiDod.utils;
+using Common.Models;
 
 namespace ComicApiDod.Services;
 

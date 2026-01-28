@@ -1,7 +1,8 @@
 using ComicApiDod.Data;
 using ComicApiDod.Services;
-using ComicApiDod.SimpleQueue;
 using ComicApiDod.Configuration;
+using Common.Models;
+using Common.SimpleQueue;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +20,15 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // Add database context factory for concurrent operations (DOD approach)
 // Using factory pattern to allow concurrent operations without lifetime conflicts
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContextFactory<ComicDbContext>(options =>
+
+// Register query metrics interceptor
+builder.Services.AddSingleton<QueryMetricsInterceptor>();
+
+builder.Services.AddDbContextFactory<ComicDbContext>((serviceProvider, options) =>
 {
     var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
+    var interceptor = serviceProvider.GetRequiredService<QueryMetricsInterceptor>();
+    
     options.UseMySql(connectionString, serverVersion,
         mysqlOptions =>
         {
@@ -29,7 +36,10 @@ builder.Services.AddDbContextFactory<ComicDbContext>(options =>
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
-        });
+        })
+        .EnableSensitiveDataLogging()  // Shows parameter values
+        .LogTo(Console.WriteLine, LogLevel.Information)  // Logs all queries
+        .AddInterceptors(interceptor);  // Add query metrics interceptor
 });
 
 // Add services

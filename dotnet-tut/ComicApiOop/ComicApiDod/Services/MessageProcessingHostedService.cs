@@ -1,6 +1,6 @@
-using ComicApiDod.Models;
-using ComicApiDod.SimpleQueue;
-using Microsoft.Extensions.DependencyInjection;
+using Common.Models;
+using Common.SimpleDodFramework;
+using Common.SimpleQueue;
 
 namespace ComicApiDod.Services;
 

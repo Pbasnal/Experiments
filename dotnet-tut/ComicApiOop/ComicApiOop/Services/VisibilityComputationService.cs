@@ -1,5 +1,5 @@
+using Common.Models;
 using ComicApiOop.Data;
-using ComicApiOop.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicApiOop.Services;
@@ -8,204 +8,343 @@ public class VisibilityComputationService
 {
     private readonly ComicDbContext _dbContext;
     private readonly ILogger<VisibilityComputationService> _logger;
+    private readonly MetricsReporter _metricsReporter;
 
-    public VisibilityComputationService(ComicDbContext dbContext, ILogger<VisibilityComputationService> logger)
+    public VisibilityComputationService(
+        ComicDbContext dbContext, 
+        ILogger<VisibilityComputationService> logger,
+        MetricsReporter metricsReporter)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _metricsReporter = metricsReporter;
     }
 
-    public async Task<VisibilityComputationResultDto> ComputeVisibilityForComicAsync(long comicId)
+    public async Task<ComicVisibilityResult> ComputeVisibilityForComicAsync(long comicId)
     {
-        try
+        const string operationName = "ComputeVisibilityForComicAsync";
+        
+        return await _metricsReporter.TrackCompleteOperationAsync(operationName, async () =>
         {
-            _logger.LogInformation($"Processing comic ID: {comicId}");
-
-            // Fetch comic with all required data
-            ComicBook? comic = await _dbContext.Comics
-                .Include(c => c.Chapters)
-                .Include(c => c.Tags)
-                .Include(c => c.Publisher)
-                .Include(c => c.Genre)
-                .Include(c => c.ContentRating)
-                .Include(c => c.RegionalPricing)
-                .FirstOrDefaultAsync(c => c.Id == comicId);
-
-            if (comic == null)
+            try
             {
-                _logger.LogWarning($"Comic ID {comicId} not found");
-                return new VisibilityComputationResultDto
+                _logger.LogInformation($"Processing comic ID: {comicId}");
+
+                // Track change tracker entities before queries
+                _metricsReporter.TrackChangeTracker(operationName);
+
+                // Fetch all required data in a single query
+                var comic = await FetchComicWithAllDataAsync(comicId, operationName);
+                if (comic == null)
+                {
+                    _logger.LogWarning($"Comic ID {comicId} not found");
+                    return CreateNotFoundResult(comicId);
+                }
+
+                // Track change tracker entities after query (should be 0 with AsNoTracking)
+                _metricsReporter.TrackChangeTracker(operationName);
+
+                // Extract rules from the loaded comic
+                var geographicRules = comic.GeographicRules;
+                var customerSegmentRules = comic.CustomerSegmentRules;
+
+                // Compute visibilities
+                var computedVisibilities = _metricsReporter.TrackOperation(
+                    "computation",
+                    operationName,
+                    () => ComputeVisibilities(
+                        comic,
+                        geographicRules,
+                        customerSegmentRules,
+                        DateTime.UtcNow));
+
+                // Save computed visibilities
+                await SaveComputedVisibilitiesAsync(computedVisibilities, operationName);
+
+                return new ComicVisibilityResult
                 {
                     ComicId = comicId,
-                    Success = false,
-                    ErrorMessage = "Comic not found",
+                    Success = computedVisibilities.Length > 0,
                     ComputationTime = DateTime.UtcNow,
-                    ComputedVisibilities = new List<ComputedVisibilityDto>()
+                    ComputedVisibilities = computedVisibilities
                 };
             }
-
-            var geographicRules = await _dbContext.GeographicRules
-                .Where(r => r.ComicId == comicId)
-                .ToListAsync();
-
-            var customerSegmentRules = await _dbContext.CustomerSegmentRules
-                .Include(r => r.Segment)
-                .Where(r => r.ComicId == comicId)
-                .ToListAsync();
-
-            // Compute visibilities
-            var computedVisibilities = new List<ComputedVisibilityDto>();
-            foreach (var geoRule in geographicRules)
+            catch (Exception ex)
             {
-                foreach (var segmentRule in customerSegmentRules)
-                {
-                    // First check if the comic is visible according to the rules
-                    bool isVisible = geoRule.EvaluateVisibility() && segmentRule.IsVisible;
-
-                    // Only create visibility object if the comic is visible
-                    if (isVisible)
-                    {
-                        // Get regional pricing for this country
-                        var pricing = comic.RegionalPricing
-                            .FirstOrDefault(p => geoRule.CountryCodes.Contains(p.RegionCode));
-
-                        var visibility = new ComputedVisibilityDto
-                        {
-                            ComicId = comicId,
-                            CountryCode = geoRule.CountryCodes.First(),
-                            CustomerSegmentId = segmentRule.SegmentId,
-                            FreeChaptersCount = comic.Chapters.Count(c => c.IsFree),
-                            LastChapterReleaseTime = comic.Chapters.Max(c => c.ReleaseTime),
-                            GenreId = comic.GenreId,
-                            PublisherId = comic.PublisherId,
-                            AverageRating = comic.AverageRating,
-                            SearchTags = string.Join(",", comic.Tags.Select(t => t.Name)),
-                            IsVisible = true,
-                            ComputedAt = DateTime.UtcNow,
-                            LicenseType = geoRule.LicenseType,
-                            CurrentPrice = pricing?.GetCurrentPrice() ?? 0m,
-                            IsFreeContent = pricing?.IsFreeContent ?? false,
-                            IsPremiumContent = pricing?.IsPremiumContent ?? false,
-                            AgeRating = comic.ContentRating?.AgeRating ?? AgeRating.AllAges,
-                            ContentFlags = ContentFlagService.DetermineContentFlags(
-                                comic.ContentRating?.ContentFlags ?? ContentFlag.None,
-                                comic.Chapters,
-                                pricing),
-                            ContentWarning = comic.ContentRating?.ContentWarning ?? string.Empty
-                        };
-                        computedVisibilities.Add(visibility);
-                    }
-                }
+                _logger.LogError(ex, $"Error processing comic {comicId}");
+                return CreateErrorResult(comicId, ex.Message);
             }
+        });
+    }
 
-            // Save computed visibilities to database
-            var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
+    private async Task<ComicBook?> FetchComicWithAllDataAsync(long comicId, string operationName)
+    {
+        return await _metricsReporter.TrackQueryAsync(
+            "fetch_comic",
+            operationName,
+            async () => await _dbContext.Comics
+                .Where(c => c.Id == comicId)
+                .Include(c => c.Chapters)
+                .Include(c => c.ContentRating)
+                .Include(c => c.RegionalPricing)
+                .Include(c => c.GeographicRules)
+                .Include(c => c.CustomerSegmentRules)
+                    .ThenInclude(csr => csr.Segment)
+                .Include(c => c.ComicTags)
+                    .ThenInclude(ct => ct.Tag)
+                .AsNoTracking()
+                .FirstOrDefaultAsync());
+    }
+
+    private async Task SaveComputedVisibilitiesAsync(
+        ComputedVisibilityData[] computedVisibilities,
+        string operationName)
+    {
+        await _metricsReporter.TrackQueryAsync(
+            "save_visibilities",
+            operationName,
+            async () =>
             {
-                ComicId = cv.ComicId,
-                CountryCode = cv.CountryCode,
-                CustomerSegmentId = cv.CustomerSegmentId,
-                FreeChaptersCount = cv.FreeChaptersCount,
-                LastChapterReleaseTime = cv.LastChapterReleaseTime,
-                GenreId = cv.GenreId,
-                PublisherId = cv.PublisherId,
-                AverageRating = cv.AverageRating,
-                SearchTags = cv.SearchTags,
-                IsVisible = cv.IsVisible,
-                ComputedAt = cv.ComputedAt,
-                LicenseType = cv.LicenseType,
-                CurrentPrice = cv.CurrentPrice,
-                IsFreeContent = cv.IsFreeContent,
-                IsPremiumContent = cv.IsPremiumContent,
-                AgeRating = cv.AgeRating,
-                ContentFlags = cv.ContentFlags,
-                ContentWarning = cv.ContentWarning
-            }).ToList();
+                var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
+                {
+                    ComicId = cv.ComicId,
+                    CountryCode = cv.CountryCode,
+                    CustomerSegmentId = cv.CustomerSegmentId,
+                    FreeChaptersCount = cv.FreeChaptersCount,
+                    LastChapterReleaseTime = cv.LastChapterReleaseTime,
+                    GenreId = cv.GenreId,
+                    PublisherId = cv.PublisherId,
+                    AverageRating = cv.AverageRating,
+                    SearchTags = cv.SearchTags,
+                    IsVisible = cv.IsVisible,
+                    ComputedAt = cv.ComputedAt,
+                    LicenseType = cv.LicenseType,
+                    CurrentPrice = cv.CurrentPrice,
+                    IsFreeContent = cv.IsFreeContent,
+                    IsPremiumContent = cv.IsPremiumContent,
+                    AgeRating = cv.AgeRating,
+                    ContentFlags = cv.ContentFlags,
+                    ContentWarning = cv.ContentWarning
+                }).ToList();
 
-            await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
+                return await _dbContext.SaveChangesAsync();
+            });
+    }
 
-            return new VisibilityComputationResultDto
-            {
-                ComicId = comicId,
-                Success = true,
-                ComputationTime = DateTime.UtcNow,
-                ComputedVisibilities = computedVisibilities
-            };
-        }
-        catch (Exception ex)
+    private static ComicVisibilityResult CreateNotFoundResult(long comicId)
+    {
+        return new ComicVisibilityResult
         {
-            _logger.LogError(ex, $"Error processing comic {comicId}");
-            return new VisibilityComputationResultDto
-            {
-                ComicId = comicId,
-                Success = false,
-                ErrorMessage = ex.Message,
-                ComputationTime = DateTime.UtcNow,
-                ComputedVisibilities = new List<ComputedVisibilityDto>()
-            };
-        }
+            ComicId = comicId,
+            Success = false,
+            ErrorMessage = "Comic not found",
+            ComputationTime = DateTime.UtcNow,
+            ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
+        };
+    }
+
+    private static ComicVisibilityResult CreateErrorResult(long comicId, string errorMessage)
+    {
+        return new ComicVisibilityResult
+        {
+            ComicId = comicId,
+            Success = false,
+            ErrorMessage = errorMessage,
+            ComputationTime = DateTime.UtcNow,
+            ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
+        };
     }
 
     public async Task<BulkVisibilityComputationResult> ComputeVisibilitiesBulkAsync(int startId, int limit)
     {
+        const string operationName = "ComputeVisibilitiesBulkAsync";
+        
         // Validate input parameters
         if (startId < 1) throw new ArgumentException("startId must be greater than 0", nameof(startId));
         if (limit < 1) throw new ArgumentException("limit must be greater than 0", nameof(limit));
         if (limit > 20) throw new ArgumentException("limit cannot exceed 20 comics", nameof(limit));
 
-        _logger.LogInformation($"Computing visibility for comics starting from ID {startId}, limit {limit}");
-
-        // Get requested comic IDs
-        var comicIds = await _dbContext.Comics
-            .Where(c => c.Id >= startId)
-            .OrderBy(c => c.Id)
-            .Take(limit)
-            .Select(c => c.Id)
-            .ToListAsync();
-
-        if (!comicIds.Any())
+        return await _metricsReporter.TrackCompleteOperationAsync(operationName, async () =>
         {
-            throw new InvalidOperationException($"No comics found starting from ID {startId}");
+            _logger.LogInformation($"Computing visibility for comics starting from ID {startId}, limit {limit}");
+
+            // Track change tracker entities before query
+            _metricsReporter.TrackChangeTracker(operationName);
+
+            // Get requested comic IDs
+            var comicIds = await _metricsReporter.TrackQueryAsync(
+                "fetch_comic_ids",
+                operationName,
+                async () => await _dbContext.Comics
+                    .Where(c => c.Id >= startId)
+                    .OrderBy(c => c.Id)
+                    .Take(limit)
+                    .AsNoTracking()
+                    .Select(c => c.Id)
+                    .ToListAsync());
+
+            if (!comicIds.Any())
+            {
+                throw new InvalidOperationException($"No comics found starting from ID {startId}");
+            }
+
+            _logger.LogInformation($"Found {comicIds.Count} comics to process");
+
+            var result = new List<ComicVisibilityResult>();
+            var processedCount = 0;
+            var failedCount = 0;
+            var startTime = DateTime.UtcNow;
+
+            // Process comics
+            foreach (var comicId in comicIds)
+            {
+                var computationResult = await ComputeVisibilityForComicAsync(comicId);
+                result.Add(computationResult);
+
+                if (computationResult.Success)
+                {
+                    processedCount++;
+                }
+                else
+                {
+                    failedCount++;
+                }
+            }
+
+            var endTime = DateTime.UtcNow;
+            var duration = endTime - startTime;
+
+            // Track change tracker entities after all operations (should be 0 with AsNoTracking)
+            _metricsReporter.TrackChangeTracker(operationName);
+
+            _logger.LogInformation($"Completed processing. Success: {processedCount}, Failed: {failedCount}, Duration: {duration.TotalSeconds}s");
+
+            return new BulkVisibilityComputationResult
+            {
+                StartId = startId,
+                Limit = limit,
+                ProcessedSuccessfully = processedCount,
+                Failed = failedCount,
+                DurationInSeconds = duration.TotalSeconds,
+                NextStartId = startId + limit,
+                Results = result.ToArray()
+            };
+        });
+    }
+
+    /// <summary>
+    /// Computes visibilities for a comic given pre-loaded data.
+    /// This method is pure computation logic and can be used for benchmarking.
+    /// Uses Common.Models types for consistency with DOD version.
+    /// </summary>
+    /// <param name="comic">The comic book with all required navigation properties loaded</param>
+    /// <param name="geographicRules">Geographic rules for the comic</param>
+    /// <param name="customerSegmentRules">Customer segment rules for the comic</param>
+    /// <param name="computationTime">The time to use for computation (usually DateTime.UtcNow)</param>
+    /// <returns>Array of computed visibility data</returns>
+    public static ComputedVisibilityData[] ComputeVisibilities(
+        ComicBook comic,
+        List<GeographicRule> geographicRules,
+        List<CustomerSegmentRule> customerSegmentRules,
+        DateTime computationTime)
+    {
+        var computedVisibilities = new List<ComputedVisibilityData>();
+        int freeChaptersCount = comic.Chapters.Count(c => c.IsFree);
+        DateTime lastChapterReleaseTime = comic.Chapters.Max(c => c.ReleaseTime);
+        string searchTags = string.Join(",", comic.ComicTags
+            .Where(ct => ct.Tag != null)
+            .Select(ct => ct.Tag!.Name));
+        
+        bool allChaptersFree = comic.Chapters.All(c => c.IsFree);
+        bool hasAnyFreeChapter = comic.Chapters.Any(c => c.IsFree);
+            
+        foreach (var geoRule in geographicRules)
+        {
+            // Evaluate geographic visibility
+            bool isGeographicVisible = geoRule.IsVisible
+                && computationTime >= geoRule.LicenseStartDate
+                && computationTime <= geoRule.LicenseEndDate
+                && geoRule.LicenseType != LicenseType.NoAccess;
+            
+            if (!isGeographicVisible)
+                continue;
+            
+            foreach (var segmentRule in customerSegmentRules)
+            {
+                // Check segment visibility
+                bool isSegmentVisible = segmentRule.IsVisible && segmentRule.Segment?.IsActive == true;
+                
+                if (!isSegmentVisible)
+                    continue;
+
+                // Create visibility object (both geographic and segment checks passed)
+                {
+                    // Get regional pricing for this country
+                    var pricing = comic.RegionalPricing
+                        .FirstOrDefault(p => geoRule.CountryCodes.Contains(p.RegionCode));
+
+                    // Calculate current price
+                    decimal currentPrice = 0m;
+                    bool isFreeContent = false;
+                    bool isPremiumContent = false;
+                    
+                    if (pricing != null)
+                    {
+                        isFreeContent = pricing.IsFreeContent;
+                        isPremiumContent = pricing.IsPremiumContent;
+                        
+                        if (isFreeContent)
+                        {
+                            currentPrice = 0m;
+                        }
+                        else
+                        {
+                            var now = DateTime.UtcNow;
+                            if (pricing.DiscountStartDate.HasValue && pricing.DiscountEndDate.HasValue &&
+                                now >= pricing.DiscountStartDate.Value && now <= pricing.DiscountEndDate.Value &&
+                                pricing.DiscountPercentage.HasValue)
+                            {
+                                currentPrice = pricing.BasePrice * (1m - pricing.DiscountPercentage.Value / 100m);
+                            }
+                            else
+                            {
+                                currentPrice = pricing.BasePrice;
+                            }
+                        }
+                    }
+
+                    var visibility = new ComputedVisibilityData
+                    {
+                        ComicId = comic.Id,
+                        CountryCode = geoRule.CountryCodes.FirstOrDefault() ?? string.Empty,
+                        CustomerSegmentId = segmentRule.SegmentId,
+                        FreeChaptersCount = freeChaptersCount,
+                        LastChapterReleaseTime = lastChapterReleaseTime,
+                        GenreId = comic.GenreId,
+                        PublisherId = comic.PublisherId,
+                        AverageRating = comic.AverageRating,
+                        SearchTags = searchTags,
+                        IsVisible = true,
+                        ComputedAt = computationTime,
+                        LicenseType = geoRule.LicenseType,
+                        CurrentPrice = currentPrice,
+                        IsFreeContent = isFreeContent,
+                        IsPremiumContent = isPremiumContent,
+                        AgeRating = comic.ContentRating?.AgeRating ?? AgeRating.AllAges,
+                        ContentFlags = ContentFlagService.DetermineContentFlags(
+                            comic.ContentRating?.ContentFlags ?? ContentFlag.None,
+                            allChaptersFree,
+                            hasAnyFreeChapter,
+                            pricing),
+                        ContentWarning = comic.ContentRating?.ContentWarning ?? string.Empty
+                    };
+                    computedVisibilities.Add(visibility);
+                }
+            }
         }
 
-        _logger.LogInformation($"Found {comicIds.Count} comics to process");
-
-        var result = new List<VisibilityComputationResultDto>();
-        var processedCount = 0;
-        var failedCount = 0;
-        var startTime = DateTime.UtcNow;
-
-        // Process comics
-        foreach (var comicId in comicIds)
-        {
-            var computationResult = await ComputeVisibilityForComicAsync(comicId);
-            result.Add(computationResult);
-
-            if (computationResult.Success)
-            {
-                processedCount++;
-            }
-            else
-            {
-                failedCount++;
-            }
-        }
-
-        var endTime = DateTime.UtcNow;
-        var duration = endTime - startTime;
-
-        _logger.LogInformation($"Completed processing. Success: {processedCount}, Failed: {failedCount}, Duration: {duration.TotalSeconds}s");
-
-        return new BulkVisibilityComputationResult
-        {
-            StartId = startId,
-            Limit = limit,
-            ProcessedSuccessfully = processedCount,
-            Failed = failedCount,
-            DurationInSeconds = duration.TotalSeconds,
-            NextStartId = startId + limit,
-            Results = result
-        };
+        return computedVisibilities.ToArray();
     }
 }
 
@@ -217,5 +356,5 @@ public class BulkVisibilityComputationResult
     public int Failed { get; set; }
     public double DurationInSeconds { get; set; }
     public int NextStartId { get; set; }
-    public List<VisibilityComputationResultDto> Results { get; set; } = new();
+    public ComicVisibilityResult[] Results { get; set; } = Array.Empty<ComicVisibilityResult>();
 }

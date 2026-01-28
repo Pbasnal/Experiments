@@ -23,4 +23,8 @@
         <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.4.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
+
 </Project>

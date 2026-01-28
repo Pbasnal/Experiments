@@ -1,6 +1,7 @@
-using ComicApiDod.SimpleQueue;
 
-namespace ComicApiDod.Models;
+using Common.SimpleDodFramework;
+
+namespace Common.Models;
 
 public class ComicBookData
 {

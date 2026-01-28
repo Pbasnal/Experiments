@@ -1,4 +1,4 @@
-﻿namespace ComicApiDod.SimpleQueue;
+﻿namespace Common.SimpleDodFramework;
 
 public interface IValue
 {

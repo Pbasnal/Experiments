@@ -1,8 +1,8 @@
-using ComicApiDod.Models;
 using ComicApiDod.Services;
-using ComicApiDod.SimpleQueue;
 using Prometheus;
 using System.Diagnostics;
+using Common.Models;
+using Common.SimpleQueue;
 
 namespace ComicApiDod.Handlers;
 

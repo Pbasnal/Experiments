@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Common.SimpleDodFramework;
 
-namespace ComicApiDod.SimpleQueue;
+namespace Common.SimpleQueue;
 
 public interface ISimpleQueue
 {

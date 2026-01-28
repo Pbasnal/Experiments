@@ -29,22 +29,22 @@ public class MetricsMiddleware
             // Record metrics after successful request
             var status = context.Response.StatusCode.ToString();
             MetricsConfiguration.HttpRequestCounter
-                .WithLabels(method, path, status)
+                .WithLabels(method, path ?? string.Empty, status)
                 .Inc();
 
             MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path, status)
+                .WithLabels(method, path ?? string.Empty, status)
                 .Observe(sw.Elapsed.TotalSeconds);
         }
         catch
         {
             // Record metrics after failed request
             MetricsConfiguration.HttpRequestCounter
-                .WithLabels(method, path, "500")
+                .WithLabels(method, path ?? string.Empty, "500")
                 .Inc();
 
             MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path, "500")
+                .WithLabels(method, path ?? string.Empty, "500")
                 .Observe(sw.Elapsed.TotalSeconds);
             throw;
         }

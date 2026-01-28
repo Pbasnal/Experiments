@@ -38,7 +38,34 @@ public static class MetricsConfiguration
             new HistogramConfiguration
             {
                 Buckets = Histogram.ExponentialBuckets(0.001, 2, 10),
-                LabelNames = new[] { "query_type" }
+                LabelNames = new[] { "api_type", "query_type", "operation" }
+            });
+
+        // Database query count metrics
+        DbQueryCountTotal = Prometheus.Metrics.CreateCounter(
+            "db_query_count_total",
+            "Total number of database queries",
+            new CounterConfiguration
+            {
+                LabelNames = new[] { "api_type", "query_type", "operation" }
+            });
+
+        // EF Core change tracker metrics
+        ChangeTrackerEntities = Prometheus.Metrics.CreateGauge(
+            "ef_change_tracker_entities",
+            "Number of entities being tracked by EF Core",
+            new GaugeConfiguration
+            {
+                LabelNames = new[] { "api_type", "operation" }
+            });
+
+        // Memory allocation tracking per operation
+        MemoryAllocatedBytesPerOperation = Prometheus.Metrics.CreateGauge(
+            "memory_allocated_bytes_per_operation",
+            "Memory allocated per operation",
+            new GaugeConfiguration
+            {
+                LabelNames = new[] { "api_type", "operation" }
             });
 
         HttpRequestCounter = Prometheus.Metrics.CreateCounter(
@@ -114,4 +141,9 @@ public static class MetricsConfiguration
     public static Gauge MemoryAllocatedBytes { get; private set; } = null!;
     public static Gauge MemoryTotalBytes { get; private set; } = null!;
     public static Counter GcCollectionCount { get; private set; } = null!;
+    
+    // Public metrics for database operations
+    public static Counter DbQueryCountTotal { get; private set; } = null!;
+    public static Gauge ChangeTrackerEntities { get; private set; } = null!;
+    public static Gauge MemoryAllocatedBytesPerOperation { get; private set; } = null!;
 }

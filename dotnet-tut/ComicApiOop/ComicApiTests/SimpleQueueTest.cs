@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using NUnit.Framework;
-using ComicApiDod.SimpleQueue;
+using Common.SimpleDodFramework;
+using Common.SimpleQueue;
 using Microsoft.Extensions.Logging;
 using Moq;
 

@@ -1,4 +1,5 @@
-using ComicApiOop.Data;
+using ComicApiOop.Services;
+using Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicApiOop.Extensions;
@@ -31,6 +32,13 @@ public static class ServiceCollectionExtensions
                         maxRetryDelay: TimeSpan.FromSeconds(30),
                         errorNumbersToAdd: null);
                 });
+        });
+
+        // Register MetricsReporter (scoped to match DbContext lifetime)
+        services.AddScoped<MetricsReporter>(sp =>
+        {
+            var dbContext = sp.GetRequiredService<ComicDbContext>();
+            return new MetricsReporter(dbContext);
         });
 
         return services;

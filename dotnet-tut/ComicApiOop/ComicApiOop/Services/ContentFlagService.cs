@@ -1,17 +1,15 @@
-using ComicApiOop.Models;
+using Common.Models;
 
 namespace ComicApiOop.Services;
 
 public static class ContentFlagService
 {
-    public static ContentFlag DetermineContentFlags(ContentFlag baseFlags, List<Chapter> chapters, ComicPricing? pricing)
+    public static ContentFlag DetermineContentFlags(ContentFlag baseFlags,
+        bool allChaptersFree,
+        bool hasAnyFreeChapter,
+        ComicPricing? pricing)
     {
         var flags = baseFlags;
-
-        // Check if all chapters are free
-        bool allChaptersFree = chapters.All(c => c.IsFree);
-        bool hasAnyFreeChapter = chapters.Any(c => c.IsFree);
-        bool hasPaidChapters = chapters.Any(c => !c.IsFree);
 
         // Add Free flag if all chapters are free
         if (allChaptersFree)
@@ -26,7 +24,7 @@ public static class ContentFlagService
         }
 
         // Add Freemium flag if the comic has both free and paid chapters or has a price
-        if ((hasAnyFreeChapter && hasPaidChapters) || (pricing?.BasePrice > 0))
+        if ((hasAnyFreeChapter && !allChaptersFree) || (pricing?.BasePrice > 0))
         {
             flags |= ContentFlag.Freemium;
         }
