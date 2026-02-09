@@ -8,6 +8,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddComicApiServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Required for Request Wait Time metric (service reads request timestamp from HttpContext)
+        services.AddHttpContextAccessor();
+
         // Add API Explorer and Swagger
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

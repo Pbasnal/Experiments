@@ -1,5 +1,7 @@
 using Common.Models;
 using ComicApiOop.Data;
+using ComicApiOop.Metrics;
+using ComicApiOop.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicApiOop.Services;
@@ -9,15 +11,18 @@ public class VisibilityComputationService
     private readonly ComicDbContext _dbContext;
     private readonly ILogger<VisibilityComputationService> _logger;
     private readonly MetricsReporter _metricsReporter;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public VisibilityComputationService(
-        ComicDbContext dbContext, 
+        ComicDbContext dbContext,
         ILogger<VisibilityComputationService> logger,
-        MetricsReporter metricsReporter)
+        MetricsReporter metricsReporter,
+        IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
         _logger = logger;
         _metricsReporter = metricsReporter;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ComicVisibilityResult> ComputeVisibilityForComicAsync(long comicId)
@@ -159,7 +164,15 @@ public class VisibilityComputationService
     public async Task<BulkVisibilityComputationResult> ComputeVisibilitiesBulkAsync(int startId, int limit)
     {
         const string operationName = "ComputeVisibilitiesBulkAsync";
-        
+
+        // Emit Request Wait Time: time from request receipt (middleware) to start of processing (includes task scheduling delay)
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext?.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime requestReceivedAtUtc)
+        {
+            var waitSeconds = (DateTime.UtcNow - requestReceivedAtUtc).TotalSeconds;
+            MetricsConfiguration.RequestWaitTimeSeconds.Observe(waitSeconds);
+        }
+
         // Validate input parameters
         if (startId < 1) throw new ArgumentException("startId must be greater than 0", nameof(startId));
         if (limit < 1) throw new ArgumentException("limit must be greater than 0", nameof(limit));

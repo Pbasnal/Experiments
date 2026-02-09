@@ -1409,6 +1409,74 @@
         "type": "Prometheus",
         "uid": "Prometheus"
       },
+      "description": "Time from request receipt to start of visibility computation (includes thread/task scheduling delay)",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
+      "id": 30,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
+          "expr": "histogram_quantile(0.99, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ],
+      "title": "Request Wait Time (p50/p95/p99)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "Prometheus",
+        "uid": "Prometheus"
+      },
       "description": "Number of entities being tracked by EF Core Change Tracker (should be 0 with AsNoTracking)",
       "fieldConfig": {
         "defaults": {
@@ -1572,7 +1640,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 56
+        "y": 64
       },
       "id": 14,
       "options": {
@@ -1638,7 +1706,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 64
+        "y": 72
       },
       "id": 16,
       "options": {

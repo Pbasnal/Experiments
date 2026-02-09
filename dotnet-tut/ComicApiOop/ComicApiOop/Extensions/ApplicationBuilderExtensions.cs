@@ -53,6 +53,9 @@ public static class ApplicationBuilderExtensions
             app.UseHttpsRedirection();
         }
 
+        // Stamp request time as early as possible for Request Wait Time metric
+        app.UseMiddleware<RequestWaitTimeMiddleware>();
+
         // Add metrics endpoint and middleware
         app.UseMetricServer();
         app.UseHttpMetrics();

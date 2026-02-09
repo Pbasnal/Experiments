@@ -101,6 +101,16 @@ public static class MetricsConfiguration
                 LabelNames = new[] { "api_type", "generation" }
             });
 
+        // Request Wait Time: time from request arrival (middleware) to start of processing (service)
+        RequestWaitTimeSeconds = Prometheus.Metrics.CreateHistogram(
+            "comic_visibility_oop_request_wait_seconds",
+            "Time from request receipt to start of visibility computation (OOP API)",
+            new HistogramConfiguration
+            {
+                Buckets = Histogram.ExponentialBuckets(0.001, 2, 14),
+                LabelNames = Array.Empty<string>()
+            });
+
         // Start periodic metric updates
         StartPeriodicMetricUpdates();
     }
@@ -146,4 +156,7 @@ public static class MetricsConfiguration
     public static Counter DbQueryCountTotal { get; private set; } = null!;
     public static Gauge ChangeTrackerEntities { get; private set; } = null!;
     public static Gauge MemoryAllocatedBytesPerOperation { get; private set; } = null!;
+
+    /// <summary>Request Wait Time: time from request receipt to start of processing (emitted in service).</summary>
+    public static Histogram RequestWaitTimeSeconds { get; private set; } = null!;
 }
