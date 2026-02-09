@@ -52,13 +52,13 @@ CREATE TABLE IF NOT EXISTS Tags (
     Name VARCHAR(50) NOT NULL
 );
 
--- Create ComicTag join table
-CREATE TABLE IF NOT EXISTS ComicTag (
+-- Create ComicTags join table
+CREATE TABLE IF NOT EXISTS ComicTags (
     ComicsId BIGINT NOT NULL,
     TagsId BIGINT NOT NULL,
     PRIMARY KEY (ComicsId, TagsId),
-    CONSTRAINT FK_ComicTag_Comics FOREIGN KEY (ComicsId) REFERENCES Comics(Id) ON DELETE CASCADE,
-    CONSTRAINT FK_ComicTag_Tags FOREIGN KEY (TagsId) REFERENCES Tags(Id) ON DELETE CASCADE
+    CONSTRAINT FK_ComicTags_Comics FOREIGN KEY (ComicsId) REFERENCES Comics(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_ComicTags_Tags FOREIGN KEY (TagsId) REFERENCES Tags(Id) ON DELETE CASCADE
 );
 
 -- Create CustomerSegments table
@@ -104,8 +104,8 @@ CREATE TABLE IF NOT EXISTS ContentRatings (
     FOREIGN KEY (ComicId) REFERENCES Comics(Id)
 );
 
--- Create ComicPricing table
-CREATE TABLE IF NOT EXISTS ComicPricing (
+-- Create ComicPricings table
+CREATE TABLE IF NOT EXISTS ComicPricings (
     Id BIGINT AUTO_INCREMENT PRIMARY KEY,
     ComicId BIGINT NOT NULL,
     RegionCode VARCHAR(2) NOT NULL,

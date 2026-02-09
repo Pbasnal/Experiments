@@ -126,7 +126,7 @@ public partial class InitialCreate : Migration
 
         // Comic-Tag relationship table
         migrationBuilder.CreateTable(
-            name: "ComicTag",
+            name: "ComicTags",
             columns: table => new
             {
                 ComicsId = table.Column<long>(type: "bigint", nullable: false),
@@ -134,15 +134,15 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_ComicTag", x => new { x.ComicsId, x.TagsId });
+                table.PrimaryKey("PK_ComicTags", x => new { x.ComicsId, x.TagsId });
                 table.ForeignKey(
-                    name: "FK_ComicTag_Comics_ComicsId",
+                    name: "FK_ComicTags_Comics_ComicsId",
                     column: x => x.ComicsId,
                     principalTable: "Comics",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
-                    name: "FK_ComicTag_Tags_TagsId",
+                    name: "FK_ComicTags_Tags_TagsId",
                     column: x => x.TagsId,
                     principalTable: "Tags",
                     principalColumn: "Id",
@@ -244,9 +244,9 @@ public partial class InitialCreate : Migration
                     onDelete: ReferentialAction.Cascade);
             });
 
-        // ComicPricing table
+        // ComicPricings table
         migrationBuilder.CreateTable(
-            name: "ComicPricing",
+            name: "ComicPricings",
             columns: table => new
             {
                 Id = table.Column<long>(type: "bigint", nullable: false)
@@ -262,9 +262,9 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_ComicPricing", x => x.Id);
+                table.PrimaryKey("PK_ComicPricings", x => x.Id);
                 table.ForeignKey(
-                    name: "FK_ComicPricing_Comics_ComicId",
+                    name: "FK_ComicPricings_Comics_ComicId",
                     column: x => x.ComicId,
                     principalTable: "Comics",
                     principalColumn: "Id",
@@ -321,8 +321,8 @@ public partial class InitialCreate : Migration
             column: "ComicId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_ComicPricing_ComicId",
-            table: "ComicPricing",
+            name: "IX_ComicPricings_ComicId",
+            table: "ComicPricings",
             column: "ComicId");
 
         migrationBuilder.CreateIndex(
@@ -341,8 +341,8 @@ public partial class InitialCreate : Migration
             column: "ThemeId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_ComicTag_TagsId",
-            table: "ComicTag",
+            name: "IX_ComicTags_TagsId",
+            table: "ComicTags",
             column: "TagsId");
 
         migrationBuilder.CreateIndex(
@@ -380,8 +380,8 @@ public partial class InitialCreate : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(name: "Chapters");
-        migrationBuilder.DropTable(name: "ComicPricing");
-        migrationBuilder.DropTable(name: "ComicTag");
+        migrationBuilder.DropTable(name: "ComicPricings");
+        migrationBuilder.DropTable(name: "ComicTags");
         migrationBuilder.DropTable(name: "ComputedVisibilities");
         migrationBuilder.DropTable(name: "ContentRatings");
         migrationBuilder.DropTable(name: "CustomerSegmentRules");

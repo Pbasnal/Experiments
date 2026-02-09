@@ -1,9 +1,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+# Copy Common project first (dependency)
+COPY ["Common/Common.csproj", "Common/"]
+# Copy csproj and restore dependencies
 COPY ["ComicApiDod/ComicApiDod.csproj", "ComicApiDod/"]
 RUN dotnet restore "ComicApiDod/ComicApiDod.csproj"
 
+# Copy Common project source files
+COPY ["Common/", "Common/"]
+# Copy the rest of the project
 COPY ["ComicApiDod/", "ComicApiDod/"]
 RUN dotnet build "ComicApiDod/ComicApiDod.csproj" -c Release -o /app/build
 

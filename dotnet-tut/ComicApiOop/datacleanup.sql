@@ -11,7 +11,7 @@ DELETE FROM CustomerSegmentRules;
 DELETE FROM GeographicRules;
 DELETE FROM ContentRatings;
 DELETE FROM Chapters;
-DELETE FROM ComicTag;
+DELETE FROM ComicTags;
 
 -- Delete main entity data
 DELETE FROM Comics;

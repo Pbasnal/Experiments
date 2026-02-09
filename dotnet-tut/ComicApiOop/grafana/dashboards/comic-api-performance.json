@@ -757,8 +757,8 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{job=\"comic-api-oop\"}[1m])) by (le, query_type)) or vector(0)",
-          "legendFormat": "p95 - {{query_type}}",
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p95 - {{query_type}} - {{operation}}",
           "refId": "A"
         },
         {
@@ -766,12 +766,21 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{job=\"comic-api-oop\"}[1m])) by (le, query_type)) or vector(0)",
-          "legendFormat": "p99 - {{query_type}}",
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p99 - {{query_type}} - {{operation}}",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p50 - {{query_type}} - {{operation}}",
+          "refId": "C"
         }
       ],
-      "title": "Database Query Duration (p95/p99)",
+      "title": "Database Query Latency by Query Type & Operation (p50/p95/p99)",
       "type": "timeseries"
     },
     {
@@ -953,8 +962,8 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(ef_query_duration_seconds_bucket{api_type=\"OOP\"}[1m])) by (le, query_type, table)) or vector(0)",
-          "legendFormat": "p95 - {{query_type}} {{table}}",
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p95 - {{query_type}} {{operation}}",
           "refId": "A"
         },
         {
@@ -962,12 +971,12 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(ef_query_duration_seconds_bucket{api_type=\"OOP\"}[1m])) by (le, query_type, table)) or vector(0)",
-          "legendFormat": "p99 - {{query_type}} {{table}}",
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p99 - {{query_type}} {{operation}}",
           "refId": "B"
         }
       ],
-      "title": "EF Core Query Duration (p95/p99) by Type & Table",
+      "title": "EF Core Query Duration (p95/p99) by Type & Operation",
       "type": "timeseries"
     },
     {
@@ -975,7 +984,7 @@
         "type": "Prometheus",
         "uid": "Prometheus"
       },
-      "description": "EF Core query count by query type and table",
+      "description": "EF Core query count by query type and operation",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1059,12 +1068,12 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(ef_query_count_total{api_type=\"OOP\"}[1m])) by (query_type, table) or vector(0)",
-          "legendFormat": "{{query_type}} {{table}}",
+          "expr": "sum(rate(db_query_count_total{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (query_type, operation) or vector(0)",
+          "legendFormat": "{{query_type}} {{operation}}",
           "refId": "A"
         }
       ],
-      "title": "EF Core Query Count by Type & Table",
+      "title": "EF Core Query Count by Type & Operation",
       "type": "timeseries"
     },
     {
@@ -1156,8 +1165,8 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{job=\"comic-api-oop\"}[1m])) by (le, query_type)) or histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\"}[1m])) by (le, query_type)) or vector(0)",
-          "legendFormat": "p95 - {{query_type}}",
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p95 - {{query_type}} - {{operation}}",
           "refId": "A"
         },
         {
@@ -1165,12 +1174,21 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{job=\"comic-api-oop\"}[1m])) by (le, query_type)) or histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\"}[1m])) by (le, query_type)) or vector(0)",
-          "legendFormat": "p99 - {{query_type}}",
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p99 - {{query_type}} - {{operation}}",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
+          "legendFormat": "p50 - {{query_type}} - {{operation}}",
+          "refId": "C"
         }
       ],
-      "title": "Database Query Duration (p95/p99) by Query Type",
+      "title": "Individual Query Latency by Type & Operation (p50/p95/p99)",
       "type": "timeseries"
     },
     {
@@ -1178,7 +1196,7 @@
         "type": "Prometheus",
         "uid": "Prometheus"
       },
-      "description": "Database query count by operation",
+      "description": "Number of database queries executed per second, broken down by query type and operation",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1275,6 +1293,122 @@
         "type": "Prometheus",
         "uid": "Prometheus"
       },
+      "description": "Total request processing latency - end-to-end time for processing entire requests",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Duration (seconds)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "p95",
+            "p99"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p50 - {{operation}}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p95 - {{operation}}",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p99 - {{operation}}",
+          "refId": "C"
+        }
+      ],
+      "title": "Total Request Processing Latency (p50/p95/p99)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "Prometheus",
+        "uid": "Prometheus"
+      },
       "description": "Number of entities being tracked by EF Core Change Tracker (should be 0 with AsNoTracking)",
       "fieldConfig": {
         "defaults": {
@@ -1340,7 +1474,7 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
+        "x": 12,
         "y": 48
       },
       "id": 13,
@@ -1437,8 +1571,8 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 48
+        "x": 0,
+        "y": 56
       },
       "id": 14,
       "options": {
@@ -1471,6 +1605,102 @@
       ],
       "title": "Memory Allocation Per Operation",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "Prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Summary: Query count and average latency by query type",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 16,
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Query Count (req/s)"
+          }
+        ]
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "sum(rate(db_query_count_total{api_type=\"OOP\"}[1m])) by (query_type)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "Prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "avg(rate(db_query_duration_seconds_sum{api_type=\"OOP\"}[1m]) / rate(db_query_duration_seconds_count{api_type=\"OOP\"}[1m])) by (query_type)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "title": "Query Metrics Summary: Count & Average Latency by Query Type",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "query_type": 0,
+              "Value #A": 1,
+              "Value #B": 2
+            },
+            "renameByName": {
+              "Value #A": "Query Count (req/s)",
+              "Value #B": "Avg Latency (s)",
+              "query_type": "Query Type"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "preload": false,
