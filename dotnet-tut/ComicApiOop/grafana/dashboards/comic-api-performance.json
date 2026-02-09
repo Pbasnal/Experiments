@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -108,9 +108,9 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total{job=\"comic-api-oop\"}[1m])) by (endpoint, method, status)",
+          "expr": "sum(rate(http_requests_total_oop{job=\"comic-api-oop\"}[1m])) by (endpoint, method, status)",
           "legendFormat": "{{method}} {{endpoint}} - {{status}}",
           "refId": "A"
         }
@@ -121,7 +121,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -209,7 +209,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
           "legendFormat": "p95 - {{method}} {{endpoint}}",
           "refId": "A"
         },
@@ -218,7 +218,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
           "legendFormat": "p99 - {{method}} {{endpoint}}",
           "refId": "B"
         },
@@ -227,7 +227,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(http_request_duration_seconds_bucket{job=\"comic-api-oop\", le=\"+Inf\"}[5m])",
+          "expr": "rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\", le=\"+Inf\"}[5m])",
           "legendFormat": "Total Requests - {{method}} {{endpoint}}",
           "refId": "C"
         }
@@ -238,7 +238,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -329,7 +329,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)",
           "legendFormat": "CPU Usage",
@@ -342,7 +342,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -433,7 +433,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "process_working_set_bytes{job=\"comic-api-oop\"}",
           "legendFormat": "Working Set",
@@ -442,7 +442,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "dotnet_total_memory_bytes{job=\"comic-api-oop\"}",
           "legendFormat": "Total Memory",
@@ -455,7 +455,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "description": "Total memory allocated by the OOP API",
       "fieldConfig": {
@@ -540,7 +540,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "dotnet_memory_allocated_bytes{job=\"comic-api-oop\", api_type=\"OOP\"}",
           "legendFormat": "Allocated Memory",
@@ -549,7 +549,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "dotnet_memory_total_bytes{job=\"comic-api-oop\", api_type=\"OOP\"}",
           "legendFormat": "Total Memory",
@@ -562,7 +562,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "description": "Garbage Collection Counts by Generation",
       "fieldConfig": {
@@ -646,7 +646,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"0\"}[5m])",
           "legendFormat": "Gen 0 Collections",
@@ -655,7 +655,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"1\"}[5m])",
           "legendFormat": "Gen 1 Collections",
@@ -664,7 +664,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"2\"}[5m])",
           "legendFormat": "Gen 2 Collections",
@@ -677,7 +677,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "description": "Database query duration by query type",
       "fieldConfig": {
@@ -755,7 +755,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
           "legendFormat": "p95 - {{query_type}} - {{operation}}",
@@ -764,7 +764,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
           "legendFormat": "p99 - {{query_type}} - {{operation}}",
@@ -773,7 +773,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
           "legendFormat": "p50 - {{query_type}} - {{operation}}",
@@ -786,7 +786,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "Prometheus"
       },
       "description": "HTTP request status codes",
       "fieldConfig": {
@@ -863,9 +863,9 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total{job=\"comic-api-oop\"}[1m])) by (status)",
+          "expr": "sum(rate(http_requests_total_oop{job=\"comic-api-oop\"}[1m])) by (status)",
           "legendFormat": "Status {{status}}",
           "refId": "A"
         }
