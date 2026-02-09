@@ -40,7 +40,7 @@ public class SimpleQueue<T> : ISimpleQueue
     {
         if (batchSize <= 0) batchSize = 10;
 
-        TimeSpan period = TimeSpan.FromMilliseconds(2);
+        TimeSpan period = TimeSpan.FromMilliseconds(0);
         Stopwatch sw = Stopwatch.StartNew();
         long nextTick = 0;
 
@@ -63,7 +63,7 @@ public class SimpleQueue<T> : ISimpleQueue
             }
 
             numberOfEmptyDequeue = 0;
-            period = TimeSpan.FromMilliseconds(2);
+            period = TimeSpan.FromMilliseconds(0);
 
             try
             {
