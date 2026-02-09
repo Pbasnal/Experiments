@@ -1,4 +1,5 @@
 using Prometheus;
+using System.Threading;
 
 namespace ComicApiDod.Configuration;
 
@@ -10,6 +11,12 @@ public static class MetricsConfiguration
     private static readonly Gauge MemoryTotalBytes;
     private static readonly Counter GcCollectionCount;
     private static readonly System.Timers.Timer MetricsUpdateTimer;
+
+    // Thread pool metrics (from CLR: ThreadPool.ThreadCount, PendingWorkItemCount, CompletedWorkItemCount)
+    private static readonly Gauge ThreadPoolThreadCount;
+    private static readonly Gauge ThreadPoolQueueLength;
+    private static readonly Counter ThreadPoolCompletedWorkItemsTotal;
+    private static long _lastCompletedWorkItemCount;
 
     // Public metrics for database operations
     public static readonly Counter DbQueryCountTotal;
@@ -96,6 +103,20 @@ public static class MetricsConfiguration
                 LabelNames = new[] { "api_type", "operation" }
             });
 
+        // Thread pool metrics (CLR-native: no custom tracking; we sample ThreadPool.* and export to Prometheus)
+        ThreadPoolThreadCount = Metrics.CreateGauge(
+            "dotnet_threadpool_thread_count",
+            "Number of thread pool threads (ThreadPool.ThreadCount)",
+            new GaugeConfiguration { LabelNames = new[] { "api_type" } });
+        ThreadPoolQueueLength = Metrics.CreateGauge(
+            "dotnet_threadpool_queue_length",
+            "Number of work items queued and not yet started (ThreadPool.PendingWorkItemCount)",
+            new GaugeConfiguration { LabelNames = new[] { "api_type" } });
+        ThreadPoolCompletedWorkItemsTotal = Metrics.CreateCounter(
+            "dotnet_threadpool_completed_work_items_total",
+            "Total work items completed by the thread pool (delta of ThreadPool.CompletedWorkItemCount)",
+            new CounterConfiguration { LabelNames = new[] { "api_type" } });
+
         MetricsUpdateTimer = new System.Timers.Timer(5000); // Update every 5 seconds
         MetricsUpdateTimer.Elapsed += UpdateMetrics;
     }
@@ -163,5 +184,14 @@ public static class MetricsConfiguration
         GcCollectionCount
             .WithLabels("DOD", "2")
             .Inc(GC.CollectionCount(2));
+
+        // Thread pool (CLR-native APIs only)
+        ThreadPoolThreadCount.WithLabels("DOD").Set(ThreadPool.ThreadCount);
+        ThreadPoolQueueLength.WithLabels("DOD").Set(ThreadPool.PendingWorkItemCount);
+        var completed = ThreadPool.CompletedWorkItemCount;
+        var delta = completed - _lastCompletedWorkItemCount;
+        if (delta > 0)
+            ThreadPoolCompletedWorkItemsTotal.WithLabels("DOD").Inc(delta);
+        _lastCompletedWorkItemCount = completed;
     }
 }

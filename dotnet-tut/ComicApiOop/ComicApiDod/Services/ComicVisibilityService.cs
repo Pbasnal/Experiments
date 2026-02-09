@@ -61,6 +61,15 @@ public class ComicVisibilityService
         "comic_visibility_request_count_in_batch",
         "Number of requests in the current request batch");
 
+    private static readonly Histogram RequestWaitTimeSeconds = Metrics.CreateHistogram(
+        "comic_visibility_request_wait_seconds",
+        "Time from request creation (enqueue) to start of processing",
+        new HistogramConfiguration
+        {
+            Buckets = Histogram.ExponentialBuckets(0.001, 2, 14),
+            LabelNames = Array.Empty<string>()
+        });
+
     public ComicVisibilityService(
         IDbContextFactory<ComicDbContext> dbFactory,
         ILogger<ComicVisibilityService> logger,
@@ -73,6 +82,16 @@ public class ComicVisibilityService
 
     public async Task ComputeVisibilities(int numOfRequest, List<VisibilityComputationRequest?> reqs)
     {
+        var processingStartUtc = DateTime.UtcNow;
+        foreach (var req in reqs)
+        {
+            if (req != null)
+            {
+                var waitSeconds = (processingStartUtc - req.RequestStartTimeUtc).TotalSeconds;
+                RequestWaitTimeSeconds.Observe(waitSeconds);
+            }
+        }
+
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
         try

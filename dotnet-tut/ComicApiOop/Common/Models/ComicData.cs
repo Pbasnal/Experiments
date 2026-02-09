@@ -143,12 +143,16 @@ public class VisibilityComputationRequest : IValue
     public int Id { get; set; }
     public TaskCompletionSource<VisibilityComputationResponse> ResponseSrc { get; set; }
 
+    /// <summary>Time when the request was created (enqueued). Used to measure task wait time.</summary>
+    public DateTime RequestStartTimeUtc { get; set; }
+
     public VisibilityComputationRequest(long startId, int limit)
     {
         StartId = startId;
         Limit = limit;
         Id = Guid.NewGuid().GetHashCode();
         ResponseSrc = new TaskCompletionSource<VisibilityComputationResponse>();
+        RequestStartTimeUtc = DateTime.UtcNow;
     }
 
     public override string ToString()
