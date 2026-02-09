@@ -25,70 +25,22 @@ public class VisibilityComputationService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ComicVisibilityResult> ComputeVisibilityForComicAsync(long comicId)
+    /// <summary>
+    /// Fetches all comics with required related data in a single query (batch fetch).
+    /// Reduces DB round-trips from N to 1 for a bulk of N comics.
+    /// </summary>
+    private async Task<Dictionary<long, ComicBook>> FetchComicsWithAllDataAsync(
+        IReadOnlyList<long> comicIds,
+        string operationName)
     {
-        const string operationName = "ComputeVisibilityForComicAsync";
-        
-        return await _metricsReporter.TrackCompleteOperationAsync(operationName, async () =>
-        {
-            try
-            {
-                _logger.LogInformation($"Processing comic ID: {comicId}");
+        if (comicIds.Count == 0)
+            return new Dictionary<long, ComicBook>();
 
-                // Track change tracker entities before queries
-                _metricsReporter.TrackChangeTracker(operationName);
-
-                // Fetch all required data in a single query
-                var comic = await FetchComicWithAllDataAsync(comicId, operationName);
-                if (comic == null)
-                {
-                    _logger.LogWarning($"Comic ID {comicId} not found");
-                    return CreateNotFoundResult(comicId);
-                }
-
-                // Track change tracker entities after query (should be 0 with AsNoTracking)
-                _metricsReporter.TrackChangeTracker(operationName);
-
-                // Extract rules from the loaded comic
-                var geographicRules = comic.GeographicRules;
-                var customerSegmentRules = comic.CustomerSegmentRules;
-
-                // Compute visibilities
-                var computedVisibilities = _metricsReporter.TrackOperation(
-                    "computation",
-                    operationName,
-                    () => ComputeVisibilities(
-                        comic,
-                        geographicRules,
-                        customerSegmentRules,
-                        DateTime.UtcNow));
-
-                // Save computed visibilities
-                await SaveComputedVisibilitiesAsync(computedVisibilities, operationName);
-
-                return new ComicVisibilityResult
-                {
-                    ComicId = comicId,
-                    Success = computedVisibilities.Length > 0,
-                    ComputationTime = DateTime.UtcNow,
-                    ComputedVisibilities = computedVisibilities
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error processing comic {comicId}");
-                return CreateErrorResult(comicId, ex.Message);
-            }
-        });
-    }
-
-    private async Task<ComicBook?> FetchComicWithAllDataAsync(long comicId, string operationName)
-    {
-        return await _metricsReporter.TrackQueryAsync(
-            "fetch_comic",
+        var comics = await _metricsReporter.TrackQueryAsync(
+            "fetch_comics_bulk",
             operationName,
             async () => await _dbContext.Comics
-                .Where(c => c.Id == comicId)
+                .Where(c => comicIds.Contains(c.Id))
                 .Include(c => c.Chapters)
                 .Include(c => c.ContentRating)
                 .Include(c => c.RegionalPricing)
@@ -98,7 +50,9 @@ public class VisibilityComputationService
                 .Include(c => c.ComicTags)
                     .ThenInclude(ct => ct.Tag)
                 .AsNoTracking()
-                .FirstOrDefaultAsync());
+                .ToListAsync());
+
+        return comics.ToDictionary(c => c.Id);
     }
 
     private async Task SaveComputedVisibilitiesAsync(
@@ -107,6 +61,49 @@ public class VisibilityComputationService
     {
         await _metricsReporter.TrackQueryAsync(
             "save_visibilities",
+            operationName,
+            async () =>
+            {
+                var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
+                {
+                    ComicId = cv.ComicId,
+                    CountryCode = cv.CountryCode,
+                    CustomerSegmentId = cv.CustomerSegmentId,
+                    FreeChaptersCount = cv.FreeChaptersCount,
+                    LastChapterReleaseTime = cv.LastChapterReleaseTime,
+                    GenreId = cv.GenreId,
+                    PublisherId = cv.PublisherId,
+                    AverageRating = cv.AverageRating,
+                    SearchTags = cv.SearchTags,
+                    IsVisible = cv.IsVisible,
+                    ComputedAt = cv.ComputedAt,
+                    LicenseType = cv.LicenseType,
+                    CurrentPrice = cv.CurrentPrice,
+                    IsFreeContent = cv.IsFreeContent,
+                    IsPremiumContent = cv.IsPremiumContent,
+                    AgeRating = cv.AgeRating,
+                    ContentFlags = cv.ContentFlags,
+                    ContentWarning = cv.ContentWarning
+                }).ToList();
+
+                await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
+                return await _dbContext.SaveChangesAsync();
+            });
+    }
+
+    /// <summary>
+    /// Saves all computed visibilities in a single round-trip (batch save).
+    /// Reduces DB round-trips from N to 1 for a bulk of N comics.
+    /// </summary>
+    private async Task SaveComputedVisibilitiesBulkAsync(
+        IReadOnlyList<ComputedVisibilityData> computedVisibilities,
+        string operationName)
+    {
+        if (computedVisibilities.Count == 0)
+            return;
+
+        await _metricsReporter.TrackQueryAsync(
+            "save_visibilities_bulk",
             operationName,
             async () =>
             {
@@ -185,45 +182,67 @@ public class VisibilityComputationService
             // Track change tracker entities before query
             _metricsReporter.TrackChangeTracker(operationName);
 
-            // Get requested comic IDs
-            var comicIds = await _metricsReporter.TrackQueryAsync(
-                "fetch_comic_ids",
-                operationName,
-                async () => await _dbContext.Comics
-                    .Where(c => c.Id >= startId)
-                    .OrderBy(c => c.Id)
-                    .Take(limit)
-                    .AsNoTracking()
-                    .Select(c => c.Id)
-                    .ToListAsync());
+            // Derive comic IDs in memory (same semantics as DOD: startId, startId+1, ... startId+limit-1)
+            // Avoids one DB round-trip; non-existent IDs are handled as "not found" after batch fetch.
+            var comicIds = Enumerable.Range(startId, limit).Select(i => (long)i).ToList();
 
-            if (!comicIds.Any())
+            _logger.LogInformation($"Processing {comicIds.Count} comic IDs from {startId}");
+
+            // Batch fetch: one query for all comics and related data (instead of N queries)
+            var comicMap = await FetchComicsWithAllDataAsync(comicIds, operationName);
+
+            if (comicMap.Count == 0)
             {
                 throw new InvalidOperationException($"No comics found starting from ID {startId}");
             }
 
-            _logger.LogInformation($"Found {comicIds.Count} comics to process");
-
             var result = new List<ComicVisibilityResult>();
+            var allVisibilities = new List<ComputedVisibilityData>();
             var processedCount = 0;
             var failedCount = 0;
             var startTime = DateTime.UtcNow;
+            var computationTime = DateTime.UtcNow;
 
-            // Process comics
+            // Process comics in memory (no per-comic DB calls)
             foreach (var comicId in comicIds)
             {
-                var computationResult = await ComputeVisibilityForComicAsync(comicId);
-                result.Add(computationResult);
-
-                if (computationResult.Success)
+                if (!comicMap.TryGetValue(comicId, out var comic))
                 {
-                    processedCount++;
-                }
-                else
-                {
+                    result.Add(CreateNotFoundResult(comicId));
                     failedCount++;
+                    continue;
                 }
+
+                var geographicRules = comic.GeographicRules;
+                var customerSegmentRules = comic.CustomerSegmentRules;
+
+                var computedVisibilities = _metricsReporter.TrackOperation(
+                    "computation",
+                    operationName,
+                    () => ComputeVisibilities(
+                        comic,
+                        geographicRules,
+                        customerSegmentRules,
+                        computationTime));
+
+                allVisibilities.AddRange(computedVisibilities);
+
+                result.Add(new ComicVisibilityResult
+                {
+                    ComicId = comicId,
+                    Success = computedVisibilities.Length > 0,
+                    ComputationTime = computationTime,
+                    ComputedVisibilities = computedVisibilities
+                });
+
+                if (computedVisibilities.Length > 0)
+                    processedCount++;
+                else
+                    failedCount++;
             }
+
+            // Batch save: one round-trip for all visibilities (instead of N saves)
+            await SaveComputedVisibilitiesBulkAsync(allVisibilities, operationName);
 
             var endTime = DateTime.UtcNow;
             var duration = endTime - startTime;
@@ -246,16 +265,6 @@ public class VisibilityComputationService
         });
     }
 
-    /// <summary>
-    /// Computes visibilities for a comic given pre-loaded data.
-    /// This method is pure computation logic and can be used for benchmarking.
-    /// Uses Common.Models types for consistency with DOD version.
-    /// </summary>
-    /// <param name="comic">The comic book with all required navigation properties loaded</param>
-    /// <param name="geographicRules">Geographic rules for the comic</param>
-    /// <param name="customerSegmentRules">Customer segment rules for the comic</param>
-    /// <param name="computationTime">The time to use for computation (usually DateTime.UtcNow)</param>
-    /// <returns>Array of computed visibility data</returns>
     public static ComputedVisibilityData[] ComputeVisibilities(
         ComicBook comic,
         List<GeographicRule> geographicRules,
