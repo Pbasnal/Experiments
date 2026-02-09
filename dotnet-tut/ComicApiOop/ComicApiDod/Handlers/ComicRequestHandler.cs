@@ -1,3 +1,4 @@
+using ComicApiDod.Middleware;
 using ComicApiDod.Services;
 using Prometheus;
 using System.Diagnostics;
@@ -29,7 +30,8 @@ public static class ComicRequestHandler
         long startId,
         int limit,
         SimpleMessageBus bus,
-        ComicVisibilityService comicVisibilityService)
+        ComicVisibilityService comicVisibilityService,
+        HttpContext context)
     {
         var sw = Stopwatch.StartNew();
         string status = "success";
@@ -65,6 +67,8 @@ public static class ComicRequestHandler
         try
         {
             VisibilityComputationRequest request = new(startId, limit);
+            if (context.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime receivedAtUtc)
+                request.RequestStartTimeUtc = receivedAtUtc;
             bus.Enqueue(request);
 
             RequestCounter

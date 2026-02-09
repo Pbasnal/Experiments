@@ -1,3 +1,4 @@
+using ComicApiDod.Middleware;
 using Prometheus;
 using System.Threading;
 
@@ -123,6 +124,8 @@ public static class MetricsConfiguration
 
     public static void ConfigureMetrics(WebApplication app)
     {
+        // Stamp request time first (same as OOP API for comparable Request Wait Time)
+        app.UseMiddleware<RequestWaitTimeMiddleware>();
         app.Use(HandleMetricsMiddleware);
         MetricsUpdateTimer.Start();
     }
