@@ -81,10 +81,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 0
+        "y": 0,
+        "w": 12,
+        "h": 8
       },
       "id": 1,
       "options": {
@@ -115,7 +115,7 @@
           "refId": "A"
         }
       ],
-      "title": "API Throughput by Endpoint",
+      "title": "API Throughput",
       "type": "timeseries"
     },
     {
@@ -177,10 +177,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 0
+        "y": 0,
+        "w": 12,
+        "h": 8
       },
       "id": 2,
       "options": {
@@ -207,7 +207,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
           "legendFormat": "p95 - {{method}} {{endpoint}}",
@@ -216,7 +216,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\"}[5m])) by (le, method, endpoint))",
           "legendFormat": "p99 - {{method}} {{endpoint}}",
@@ -225,14 +225,14 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "Prometheus"
           },
           "expr": "rate(http_request_duration_seconds_oop_bucket{job=\"comic-api-oop\", le=\"+Inf\"}[5m])",
           "legendFormat": "Total Requests - {{method}} {{endpoint}}",
           "refId": "C"
         }
       ],
-      "title": "API Latency (p95/p99/Max) by Endpoint",
+      "title": "API Latency",
       "type": "timeseries"
     },
     {
@@ -240,19 +240,18 @@
         "type": "prometheus",
         "uid": "Prometheus"
       },
+      "description": "HTTP request status codes",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "CPU Usage (%)",
+            "axisLabel": "Requests/Second",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "none",
@@ -261,7 +260,6 @@
               "tooltip": false,
               "viz": false
             },
-            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
@@ -269,14 +267,13 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -284,28 +281,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
+                "color": "green"
               }
             ]
           },
-          "unit": "percent"
+          "unit": "reqps"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 8
+        "y": 8,
+        "w": 12,
+        "h": 8
       },
       "id": 3,
       "options": {
@@ -319,24 +307,22 @@
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)",
-          "legendFormat": "CPU Usage",
+          "expr": "sum(rate(http_requests_total_oop{job=\"comic-api-oop\"}[1m])) by (status)",
+          "legendFormat": "Status {{status}}",
           "refId": "A"
         }
       ],
-      "title": "CPU Utilization",
+      "title": "HTTP Status Codes",
       "type": "timeseries"
     },
     {
@@ -344,6 +330,7 @@
         "type": "prometheus",
         "uid": "Prometheus"
       },
+      "description": "Total request processing latency - end-to-end time for processing entire requests",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -353,7 +340,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "Memory Usage",
+            "axisLabel": "Duration (seconds)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -380,7 +367,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -389,41 +376,34 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 80
-              },
-              {
-                "color": "red",
-                "value": 90
+                "value": null
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "s"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 8
+        "y": 8,
+        "w": 12,
+        "h": 8
       },
       "id": 4,
       "options": {
         "legend": {
           "calcs": [
             "mean",
-            "max"
+            "max",
+            "p95",
+            "p99"
           ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
@@ -435,8 +415,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "process_working_set_bytes{job=\"comic-api-oop\"}",
-          "legendFormat": "Working Set",
+          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p50 - {{operation}}",
           "refId": "A"
         },
         {
@@ -444,12 +424,136 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_total_memory_bytes{job=\"comic-api-oop\"}",
-          "legendFormat": "Total Memory",
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p95 - {{operation}}",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
+          "legendFormat": "p99 - {{operation}}",
+          "refId": "C"
         }
       ],
-      "title": "Memory Utilization",
+      "title": "Total request latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Garbage Collection Counts by Generation",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Collection Count",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"0\"}[5m])",
+          "legendFormat": "Gen 0 Collections",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"1\"}[5m])",
+          "legendFormat": "Gen 1 Collections",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"2\"}[5m])",
+          "legendFormat": "Gen 2 Collections",
+          "refId": "C"
+        }
+      ],
+      "title": "Garbage Collection",
       "type": "timeseries"
     },
     {
@@ -516,12 +620,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "x": 12,
+        "y": 16,
         "w": 12,
-        "x": 0,
-        "y": 16
+        "h": 8
       },
-      "id": 5,
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -556,7 +660,7 @@
           "refId": "B"
         }
       ],
-      "title": "Memory Allocation (OOP API)",
+      "title": "Memory allocation",
       "type": "timeseries"
     },
     {
@@ -564,7 +668,7 @@
         "type": "prometheus",
         "uid": "Prometheus"
       },
-      "description": "Garbage Collection Counts by Generation",
+      "description": "Time from request receipt to start of visibility computation (includes thread/task scheduling delay)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -574,12 +678,12 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "Collection Count",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -593,9 +697,9 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "showValues": false,
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -610,117 +714,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"0\"}[5m])",
-          "legendFormat": "Gen 0 Collections",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"1\"}[5m])",
-          "legendFormat": "Gen 1 Collections",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"2\"}[5m])",
-          "legendFormat": "Gen 2 Collections",
-          "refId": "C"
-        }
-      ],
-      "title": "Garbage Collection Counts (OOP API)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Database query duration by query type",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Duration (seconds)",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
+                "value": null
               }
             ]
           },
@@ -729,121 +723,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 24
+        "y": 24,
+        "w": 24,
+        "h": 8
       },
       "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "p95"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p95 - {{query_type}} - {{operation}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p99 - {{query_type}} - {{operation}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p50 - {{query_type}} - {{operation}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Database Query Latency by Query Type & Operation (p50/p95/p99)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "HTTP request status codes",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Requests/Second",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      },
-      "id": 8,
       "options": {
         "legend": {
           "calcs": [
@@ -859,23 +744,42 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total_oop{job=\"comic-api-oop\"}[1m])) by (status)",
-          "legendFormat": "Status {{status}}",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p50",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
+          "legendFormat": "p99",
+          "refId": "C"
         }
       ],
-      "title": "HTTP Status Codes",
+      "title": "Request wait time",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "Prometheus",
+        "type": "prometheus",
         "uid": "Prometheus"
       },
       "description": "EF Core query duration by query type and table (from QueryMetricsInterceptor)",
@@ -933,12 +837,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 32
+        "y": 32,
+        "w": 12,
+        "h": 8
       },
-      "id": 9,
+      "id": 8,
       "options": {
         "legend": {
           "calcs": [
@@ -959,7 +863,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "Prometheus",
+            "type": "prometheus",
             "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
@@ -968,7 +872,7 @@
         },
         {
           "datasource": {
-            "type": "Prometheus",
+            "type": "prometheus",
             "uid": "Prometheus"
           },
           "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
@@ -976,12 +880,12 @@
           "refId": "B"
         }
       ],
-      "title": "EF Core Query Duration (p95/p99) by Type & Operation",
+      "title": "DB / EF query duration",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "Prometheus",
+        "type": "prometheus",
         "uid": "Prometheus"
       },
       "description": "EF Core query count by query type and operation",
@@ -1039,12 +943,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 12,
-        "y": 32
+        "y": 32,
+        "w": 12,
+        "h": 8
       },
-      "id": 10,
+      "id": 9,
       "options": {
         "legend": {
           "calcs": [
@@ -1065,7 +969,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "Prometheus",
+            "type": "prometheus",
             "uid": "Prometheus"
           },
           "expr": "sum(rate(db_query_count_total{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (query_type, operation) or vector(0)",
@@ -1073,408 +977,12 @@
           "refId": "A"
         }
       ],
-      "title": "EF Core Query Count by Type & Operation",
+      "title": "DB / EF query count",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "Prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Database query duration by query type (from MetricsConfiguration)",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Duration (seconds)",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 40
-      },
-      "id": 11,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "p95"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p95 - {{query_type}} - {{operation}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p99 - {{query_type}} - {{operation}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type!=\"total_operation\"}[1m])) by (le, query_type, operation)) or vector(0)",
-          "legendFormat": "p50 - {{query_type}} - {{operation}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Individual Query Latency by Type & Operation (p50/p95/p99)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "Prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Number of database queries executed per second, broken down by query type and operation",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Queries/Second",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 40
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "sum"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "sum(rate(db_query_count_total{api_type=\"OOP\"}[1m])) by (query_type, operation) or vector(0)",
-          "legendFormat": "{{query_type}} {{operation}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Database Query Count by Operation",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "Prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Total request processing latency - end-to-end time for processing entire requests",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Duration (seconds)",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 48
-      },
-      "id": 15,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "p95",
-            "p99"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.50, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
-          "legendFormat": "p50 - {{operation}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
-          "legendFormat": "p95 - {{operation}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{api_type=\"OOP\", query_type=\"total_operation\"}[1m])) by (le, operation)) or vector(0)",
-          "legendFormat": "p99 - {{operation}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Total Request Processing Latency (p50/p95/p99)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "Prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Time from request receipt to start of visibility computation (includes thread/task scheduling delay)",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
-          },
-          "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
-      "id": 30,
-      "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
-          "legendFormat": "p50",
-          "refId": "A"
-        },
-        {
-          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
-          "legendFormat": "p95",
-          "refId": "B"
-        },
-        {
-          "datasource": { "type": "Prometheus", "uid": "Prometheus" },
-          "expr": "histogram_quantile(0.99, sum(rate(comic_visibility_oop_request_wait_seconds_bucket[1m])) by (le)) or vector(0)",
-          "legendFormat": "p99",
-          "refId": "C"
-        }
-      ],
-      "title": "Request Wait Time (p50/p95/p99)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "Prometheus",
+        "type": "prometheus",
         "uid": "Prometheus"
       },
       "description": "Number of entities being tracked by EF Core Change Tracker (should be 0 with AsNoTracking)",
@@ -1540,12 +1048,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "x": 0,
+        "y": 40,
         "w": 12,
-        "x": 12,
-        "y": 48
+        "h": 8
       },
-      "id": 13,
+      "id": 10,
       "options": {
         "legend": {
           "calcs": [
@@ -1566,7 +1074,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "Prometheus",
+            "type": "prometheus",
             "uid": "Prometheus"
           },
           "expr": "ef_change_tracker_entities{api_type=\"OOP\"} or vector(0)",
@@ -1574,12 +1082,12 @@
           "refId": "A"
         }
       ],
-      "title": "EF Core Change Tracker Entities (Should be 0)",
+      "title": "EF Core change tracker",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "Prometheus",
+        "type": "prometheus",
         "uid": "Prometheus"
       },
       "description": "Memory allocated per operation",
@@ -1637,12 +1145,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "x": 12,
+        "y": 40,
         "w": 12,
-        "x": 0,
-        "y": 64
+        "h": 8
       },
-      "id": 14,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [
@@ -1663,7 +1171,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "Prometheus",
+            "type": "prometheus",
             "uid": "Prometheus"
           },
           "expr": "memory_allocated_bytes_per_operation{api_type=\"OOP\"} or vector(0)",
@@ -1671,104 +1179,8 @@
           "refId": "A"
         }
       ],
-      "title": "Memory Allocation Per Operation",
+      "title": "Memory per operation",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "Prometheus",
-        "uid": "Prometheus"
-      },
-      "description": "Summary: Query count and average latency by query type",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 72
-      },
-      "id": 16,
-      "options": {
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Query Count (req/s)"
-          }
-        ]
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "sum(rate(db_query_count_total{api_type=\"OOP\"}[1m])) by (query_type)",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "Prometheus",
-            "uid": "Prometheus"
-          },
-          "expr": "avg(rate(db_query_duration_seconds_sum{api_type=\"OOP\"}[1m]) / rate(db_query_duration_seconds_count{api_type=\"OOP\"}[1m])) by (query_type)",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "B"
-        }
-      ],
-      "title": "Query Metrics Summary: Count & Average Latency by Query Type",
-      "transformations": [
-        {
-          "id": "merge",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "indexByName": {
-              "query_type": 0,
-              "Value #A": 1,
-              "Value #B": 2
-            },
-            "renameByName": {
-              "Value #A": "Query Count (req/s)",
-              "Value #B": "Avg Latency (s)",
-              "query_type": "Query Type"
-            }
-          }
-        }
-      ],
-      "type": "table"
     }
   ],
   "preload": false,
