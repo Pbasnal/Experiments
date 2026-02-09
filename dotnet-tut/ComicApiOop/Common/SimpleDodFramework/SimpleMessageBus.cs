@@ -57,7 +57,7 @@ public class SimpleMessageBus
 
                 if (_allQueues[messageType] is SimpleQueue<T> queue)
                 {
-                    await queue.BatchDequeue(batchSize, callback);
+                    await queue.BatchDequeue(batchSize, callback, cts.Token);
                 }
             }
             catch (Exception ex)

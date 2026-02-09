@@ -21,7 +21,6 @@ public class SimpleQueueTests
     [Test]
     public async Task BatchDequeue_EnqueueMessages_CallbackReceivesMessages()
     {
-
         ConcurrentBag<string> processedMessages = new ConcurrentBag<string>();
         int processedCount = 0;
         Random random = new Random();
@@ -39,7 +38,7 @@ public class SimpleQueueTests
         // Create a task completion source to signal when test is complete
         var tcs = new TaskCompletionSource<bool>();
 
-        // Setup callback to process messages
+        // Setup callback to process messages (thread-safe for parallel batches)
         Task<IValue[]> ProcessBatch(int batchSize, List<string?> messages)
         {
             Console.WriteLine($"Number of dequeued messages: {batchSize}");
@@ -48,16 +47,15 @@ public class SimpleQueueTests
                 if (messages[i] != null)
                 {
                     processedMessages.Add(messages[i]!);
-                    processedCount++;
+                    Interlocked.Increment(ref processedCount);
                 }
             }
 
             // Signal test completion when all messages are processed
-            if (processedCount >= messagesToEnqueue.Count)
-            {
+            int current = Volatile.Read(ref processedCount);
+            if (current >= messagesToEnqueue.Count)
                 tcs.TrySetResult(true);
-            }
-            return Task.Run(()=> new IValue[0]);
+            return Task.Run(() => new IValue[0]);
         }
 
         // Start batch dequeue in a separate task
@@ -79,7 +77,7 @@ public class SimpleQueueTests
 
         // Assert
         Assert.That(processingCompleted, Is.EqualTo(tcs.Task), "Processing did not complete in time");
-        Assert.That(processedCount, Is.EqualTo(messagesToEnqueue.Count), "Not all messages were processed");
+        Assert.That(Volatile.Read(ref processedCount), Is.EqualTo(messagesToEnqueue.Count), "Not all messages were processed");
 
         // Verify that all original messages were processed
         foreach (var message in messagesToEnqueue)

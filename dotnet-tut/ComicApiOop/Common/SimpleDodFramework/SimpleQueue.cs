@@ -21,66 +21,84 @@ public class SimpleQueue<T> : ISimpleQueue
         _queue.Enqueue(item);
     }
 
-    public T? Dequeue()
+    public List<T?> Dequeue(int batchSize)
     {
-        long startTimer = System.DateTime.Now.Millisecond;
-        long timeElapsed = 0;
-        bool messageDequeued = false;
-        T? message;
-        do
-        {
-            messageDequeued = _queue.TryDequeue(out message);
-            timeElapsed = DateTime.Now.Millisecond - startTimer;
-        } while (!messageDequeued && timeElapsed < _dequeueTimeoutMs);
+        List<T?> messageBatch = new List<T?>(batchSize);
 
-        if (!messageDequeued)
+        while (messageBatch.Count < batchSize && _queue.TryDequeue(out T? message))
         {
-            throw new TimeoutException($"Failed to dequeue message in the given timeout of {_dequeueTimeoutMs}");
+            messageBatch.Add(message);
         }
 
-        return message;
+        return messageBatch;
     }
 
-    public async Task<List<IValue>> BatchDequeue(int batchSize, Func<int, List<T?>, Task<IValue[]>> callback)
+    public async Task<List<IValue>> BatchDequeue(
+        int batchSize,
+        Func<int, List<T?>, Task<IValue[]>> callback,
+        CancellationToken cancellationToken = default)
     {
         if (batchSize <= 0) batchSize = 10;
 
-        var period = TimeSpan.FromMilliseconds(500);
+        TimeSpan period = TimeSpan.FromMilliseconds(2);
         Stopwatch sw = Stopwatch.StartNew();
-
         long nextTick = 0;
 
-        List<T?> messageBatch = new List<T?>(batchSize);
+        int numberOfEmptyDequeue = 0;
 
-        while (true)
+
+        while (!cancellationToken.IsCancellationRequested)
         {
-            int numberOfDequeuedMsgs = 0;
+            List<T?> messageBatch = Dequeue(batchSize);
 
-            // real production - this will be a problem that can lead to message loss
-            // if the service goes down after dequeue but before processing the message.
-            while (numberOfDequeuedMsgs < batchSize && _queue.Count > 0)
+            if (messageBatch.Count == 0)
             {
-                T? msg = Dequeue();
-                if (msg != null)
+                numberOfEmptyDequeue++;
+                if (numberOfEmptyDequeue > 5)
                 {
-                    messageBatch.Add(msg);
+                    period = TimeSpan.FromMilliseconds(10);
                 }
+
+                continue;
             }
 
-            if (messageBatch.Count > 0)
+            numberOfEmptyDequeue = 0;
+            period = TimeSpan.FromMilliseconds(2);
+
+            try
             {
-                await callback(numberOfDequeuedMsgs, messageBatch);
-                messageBatch.Clear();
+                callback(messageBatch.Count, messageBatch);
+            }
+            catch (Exception)
+            {
+                continue;
             }
 
             nextTick += period.Ticks;
-            var delay = nextTick - sw.Elapsed.Ticks;
-            if (delay > 0)
-                await Task.Delay(TimeSpan.FromTicks(delay));
-            else
-                await Task.Yield(); // We're running behind, skip sleep
-
-            await Task.Delay(_batchDequeueTimeoutMs);
+            long delay = nextTick - sw.Elapsed.Ticks;
+            try
+            {
+                if (delay > 0)
+                    await Task.Delay(TimeSpan.FromTicks(delay), cancellationToken);
+                else
+                    await Task.Yield();
+                await Task.Delay(_batchDequeueTimeoutMs, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
+
+        // Task[] remaining;
+        // lock (inFlightLock)
+        // {
+        //     remaining = inFlightTasks.ToArray();
+        // }
+        //
+        // if (remaining.Length > 0)
+        //     await Task.WhenAll(remaining);
+
+        return new List<IValue>();
     }
 }
