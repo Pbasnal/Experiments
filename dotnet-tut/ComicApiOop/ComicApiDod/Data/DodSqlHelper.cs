@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
+using Prometheus;
 
 namespace ComicApiDod.Data;
 
@@ -10,6 +12,15 @@ namespace ComicApiDod.Data;
 /// </summary>
 public static class DodSqlHelper
 {
+    private static readonly Histogram FetchPhaseDuration = Metrics.CreateHistogram(
+        "comic_visibility_fetch_batch_phase_duration_seconds",
+        "Duration of FetchVisibilityBatchAsync phases: db_call = ExecuteReaderAsync, result_processing = Read + build DodVisibilityBatch",
+        new HistogramConfiguration
+        {
+            Buckets = Histogram.ExponentialBuckets(0.0001, 2, 16),
+            LabelNames = new[] { "phase" }
+        });
+
     /// <summary>
     /// DOD-friendly row structs filled directly from SQL result sets.
     /// Flat, contiguous layout for cache efficiency.
@@ -258,93 +269,115 @@ public static class DodSqlHelper
         IDictionary<long, IList<ChapterRow>> chapters =
             new Dictionary<long, IList<ChapterRow>>();
 
-        await using var reader = (MySqlDataReader)await batch.ExecuteReaderAsync(ct);
-
-        // Result sets arrive in BatchCommands order: Comics, Chapters, GeoRules, SegmentRules, Pricings, ContentRatings, ComicTags
-        // Comics
-        while (await reader.ReadAsync(ct))
-            comics.Add(new ComicRow(reader.GetInt64(0), reader.GetInt64(1), reader.GetInt64(2), reader.GetDouble(3)));
-
-        await reader.NextResultAsync(ct);
-        // Chapters
-        while (await reader.ReadAsync(ct))
+        MySqlDataReader reader;
+        var dbCallSw = Stopwatch.StartNew();
+        try
         {
-            long comicId = reader.GetInt64(0);
-            if (!chapters.ContainsKey(comicId))
+            reader = (MySqlDataReader)await batch.ExecuteReaderAsync(ct);
+        }
+        finally
+        {
+            FetchPhaseDuration.WithLabels("db_call").Observe(dbCallSw.Elapsed.TotalSeconds);
+        }
+
+        await using (reader)
+        {
+            var resultProcessingSw = Stopwatch.StartNew();
+            try
             {
-                chapters.Add(comicId, new List<ChapterRow>());
+                // Result sets arrive in BatchCommands order: Comics, Chapters, GeoRules, SegmentRules, Pricings, ContentRatings, ComicTags
+                // Comics
+                while (await reader.ReadAsync(ct))
+                    comics.Add(new ComicRow(reader.GetInt64(0), reader.GetInt64(1), reader.GetInt64(2),
+                        reader.GetDouble(3)));
+
+                await reader.NextResultAsync(ct);
+                // Chapters
+                while (await reader.ReadAsync(ct))
+                {
+                    long comicId = reader.GetInt64(0);
+                    if (!chapters.ContainsKey(comicId))
+                    {
+                        chapters.Add(comicId, new List<ChapterRow>());
+                    }
+
+                    chapters[comicId].Add(new ChapterRow(comicId, reader.GetDateTime(1), reader.GetBoolean(2)));
+                }
+
+                await reader.NextResultAsync(ct);
+                // GeoRules
+                while (await reader.ReadAsync(ct))
+                    geoRules.Add(new GeoRuleRow(
+                        reader.GetInt64(0),
+                        reader.GetInt64(1),
+                        reader.GetString(2),
+                        reader.GetDateTime(3),
+                        reader.GetDateTime(4),
+                        reader.GetInt32(5),
+                        reader.GetBoolean(6)));
+
+
+                await reader.NextResultAsync(ct);
+                // SegmentRules
+                while (await reader.ReadAsync(ct))
+                    segmentRules.Add(new SegmentRuleRow(
+                        reader.GetInt64(0),
+                        reader.GetInt64(1),
+                        reader.GetBoolean(2),
+                        reader.GetBoolean(3)));
+
+                await reader.NextResultAsync(ct);
+                // Pricings
+                while (await reader.ReadAsync(ct))
+                    pricings.Add(new PricingRow(
+                        reader.GetInt64(0),
+                        reader.GetString(1),
+                        reader.GetDecimal(2),
+                        reader.GetBoolean(3),
+                        reader.GetBoolean(4)));
+
+                await reader.NextResultAsync(ct);
+                // ContentRatings
+                while (await reader.ReadAsync(ct))
+                {
+                    long comicId = reader.GetInt64(0);
+                    contentRatings.Add(comicId, new ContentRatingRow(
+                        comicId,
+                        reader.GetInt32(1),
+                        reader.GetInt32(2),
+                        reader.IsDBNull(3) ? string.Empty : reader.GetString(3)));
+                }
+
+                await reader.NextResultAsync(ct);
+                // ComicTags
+                while (await reader.ReadAsync(ct))
+                {
+                    long comicId = reader.GetInt64(0);
+                    if (!comicTags.ContainsKey(comicId))
+                    {
+                        comicTags.Add(comicId, new List<ComicTagRow>());
+                    }
+
+                    comicTags[comicId].Add(new ComicTagRow(
+                        comicId,
+                        reader.IsDBNull(1) ? string.Empty : reader.GetString(1)));
+                }
+
+                var batchResult = new DodVisibilityBatch(
+                    comics.ToArray(),
+                    chapters,
+                    geoRules.ToArray(),
+                    segmentRules.ToArray(),
+                    pricings.ToArray(),
+                    contentRatings,
+                    comicTags);
+                return batchResult;
             }
-
-            chapters[comicId].Add(new ChapterRow(comicId, reader.GetDateTime(1), reader.GetBoolean(2)));
-        }
-
-        await reader.NextResultAsync(ct);
-        // GeoRules
-        while (await reader.ReadAsync(ct))
-            geoRules.Add(new GeoRuleRow(
-                reader.GetInt64(0),
-                reader.GetInt64(1),
-                reader.GetString(2),
-                reader.GetDateTime(3),
-                reader.GetDateTime(4),
-                reader.GetInt32(5),
-                reader.GetBoolean(6)));
-
-
-        await reader.NextResultAsync(ct);
-        // SegmentRules
-        while (await reader.ReadAsync(ct))
-            segmentRules.Add(new SegmentRuleRow(
-                reader.GetInt64(0),
-                reader.GetInt64(1),
-                reader.GetBoolean(2),
-                reader.GetBoolean(3)));
-
-        await reader.NextResultAsync(ct);
-        // Pricings
-        while (await reader.ReadAsync(ct))
-            pricings.Add(new PricingRow(
-                reader.GetInt64(0),
-                reader.GetString(1),
-                reader.GetDecimal(2),
-                reader.GetBoolean(3),
-                reader.GetBoolean(4)));
-
-        await reader.NextResultAsync(ct);
-        // ContentRatings
-        while (await reader.ReadAsync(ct))
-        {
-            long comicId = reader.GetInt64(0);
-            contentRatings.Add(comicId, new ContentRatingRow(
-                comicId,
-                reader.GetInt32(1),
-                reader.GetInt32(2),
-                reader.IsDBNull(3) ? string.Empty : reader.GetString(3)));
-        }
-
-        await reader.NextResultAsync(ct);
-        // ComicTags
-        while (await reader.ReadAsync(ct))
-        {
-            long comicId = reader.GetInt64(0);
-            if (!comicTags.ContainsKey(comicId))
+            finally
             {
-                comicTags.Add(comicId, new List<ComicTagRow>());
+                FetchPhaseDuration.WithLabels("result_processing").Observe(resultProcessingSw.Elapsed.TotalSeconds);
             }
-
-            comicTags[comicId].Add(new ComicTagRow(
-                comicId,
-                reader.IsDBNull(1) ? string.Empty : reader.GetString(1)));
         }
-
-        return new DodVisibilityBatch(
-            comics.ToArray(),
-            chapters,
-            geoRules.ToArray(),
-            segmentRules.ToArray(),
-            pricings.ToArray(),
-            contentRatings,
-            comicTags);
     }
 }
 

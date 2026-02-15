@@ -134,10 +134,41 @@ public class ComicVisibilityService
 
             await using ComicDbContext db = _dbFactory.CreateDbContext();
             long[] comicIds = allComicIds.SelectMany(i => i).ToHashSet().ToArray();
-            DodSqlHelper.DodVisibilityBatch dodVisibilityBatch = await DodSqlHelper.FetchVisibilityBatchAsync(db,
-                comicIds, tkn);
 
-            ComicVisibilityResult[][] visibilityResults = ComputeVisibilityDod2(allComicIds, dodVisibilityBatch);
+            DodSqlHelper.DodVisibilityBatch dodVisibilityBatch;
+            var fetchSw = Stopwatch.StartNew();
+            try
+            {
+                dodVisibilityBatch = await DodSqlHelper.FetchVisibilityBatchAsync(db, comicIds, tkn);
+            }
+            finally
+            {
+                DbQueryDuration
+                    .WithLabels("fetch_visibility_batch")
+                    .Observe(fetchSw.Elapsed.TotalSeconds);
+            }
+
+            ComicVisibilityResult[][] visibilityResults;
+            var computeSw = Stopwatch.StartNew();
+            string computeStatus = "success";
+            try
+            {
+                visibilityResults = ComputeVisibilityDod2(allComicIds, dodVisibilityBatch);
+            }
+            catch
+            {
+                computeStatus = "failure";
+                throw;
+            }
+            finally
+            {
+                OperationDuration
+                    .WithLabels("compute_visibility_dod_style2", computeStatus)
+                    .Observe(computeSw.Elapsed.TotalSeconds);
+                OperationCounter
+                    .WithLabels("compute_visibility_dod_style2", computeStatus)
+                    .Inc();
+            }
 
             // Save computed visibility
             await SaveComputedVisibility(visibilityResults);

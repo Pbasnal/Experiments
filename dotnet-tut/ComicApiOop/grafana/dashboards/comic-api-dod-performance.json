@@ -1575,6 +1575,161 @@
       ],
       "title": "Computation Latencies",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "FetchVisibilityBatchAsync: db_call = ExecuteReaderAsync (DB round-trip), result_processing = Read + build DodVisibilityBatch. ComputeVisibilityDodStyle2 = visibility computation.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Duration (seconds)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 24,
+        "h": 8
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "legendFormat": "Fetch db_call p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "legendFormat": "Fetch db_call p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "legendFormat": "Fetch result_processing p50",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "legendFormat": "Fetch result_processing p95",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"compute_visibility_dod_style2\"}[1m])) by (le))",
+          "legendFormat": "ComputeVisibilityDodStyle2 p50",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"compute_visibility_dod_style2\"}[1m])) by (le))",
+          "legendFormat": "ComputeVisibilityDodStyle2 p95",
+          "range": true,
+          "refId": "F"
+        }
+      ],
+      "title": "DB Fetch & Compute Visibility (DOD Pipeline)",
+      "type": "timeseries"
     }
   ],
   "preload": false,
