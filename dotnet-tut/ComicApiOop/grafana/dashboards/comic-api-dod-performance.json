@@ -1581,7 +1581,7 @@
         "type": "prometheus",
         "uid": "Prometheus"
       },
-      "description": "FetchVisibilityBatchAsync: db_call = ExecuteReaderAsync (DB round-trip), result_processing = Read + build DodVisibilityBatch. ComputeVisibilityDodStyle2 = visibility computation.",
+      "description": "FetchVisibilityBatchAsync: db_call = ExecuteReaderAsync, result_processing = Read + build DodVisibilityBatch. ComputeVisibilityDodStyle2 = visibility computation. Save = flatten + EF SaveChangesAsync.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1726,6 +1726,50 @@
           "legendFormat": "ComputeVisibilityDodStyle2 p95",
           "range": true,
           "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"save_computed_visibility\"}[1m])) by (le))",
+          "legendFormat": "SaveComputedVisibility p50",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"save_computed_visibility\"}[1m])) by (le))",
+          "legendFormat": "SaveComputedVisibility p95",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_db_query_duration_seconds_bucket{query_type=\"save_computed_visibilities\"}[1m])) by (le))",
+          "legendFormat": "Save DB (SaveChangesAsync) p50",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_db_query_duration_seconds_bucket{query_type=\"save_computed_visibilities\"}[1m])) by (le))",
+          "legendFormat": "Save DB (SaveChangesAsync) p95",
+          "range": true,
+          "refId": "J"
         }
       ],
       "title": "DB Fetch & Compute Visibility (DOD Pipeline)",
