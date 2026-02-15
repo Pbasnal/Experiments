@@ -56,7 +56,7 @@ public class SimpleQueue<T> : ISimpleQueue
                 numberOfEmptyDequeue++;
                 if (numberOfEmptyDequeue > 5)
                 {
-                    period = TimeSpan.FromMilliseconds(10);
+                    period = TimeSpan.FromMilliseconds(2);
                 }
 
                 continue;

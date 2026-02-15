@@ -674,10 +674,8 @@ public class ComicVisibilityService
                     .SelectMany(res => res.ComputedVisibilities))
                 .ToArray();
 
-            await using ComicDbContext db = _dbFactory.CreateDbContext();
-
             var querySw = Stopwatch.StartNew();
-            await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(db, visibilityResultsToSave);
+            await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(_dbFactory, visibilityResultsToSave);
             DbQueryDuration
                 .WithLabels("save_computed_visibilities")
                 .Observe(querySw.Elapsed.TotalSeconds);
