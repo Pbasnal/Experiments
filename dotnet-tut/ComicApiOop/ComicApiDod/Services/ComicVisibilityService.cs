@@ -97,17 +97,9 @@ public class ComicVisibilityService
         try
         {
             // Sort requests
-            var sortSw = Stopwatch.StartNew();
+            Stopwatch sortSw = Stopwatch.StartNew();
             SortRequests(reqs);
-            OperationDuration
-                .WithLabels("sort_requests", "success")
-                .Observe(sortSw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("sort_requests", "success")
-                .Inc();
-
-            RequestsInBatch.Set(reqs.Count);
-            _metrics.RecordBatchProcessing(reqs.Count, TimeSpan.Zero, "started");
+            Metric.RecordReqMetrics(reqs, OperationDuration, OperationCounter, RequestsInBatch, _metrics, sortSw);
 
             // Validate requests (metrics recorded inside method)
             bool[] isReqValid = ValidateAllRequests(reqs, out IResult?[] validationResults);
@@ -328,6 +320,88 @@ public class ComicVisibilityService
     }
 
     private ComicVisibilityResult[][] ComputeVisibility(ComicBook[][] comicBooks)
+    {
+        // return computeVisibilityOopStyle(comicBooks);
+        return ComputeVisibilityDodStyle(comicBooks);
+    }
+
+    private ComicVisibilityResult[][] ComputeVisibilityDodStyle(ComicBook[][] comicBooks)
+    {
+        DateTime computationTime = DateTime.UtcNow;
+        // comicBooks -> Req x Comics per req
+
+        // compute pre-filters - Geo and Segment
+        // ComicGeoSegFilter[Req][Comic] 
+        ComicGeoSegFilter[][] geoSegFilters = ComicGeoSegFilter.GenerateGeoSegFilters(comicBooks, computationTime);
+
+        // ComicGeoSegFilter[Req][Comic] 
+        ComicGeoPricing[][] geoPricingOfComics = ComicGeoPricing.GenerateGeoPricingRules(comicBooks, geoSegFilters);
+
+        // ComicMeta[Req][Comic]
+        ComicMeta[][] comicMetas = ComicMeta.GenerateComicMeta(comicBooks, geoPricingOfComics);
+
+        ComputedVisibilityData emptyData = new ComputedVisibilityData();
+        ComicVisibilityResult[][] results = new ComicVisibilityResult[comicBooks.Length][];
+        for (int reqIdx = 0; reqIdx < comicBooks.Length; reqIdx++)
+        {
+            results[reqIdx] = new ComicVisibilityResult[comicBooks[reqIdx].Length];
+            for (int comicIdx = 0; comicIdx < comicBooks[reqIdx].Length; comicIdx++)
+            {
+                ComicBook comic = comicBooks[reqIdx][comicIdx];
+                ComputedVisibilityData[] computedVisibilityList =
+                    new ComputedVisibilityData[geoSegFilters[reqIdx][comicIdx].totalVisibleCount];
+                int visIdx = 0;
+                for (int geoIdx = 0; geoIdx < comic.GeographicRules.Count; geoIdx++)
+                {
+                    if (!geoSegFilters[reqIdx][comicIdx].geoFilter[geoIdx]) continue;
+                    string countryCode = comic.GeographicRules[geoIdx].CountryCodes.FirstOrDefault() ?? string.Empty;
+                    for (int segIdx = 0; segIdx < comic.CustomerSegmentRules.Count; segIdx++)
+                    {
+                        if (!geoSegFilters[reqIdx][comicIdx].segmentFilter[segIdx]) continue;
+
+                        computedVisibilityList[visIdx++] = new ComputedVisibilityData
+                        {
+                            ComicId = comic.Id,
+                            CountryCode = countryCode,
+                            CustomerSegmentId = comic.CustomerSegmentRules[segIdx].SegmentId,
+                            FreeChaptersCount = comicMetas[reqIdx][comicIdx].freeChapterCount,
+                            LastChapterReleaseTime = comicMetas[reqIdx][comicIdx].lastChapterReleaseTime,
+                            GenreId = comic.GenreId,
+                            PublisherId = comic.PublisherId,
+                            AverageRating = comic.AverageRating,
+                            SearchTags = comicMetas[reqIdx][comicIdx].searchTags,
+                            IsVisible = true,
+                            ComputedAt = computationTime,
+                            LicenseType = comic.GeographicRules[geoIdx].LicenseType,
+                            CurrentPrice = geoPricingOfComics[reqIdx][comicIdx].pricing[geoIdx]?.BasePrice ?? 0m,
+                            IsFreeContent =
+                                geoPricingOfComics[reqIdx][comicIdx].pricing[geoIdx]?.IsFreeContent ?? false,
+                            IsPremiumContent =
+                                geoPricingOfComics[reqIdx][comicIdx].pricing[geoIdx]?.IsPremiumContent ??
+                                false,
+                            AgeRating = comic.ContentRating?.AgeRating ?? AgeRating.AllAges,
+                            ContentFlags = comicMetas[reqIdx][comicIdx].contentFlag[geoIdx],
+                            ContentWarning = comic.ContentRating?.ContentWarning ?? string.Empty
+                        };
+                    }
+                }
+
+                results[reqIdx][comicIdx] = new ComicVisibilityResult
+                {
+                    ComicId = comicMetas[reqIdx][comicIdx].comicId,
+                    Success = true,
+                    ErrorMessage = null,
+                    ComputationTime = computationTime,
+                    ComputedVisibilities = computedVisibilityList
+                };
+            }
+        }
+
+        return results;
+    }
+
+
+    private ComicVisibilityResult[][] computeVisibilityOopStyle(ComicBook[][] comicBooks)
     {
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";

@@ -98,7 +98,7 @@ public static class VisibilityProcessor
 
         return flags;
     }
-
+    
     public static ComputedVisibilityData[] ComputeVisibilities(
         ComicBook comicBook,
         DateTime computationTime)
@@ -107,6 +107,8 @@ public static class VisibilityProcessor
         int freeChapterCount = comicBook.Chapters.Count(c => c.IsFree);
         DateTime lastChapterReleaseTime = comicBook.Chapters.Max(c => c.ReleaseTime);
         string searchTags = string.Join(",", comicBook.ComicTags.Select(t => t.Tag.Name));
+        bool allChaptersFree = comicBook.Chapters.Count == freeChapterCount;
+        bool hasAnyFreeChapter = freeChapterCount > 0;
 
         // Process all combinations of geographic and segment rules
         foreach (var geoRule in comicBook.GeographicRules)
@@ -118,9 +120,7 @@ public static class VisibilityProcessor
             // Get regional pricing
             ComicPricing? pricing = comicBook.RegionalPricing
                 .FirstOrDefault(p => geoRule.CountryCodes.Contains(p.RegionCode));
-           
-            bool allChaptersFree = comicBook.Chapters.Count == freeChapterCount;
-            bool hasAnyFreeChapter = freeChapterCount > 0;
+
             ContentFlag contentFlags = DetermineContentFlags(
                 comicBook.ContentRating?.ContentFlags ?? ContentFlag.None,
                 allChaptersFree, hasAnyFreeChapter,
@@ -131,7 +131,7 @@ public static class VisibilityProcessor
                 // Check segment visibility
                 if (!EvaluateSegmentVisibility(segmentRule))
                     continue;
-                
+
                 // Create visibility data
                 var visibility = new ComputedVisibilityData
                 {
