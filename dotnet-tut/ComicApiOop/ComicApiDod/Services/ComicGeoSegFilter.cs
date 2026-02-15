@@ -1,22 +1,24 @@
-﻿using ComicApiDod.Data;
+﻿using System.Collections.Concurrent;
+using ComicApiDod.Data;
 using Common.Models;
 
 namespace ComicApiDod.Services;
 
 public struct ComicGeoSegFilter
 {
-    public int totalVisibleCount;
     public bool[] geoFilter;
     public bool[] segmentFilter;
+    public IDictionary<long, int> totalVisibleCount;
     public IDictionary<long, IList<int>> comicToGeoIndex;
     public IDictionary<long, IList<int>> comicToSegIndex;
-    
+
     public ComicGeoSegFilter(int lenOfGeoFilter, int lenOfSegmentFilter)
     {
         geoFilter = new bool[lenOfGeoFilter];
         segmentFilter = new bool[lenOfSegmentFilter];
         comicToGeoIndex = new Dictionary<long, IList<int>>();
         comicToSegIndex = new Dictionary<long, IList<int>>();
+        totalVisibleCount = new Dictionary<long, int>();
     }
 
     public static ComicGeoSegFilter[][] GenerateGeoSegFilters(ComicBook[][] comicBooks,
@@ -53,7 +55,7 @@ public struct ComicGeoSegFilter
                     if (geoSegFilters[reqIdx][comicIdx].segmentFilter[segIdx]) visibleSegs++;
                 }
 
-                geoSegFilters[reqIdx][comicIdx].totalVisibleCount = visibleGeos * visibleSegs;
+                // geoSegFilters[reqIdx][comicIdx].totalVisibleCount = visibleGeos * visibleSegs;
             }
         }
 
@@ -70,7 +72,6 @@ public struct ComicGeoSegFilter
             segRules.Length);
 
         // comicBooks[i][j] <- this gives jth comic for request i
-        int visibleGeos = 0;
         // assumption: SQL will get geoRules sorted on comicId
         // So when we are building the Dictionary, we will be
         // processing 1 comicId at a time and code won't jump 
@@ -81,23 +82,36 @@ public struct ComicGeoSegFilter
                 .EvaluateGeographicVisibility(
                     geoRules[geoRuleIdx],
                     computationTime);
-            if (geoSegFilters.geoFilter[geoRuleIdx]) visibleGeos++;
 
             updateIndex(geoSegFilters.comicToGeoIndex, geoRules[geoRuleIdx].ComicId, geoRuleIdx);
+            if (!geoSegFilters.totalVisibleCount.ContainsKey(geoRules[geoRuleIdx].ComicId))
+            {
+                geoSegFilters.totalVisibleCount.Add(geoRules[geoRuleIdx].ComicId, 0);
+            }
+
+            if (geoSegFilters.geoFilter[geoRuleIdx])
+                geoSegFilters.totalVisibleCount[geoRules[geoRuleIdx].ComicId] +=
+                    geoRules[geoRuleIdx].CountryCodes.Count;
         }
 
-        int visibleSegs = 0;
+        IDictionary<long, int> visibleSegs = new Dictionary<long, int>();
         for (int segIdx = 0; segIdx < segRules.Length; segIdx++)
         {
             geoSegFilters.segmentFilter[segIdx] = VisibilityProcessor
                 .EvaluateSegmentVisibility(segRules[segIdx]);
-            if (geoSegFilters.segmentFilter[segIdx]) visibleSegs++;
-            
+
             updateIndex(geoSegFilters.comicToSegIndex, segRules[segIdx].ComicId, segIdx);
+
+            if (!visibleSegs.ContainsKey(segRules[segIdx].ComicId)) visibleSegs.Add(segRules[segIdx].ComicId, 0);
+
+            if (geoSegFilters.segmentFilter[segIdx]) visibleSegs[segRules[segIdx].ComicId]++;
         }
 
-        geoSegFilters.totalVisibleCount = visibleGeos * visibleSegs;
-        
+        foreach (long comicId in visibleSegs.Keys)
+        {
+            geoSegFilters.totalVisibleCount[comicId] *= visibleSegs[comicId];
+        }
+
         return geoSegFilters;
     }
 
@@ -110,6 +124,7 @@ public struct ComicGeoSegFilter
         {
             index.Add(comicId, new List<int>());
         }
+
         index[comicId].Add(idx);
     }
 }
@@ -218,12 +233,13 @@ public struct ComicMeta
             comicMeta.freeChapterCount = comicBatch.Chapters[comic.Id].Count(c => c.IsFree);
             comicMeta.allChaptersFree = comicBatch.Chapters[comic.Id].Count == comicMeta.freeChapterCount;
             comicMeta.lastChapterReleaseTime = comicBatch.Chapters[comic.Id].Max(c => c.ReleaseTime);
-            comicMeta.searchTags = comicBatch.ComicTags.ContainsKey(comic.Id) 
-                ?  string.Join(",", comicBatch.ComicTags[comic.Id] .Select(t => t.TagName))
+            comicMeta.searchTags = comicBatch.ComicTags.ContainsKey(comic.Id)
+                ? string.Join(",", comicBatch.ComicTags[comic.Id].Select(t => t.TagName))
                 : string.Empty;
-            
+
             comicMetaMap.Add(comic.Id, comicMeta);
         }
+
         return comicMetaMap;
     }
 }
