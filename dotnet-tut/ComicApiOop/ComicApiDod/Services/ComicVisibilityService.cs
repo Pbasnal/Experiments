@@ -92,6 +92,7 @@ public class ComicVisibilityService
             }
         }
 
+        CancellationToken tkn = new CancellationTokenSource().Token;
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
         try
@@ -126,10 +127,17 @@ public class ComicVisibilityService
                 .Inc();
 
             // Fetch batch data
-            ComicBook[][] comicBatchData = await FetchBatchDataForComics(allComicIds);
+            // ComicBook[][] comicBatchData = await FetchBatchDataForComics(allComicIds);
+            //
+            // // Compute visibility
+            // ComicVisibilityResult[][] visibilityResults = ComputeVisibility(comicBatchData);
 
-            // Compute visibility
-            ComicVisibilityResult[][] visibilityResults = ComputeVisibility(comicBatchData);
+            await using ComicDbContext db = _dbFactory.CreateDbContext();
+            long[] comicIds = allComicIds.SelectMany(i => i).ToHashSet().ToArray();
+            DodSqlHelper.DodVisibilityBatch dodVisibilityBatch = await DodSqlHelper.FetchVisibilityBatchAsync(db,
+                comicIds, tkn);
+
+            ComicVisibilityResult[][] visibilityResults = ComputeVisibilityDod2(allComicIds, dodVisibilityBatch);
 
             // Save computed visibility
             await SaveComputedVisibility(visibilityResults);
@@ -400,6 +408,133 @@ public class ComicVisibilityService
         return results;
     }
 
+    private ComicVisibilityResult[][] ComputeVisibilityDod2(
+        long[][] requestComicIds,
+        DodSqlHelper.DodVisibilityBatch comicBatch)
+    {
+        IDictionary<long, ComicVisibilityResult> visibilities = ComputeVisibilityDodStyle2(comicBatch);
+
+        ComicVisibilityResult[][] results = new ComicVisibilityResult[requestComicIds.Length][];
+        for (int i = 0; i < requestComicIds.Length; i++)
+        {
+            int numOfComics = requestComicIds[i].Length;
+            results[i] = new ComicVisibilityResult[numOfComics];
+            for (int comicIdx = 0; comicIdx < numOfComics; comicIdx++)
+            {
+                long comicId = requestComicIds[i][comicIdx];
+                results[i][comicIdx] = visibilities[comicId];
+            }
+        }
+
+        return results;
+    }
+
+    private IDictionary<long, ComicVisibilityResult> ComputeVisibilityDodStyle2(
+        DodSqlHelper.DodVisibilityBatch comicBatch)
+    {
+        DateTime computationTime = DateTime.UtcNow;
+        // comicBooks -> Req x Comics per req
+
+        // compute pre-filters - Geo and Segment
+        // ComicGeoSegFilter[Comic] 
+        ComicGeoSegFilter geoSegFilters = ComicGeoSegFilter.GenerateGeoSegFilters(
+            comicBatch.GeoRules,
+            comicBatch.SegmentRules,
+            computationTime);
+
+        // ComicGeoSegFilter[Comic] 
+        DodSqlHelper.PricingRow[] pricingRows = comicBatch.Pricings;
+        IDictionary<PricingRegionKey, int> pricingIndex = new Dictionary<PricingRegionKey, int>();
+        for (int pricingIdx = 0; pricingIdx < pricingRows.Length; pricingIdx++)
+        {
+            PricingRegionKey key = PricingRegionKey.of(pricingRows[pricingIdx].ComicId,
+                pricingRows[pricingIdx].RegionCode);
+
+            if (pricingIndex.ContainsKey(key)) continue;
+
+            pricingIndex.Add(key, pricingIdx);
+        }
+
+
+        // ComicMeta[Comic] without content flags
+        IDictionary<long, ComicMeta> comicMetaMap = ComicMeta.GenerateComicMeta(comicBatch);
+
+        for (int pricingIdx = 0; pricingIdx < pricingRows.Length; pricingIdx++)
+        {
+            long comicId = pricingRows[pricingIdx].ComicId;
+            comicMetaMap[comicId].contentFlag[pricingIdx] = VisibilityProcessor.DetermineContentFlags(
+                (ContentFlag)comicBatch.ContentRatings[comicId].ContentFlags,
+                comicMetaMap[comicId].allChaptersFree,
+                comicMetaMap[comicId].freeChapterCount > 0,
+                pricingRows[pricingIdx].BasePrice
+            );
+        }
+
+        IDictionary<long, ComicVisibilityResult> results = new Dictionary<long, ComicVisibilityResult>();
+        for (int comicIdx = 0; comicIdx < comicBatch.Comics.Length; comicIdx++)
+        {
+            DodSqlHelper.ComicRow comic = comicBatch.Comics[comicIdx];
+            if (results.ContainsKey(comic.Id)) continue;
+
+            IList<int> geoRuleIdxList = geoSegFilters.comicToGeoIndex[comic.Id];
+            IList<int> segRuleIdxList = geoSegFilters.comicToSegIndex[comic.Id];
+            long numberOfVisibilities = geoRuleIdxList.Count * segRuleIdxList.Count;
+
+            ComputedVisibilityData[] computedVisibilityList = new ComputedVisibilityData[numberOfVisibilities];
+            int visIdx = 0;
+            foreach (int geoRuleId in geoRuleIdxList)
+            {
+                if (!geoSegFilters.geoFilter[geoRuleId]) continue;
+
+                // CountryCodes can't be empty since we set filter to false if it is.
+                // string countryCode = comicBatch.GeoRules[geoRuleId].CountryCodes.FirstOrDefault();
+                foreach (string countryCode in comicBatch.GeoRules[geoRuleId].CountryCodes)
+                {
+                    foreach (int segRuleId in segRuleIdxList)
+                    {
+                        if (!geoSegFilters.segmentFilter[segRuleId]) continue;
+                        PricingRegionKey pricingRegionKey = PricingRegionKey.of(comic.Id, countryCode);
+                        if (!pricingIndex.ContainsKey(pricingRegionKey)) continue;
+
+                        computedVisibilityList[visIdx++] = new ComputedVisibilityData
+                        {
+                            ComicId = comic.Id,
+                            CountryCode = countryCode,
+                            CustomerSegmentId = comicBatch.SegmentRules[segRuleId].SegmentId,
+                            FreeChaptersCount = comicMetaMap[comic.Id].freeChapterCount,
+                            LastChapterReleaseTime = comicMetaMap[comic.Id].lastChapterReleaseTime,
+                            GenreId = comic.GenreId,
+                            PublisherId = comic.PublisherId,
+                            AverageRating = comic.AverageRating,
+                            SearchTags = comicMetaMap[comic.Id].searchTags,
+                            IsVisible = true,
+                            ComputedAt = computationTime,
+                            LicenseType = (LicenseType)comicBatch.GeoRules[geoRuleId].LicenseType,
+                            CurrentPrice = pricingRows[pricingIndex[pricingRegionKey]].BasePrice,
+                            IsFreeContent = pricingRows[pricingIndex[pricingRegionKey]].IsFreeContent,
+                            IsPremiumContent = pricingRows[pricingIndex[pricingRegionKey]].IsPremiumContent,
+                            AgeRating = (AgeRating)comicBatch.ContentRatings[comic.Id].AgeRating,
+                            ContentFlags = comicMetaMap[comic.Id].contentFlag[pricingIndex[pricingRegionKey]],
+                            ContentWarning = comicBatch.ContentRatings[comic.Id].ContentWarning ?? string.Empty
+                        };
+                    }
+                }
+            }
+
+            results.Add(comic.Id, new ComicVisibilityResult
+            {
+                ComicId = comic.Id,
+                Success = true,
+                ErrorMessage = null,
+                ComputationTime = computationTime,
+                ComputedVisibilities = visIdx == 0
+                    ? new ComputedVisibilityData[0]
+                    : computedVisibilityList[0..(visIdx + 1)]
+            });
+        }
+
+        return results;
+    }
 
     private ComicVisibilityResult[][] computeVisibilityOopStyle(ComicBook[][] comicBooks)
     {
@@ -457,7 +592,8 @@ public class ComicVisibilityService
 
                     // Record per-item computation latency
                     OperationDuration
-                        .WithLabels("compute_visibility_item", computedVisibilities.Length > 0 ? "success" : "failure")
+                        .WithLabels("compute_visibility_item",
+                            computedVisibilities.Length > 0 ? "success" : "failure")
                         .Observe(itemSw.Elapsed.TotalSeconds);
                 }
             }

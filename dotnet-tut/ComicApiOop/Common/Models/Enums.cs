@@ -25,9 +25,9 @@ public enum AgeRating
 
 public enum LicenseType
 {
-    Full,
-    PreviewOnly,
-    NoAccess
+    Full = 0,
+    PreviewOnly = 1,
+    NoAccess = 2
 }
 
 

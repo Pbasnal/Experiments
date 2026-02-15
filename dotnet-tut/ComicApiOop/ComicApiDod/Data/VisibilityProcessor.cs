@@ -19,6 +19,15 @@ public static class VisibilityProcessor
                && rule.LicenseType != LicenseType.NoAccess;
     }
 
+    public static bool EvaluateGeographicVisibility(in DodSqlHelper.GeoRuleRow rule, DateTime currentTime)
+    {
+        return rule.IsVisible
+               && currentTime >= rule.LicenseStartDate
+               && currentTime <= rule.LicenseEndDate
+               && rule.LicenseType != (int)LicenseType.NoAccess
+               && rule.CountryCodes.Count > 0;
+    }
+
     public static bool EvaluateGeographicVisibility(GeographicRule rule, DateTime currentTime)
     {
         return rule.IsVisible
@@ -33,6 +42,11 @@ public static class VisibilityProcessor
     public static bool EvaluateSegmentVisibility(CustomerSegmentRule segment)
     {
         return segment.IsVisible && segment.Segment.IsActive;
+    }
+    
+    public static bool EvaluateSegmentVisibility(DodSqlHelper.SegmentRuleRow segment)
+    {
+        return segment.IsVisible && segment.SegmentIsActive;
     }
 
     /// <summary>
@@ -98,7 +112,7 @@ public static class VisibilityProcessor
 
         return flags;
     }
-    
+
     public static ComputedVisibilityData[] ComputeVisibilities(
         ComicBook comicBook,
         DateTime computationTime)
@@ -124,7 +138,7 @@ public static class VisibilityProcessor
             ContentFlag contentFlags = DetermineContentFlags(
                 comicBook.ContentRating?.ContentFlags ?? ContentFlag.None,
                 allChaptersFree, hasAnyFreeChapter,
-                pricing);
+                pricing?.BasePrice);
 
             foreach (CustomerSegmentRule segmentRule in comicBook.CustomerSegmentRules)
             {
@@ -199,7 +213,7 @@ public static class VisibilityProcessor
         ContentFlag baseFlags,
         bool allChaptersFree,
         bool hasAnyFreeChapter,
-        ComicPricing? pricing)
+        decimal? basePrice)
     {
         var flags = baseFlags;
 
@@ -216,7 +230,7 @@ public static class VisibilityProcessor
         }
 
         // Add Freemium flag if the comic has both free and paid chapters or has a price
-        if ((hasAnyFreeChapter && !allChaptersFree) || (pricing?.BasePrice > 0))
+        if ((hasAnyFreeChapter && !allChaptersFree) || (basePrice > 0))
         {
             flags |= ContentFlag.Freemium;
         }
