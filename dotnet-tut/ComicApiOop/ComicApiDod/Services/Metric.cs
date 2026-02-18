@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using Common.Metrics;
 using Common.Models;
 using Prometheus;
 
@@ -7,22 +8,15 @@ namespace ComicApiDod.Services;
 public class Metric
 {
     public static void RecordReqMetrics(List<VisibilityComputationRequest?> reqs,
-        Histogram OperationDuration,
-        Counter OperationCounter,
         Gauge RequestsInBatch,
-        VisibilityMetricsService _metrics,
+        IAppMetrics appMetrics,
         Stopwatch sortSw)
     {
-        
-        OperationDuration
-            .WithLabels("sort_requests", "success")
-            .Observe(sortSw.Elapsed.TotalSeconds);
-        OperationCounter
-            .WithLabels("sort_requests", "success")
-            .Inc();
+        var sortAttrs = new Dictionary<string, string> { ["status"] = "success" };
+        appMetrics.RecordLatency("comic_visibility_operation_sort_requests", sortSw.Elapsed.TotalSeconds, sortAttrs);
+        appMetrics.CaptureCount("comic_visibility_operation_sort_requests", 1, sortAttrs);
 
         RequestsInBatch.Set(reqs.Count);
-        _metrics.RecordBatchProcessing(reqs.Count, TimeSpan.Zero, "started");
-
+        appMetrics.CaptureCount("visibility_batch_processing", 1, new Dictionary<string, string> { ["status"] = "started" });
     }
 }
