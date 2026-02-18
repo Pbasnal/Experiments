@@ -120,10 +120,10 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "rate(request_count_total_dod{query_type=\"compute_visibilities\"}[$__rate_interval])",
+          "expr": "sum(rate(metric_counter{process=\"compute_visibilities\"}[$__rate_interval])) by (process, status)",
           "hide": false,
           "instant": false,
-          "legendFormat": "{{query_type}} call rate",
+          "legendFormat": "{{process}} {{status}}",
           "range": true,
           "refId": "B"
         }
@@ -1469,8 +1469,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "group by(type, status) (rate(comic_visibility_computation_total[1m]))",
-          "legendFormat": "{{type}} {{status}}",
+          "expr": "sum(rate(metric_counter{process=~\"visibility_batch_processing|comic_visibility_operation_.*\"}[1m])) by (process, status)",
+          "legendFormat": "{{process}} {{status}}",
           "range": true,
           "refId": "A"
         }
@@ -1567,8 +1567,8 @@
       "targets": [
         {
           "editorMode": "builder",
-          "expr": "group by(type, status) (histogram_quantile(0.9, comic_visibility_computation_duration_seconds_bucket))",
-          "legendFormat": "{{type}} - {{status}} p90",
+          "expr": "histogram_quantile(0.9, sum(rate(metric_latency_bucket{process=\"visibility_batch_processing\"}[1m])) by (le, process, status))",
+          "legendFormat": "{{process}} - {{status}} p90",
           "range": true,
           "refId": "A"
         }
@@ -1711,7 +1711,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"compute_visibility_dod_style2\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
           "legendFormat": "ComputeVisibilityDodStyle2 p50",
           "range": true,
           "refId": "E"
@@ -1722,7 +1722,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"compute_visibility_dod_style2\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
           "legendFormat": "ComputeVisibilityDodStyle2 p95",
           "range": true,
           "refId": "F"
@@ -1733,7 +1733,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"save_computed_visibility\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
           "legendFormat": "SaveComputedVisibility p50",
           "range": true,
           "refId": "G"
@@ -1744,7 +1744,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_operation_duration_seconds_bucket{operation=\"save_computed_visibility\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
           "legendFormat": "SaveComputedVisibility p95",
           "range": true,
           "refId": "H"
@@ -1755,7 +1755,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_db_query_duration_seconds_bucket{query_type=\"save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p50",
           "range": true,
           "refId": "I"
@@ -1766,7 +1766,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_db_query_duration_seconds_bucket{query_type=\"save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p95",
           "range": true,
           "refId": "J"
@@ -1777,7 +1777,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum(rate(comic_visibility_db_query_duration_seconds_bucket{query_type=\"save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p99",
           "range": true,
           "refId": "K"
