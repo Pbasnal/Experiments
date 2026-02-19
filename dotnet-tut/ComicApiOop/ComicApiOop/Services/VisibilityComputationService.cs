@@ -1,6 +1,6 @@
+using Common.Metrics;
 using Common.Models;
 using ComicApiOop.Data;
-using ComicApiOop.Metrics;
 using ComicApiOop.Middleware;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,17 +11,20 @@ public class VisibilityComputationService
     private readonly ComicDbContext _dbContext;
     private readonly ILogger<VisibilityComputationService> _logger;
     private readonly MetricsReporter _metricsReporter;
+    private readonly IAppMetrics _appMetrics;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public VisibilityComputationService(
         ComicDbContext dbContext,
         ILogger<VisibilityComputationService> logger,
         MetricsReporter metricsReporter,
+        IAppMetrics appMetrics,
         IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
         _logger = logger;
         _metricsReporter = metricsReporter;
+        _appMetrics = appMetrics;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -167,7 +170,7 @@ public class VisibilityComputationService
         if (httpContext?.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime requestReceivedAtUtc)
         {
             var waitSeconds = (DateTime.UtcNow - requestReceivedAtUtc).TotalSeconds;
-            MetricsConfiguration.RequestWaitTimeSeconds.Observe(waitSeconds);
+            _appMetrics.RecordLatency("oop_request_wait", waitSeconds);
         }
 
         // Validate input parameters

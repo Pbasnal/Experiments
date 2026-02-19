@@ -1,3 +1,4 @@
+using Common.Metrics;
 using ComicApiOop.Services;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddComicApiServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<IAppMetrics, AppMetrics>();
+
         // Required for Request Wait Time metric (service reads request timestamp from HttpContext)
         services.AddHttpContextAccessor();
 
@@ -41,7 +44,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MetricsReporter>(sp =>
         {
             var dbContext = sp.GetRequiredService<ComicDbContext>();
-            return new MetricsReporter(dbContext);
+            var appMetrics = sp.GetRequiredService<IAppMetrics>();
+            return new MetricsReporter(dbContext, appMetrics);
         });
 
         return services;

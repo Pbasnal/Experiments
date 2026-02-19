@@ -1,3 +1,4 @@
+using Common.Metrics;
 using ComicApiOop.Metrics;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -7,15 +8,18 @@ namespace ComicApiOop.Services;
 /// <summary>
 /// Encapsulates metric reporting logic using a functional approach.
 /// Methods accept functions/lambdas that are executed and automatically tracked.
+/// Uses Common.Metrics.IAppMetrics for latency and count; MetricsConfiguration for gauges.
 /// </summary>
 public class MetricsReporter
 {
     private const string ApiType = "OOP";
     private readonly DbContext _dbContext;
+    private readonly IAppMetrics _appMetrics;
 
-    public MetricsReporter(DbContext dbContext)
+    public MetricsReporter(DbContext dbContext, IAppMetrics appMetrics)
     {
         _dbContext = dbContext;
+        _appMetrics = appMetrics;
     }
 
     /// <summary>
@@ -40,12 +44,10 @@ public class MetricsReporter
         finally
         {
             sw.Stop();
-            MetricsConfiguration.DbQueryDuration
-                .WithLabels(ApiType, queryType, operationName)
-                .Observe(sw.Elapsed.TotalSeconds);
-            MetricsConfiguration.DbQueryCountTotal
-                .WithLabels(ApiType, queryType, operationName)
-                .Inc();
+            var process = $"oop_db_query_{queryType}";
+            var attrs = new Dictionary<string, string> { ["status"] = "ok" };
+            _appMetrics.RecordLatency(process, sw.Elapsed.TotalSeconds, attrs);
+            _appMetrics.CaptureCount(process, 1, attrs);
         }
     }
 
@@ -70,9 +72,10 @@ public class MetricsReporter
         finally
         {
             sw.Stop();
-            MetricsConfiguration.DbQueryDuration
-                .WithLabels(ApiType, queryType, operationName)
-                .Observe(sw.Elapsed.TotalSeconds);
+            var process = $"oop_operation_{queryType}";
+            var attrs = new Dictionary<string, string> { ["status"] = "ok" };
+            _appMetrics.RecordLatency(process, sw.Elapsed.TotalSeconds, attrs);
+            _appMetrics.CaptureCount(process, 1, attrs);
         }
     }
 
@@ -119,28 +122,16 @@ public class MetricsReporter
         try
         {
             var result = await operationFunc();
-            
-            // Track total operation time
-            MetricsConfiguration.DbQueryDuration
-                .WithLabels(ApiType, "total_operation", operationName)
-                .Observe(swTotal.Elapsed.TotalSeconds);
-            
-            // Track memory allocation
-            // var memoryAfter = GC.GetTotalMemory(false);
-            // TrackMemoryAllocation(operationName, memoryBefore, memoryAfter);
-            //
+            var attrs = new Dictionary<string, string> { ["status"] = "ok" };
+            _appMetrics.RecordLatency("oop_operation_total", swTotal.Elapsed.TotalSeconds, attrs);
+            _appMetrics.CaptureCount("oop_operation_total", 1, attrs);
             return result;
         }
         catch
         {
-            // Still track metrics even on error
-            MetricsConfiguration.DbQueryDuration
-                .WithLabels(ApiType, "total_operation", operationName)
-                .Observe(swTotal.Elapsed.TotalSeconds);
-            
-            // var memoryAfter = GC.GetTotalMemory(false);
-            // TrackMemoryAllocation(operationName, memoryBefore, memoryAfter);
-            //
+            var attrs = new Dictionary<string, string> { ["status"] = "error" };
+            _appMetrics.RecordLatency("oop_operation_total", swTotal.Elapsed.TotalSeconds, attrs);
+            _appMetrics.CaptureCount("oop_operation_total", 1, attrs);
             throw;
         }
     }

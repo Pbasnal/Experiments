@@ -1,4 +1,4 @@
-using ComicApiOop.Metrics;
+using Common.Metrics;
 using System.Diagnostics;
 
 namespace ComicApiOop.Middleware;
@@ -7,46 +7,34 @@ public class MetricsMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<MetricsMiddleware> _logger;
+    private readonly IAppMetrics _appMetrics;
 
-    public MetricsMiddleware(RequestDelegate next, ILogger<MetricsMiddleware> logger)
+    public MetricsMiddleware(RequestDelegate next, ILogger<MetricsMiddleware> logger, IAppMetrics appMetrics)
     {
         _next = next;
         _logger = logger;
+        _appMetrics = appMetrics;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var path = context.Request.Path.Value;
-        var method = context.Request.Method;
-        var endpoint = $"{method} {path}";
-
         var sw = Stopwatch.StartNew();
+        string status;
 
         try
         {
             await _next(context);
-
-            // Record metrics after successful request
-            var status = context.Response.StatusCode.ToString();
-            MetricsConfiguration.HttpRequestCounter
-                .WithLabels(method, path ?? string.Empty, status)
-                .Inc();
-
-            MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path ?? string.Empty, status)
-                .Observe(sw.Elapsed.TotalSeconds);
+            status = context.Response.StatusCode.ToString();
         }
         catch
         {
-            // Record metrics after failed request
-            MetricsConfiguration.HttpRequestCounter
-                .WithLabels(method, path ?? string.Empty, "500")
-                .Inc();
-
-            MetricsConfiguration.HttpRequestDuration
-                .WithLabels(method, path ?? string.Empty, "500")
-                .Observe(sw.Elapsed.TotalSeconds);
+            status = "500";
+            _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
+            _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
             throw;
         }
+
+        _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
+        _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
     }
 }
