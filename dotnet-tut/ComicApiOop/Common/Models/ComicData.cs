@@ -151,7 +151,7 @@ public class VisibilityComputationRequest : IValue
         StartId = startId;
         Limit = limit;
         Id = Guid.NewGuid().GetHashCode();
-        ResponseSrc = new TaskCompletionSource<VisibilityComputationResponse>(TaskCreationOptions.None);
+        ResponseSrc = new TaskCompletionSource<VisibilityComputationResponse>();
         RequestStartTimeUtc = DateTime.UtcNow;
     }
 

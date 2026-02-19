@@ -7,6 +7,8 @@ namespace ComicApiOop.Endpoints;
 public static class ComicEndpoints
 {
     private const string ProcessName = "compute_visibilities";
+    /// <summary>Server-side request timeout; requests exceeding this return 504 so timeouts are visible in metrics.</summary>
+    private static readonly TimeSpan ProcessTimeout = TimeSpan.FromSeconds(10);
 
     public static void MapComicEndpoints(this WebApplication app)
     {
@@ -44,7 +46,20 @@ public static class ComicEndpoints
 
             try
             {
-                var result = await service.ComputeVisibilitiesBulkAsync(startId, limit);
+                var workTask = service.ComputeVisibilitiesBulkAsync(startId, limit);
+                var delayTask = Task.Delay(ProcessTimeout);
+                var completed = await Task.WhenAny(workTask, delayTask);
+                if (completed == delayTask)
+                {
+                    var timeoutAttrs = new Dictionary<string, string> { ["status"] = "timeout" };
+                    metrics.CaptureCount(ProcessName, 1, timeoutAttrs);
+                    metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, timeoutAttrs);
+                    return Results.Problem(
+                        detail: "Request timed out after 10 seconds",
+                        title: "Request Timeout",
+                        statusCode: 504);
+                }
+                var result = await workTask;
                 var attrs = new Dictionary<string, string> { ["status"] = status };
                 metrics.CaptureCount(ProcessName, 1, attrs);
                 metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
@@ -87,6 +102,7 @@ public static class ComicEndpoints
         .Produces<BulkVisibilityComputationResult>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status504GatewayTimeout)
         .Produces(StatusCodes.Status500InternalServerError);
     }
 }
