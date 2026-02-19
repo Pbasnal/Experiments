@@ -1,4 +1,5 @@
 using Common.Metrics;
+using ComicApiOop.Metrics;
 using System.Diagnostics;
 
 namespace ComicApiOop.Middleware;
@@ -31,10 +32,12 @@ public class MetricsMiddleware
             status = "500";
             _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
             _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
+            MetricsConfiguration.RecordApiRequest("OOP", status);
             throw;
         }
 
         _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
         _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
+        MetricsConfiguration.RecordApiRequest("OOP", status);
     }
 }

@@ -530,8 +530,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"0\"}[5m])",
-          "legendFormat": "Gen 0 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 0",
           "refId": "A"
         },
         {
@@ -539,8 +539,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"1\"}[5m])",
-          "legendFormat": "Gen 1 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 1",
           "refId": "B"
         },
         {
@@ -548,12 +548,12 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{job=\"comic-api-oop\", api_type=\"OOP\", generation=\"2\"}[5m])",
-          "legendFormat": "Gen 2 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 2",
           "refId": "C"
         }
       ],
-      "title": "Garbage Collection",
+      "title": "Garbage Collection (OOP vs DOD)",
       "type": "timeseries"
     },
     {
@@ -646,8 +646,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_allocated_bytes{job=\"comic-api-oop\", api_type=\"OOP\"}",
-          "legendFormat": "Allocated Memory",
+          "expr": "dotnet_memory_allocated_bytes{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}} Allocated",
           "refId": "A"
         },
         {
@@ -655,12 +655,100 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_total_bytes{job=\"comic-api-oop\", api_type=\"OOP\"}",
-          "legendFormat": "Total Memory",
+          "expr": "dotnet_memory_total_bytes{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}} Total",
           "refId": "B"
         }
       ],
-      "title": "Memory allocation",
+      "title": "Memory allocation (OOP vs DOD)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Gen 0 GC collections per 1000 HTTP requests; compare OOP vs DOD under same load",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "GC per 1000 req",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "scaleDistribution": { "type": "linear" }
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "id": 20,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "(rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(api_http_requests_total[5m])) by (api_type)) * 1000",
+          "legendFormat": "{{api_type}} Gen 0 per 1k req",
+          "refId": "A"
+        }
+      ],
+      "title": "GC per 1000 requests (Gen 0)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Fraction of time spent in GC pause (0–1). Lower is better.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Pause ratio",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "scaleDistribution": { "type": "linear" }
+          },
+          "max": 1,
+          "min": 0,
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "id": 21,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "gc_pause_time_ratio{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}}",
+          "refId": "A"
+        }
+      ],
+      "title": "GC pause time ratio (OOP vs DOD)",
       "type": "timeseries"
     },
     {
@@ -724,7 +812,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 32,
         "w": 24,
         "h": 8
       },
@@ -838,7 +926,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 32,
+        "y": 40,
         "w": 12,
         "h": 8
       },
@@ -944,7 +1032,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 32,
+        "y": 40,
         "w": 12,
         "h": 8
       },
@@ -1049,7 +1137,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 40,
+        "y": 48,
         "w": 12,
         "h": 8
       },
@@ -1146,7 +1234,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 40,
+        "y": 48,
         "w": 12,
         "h": 8
       },

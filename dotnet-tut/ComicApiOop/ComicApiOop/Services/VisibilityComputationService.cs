@@ -95,9 +95,11 @@ public class VisibilityComputationService
     }
 
     /// <summary>
-    /// Saves all computed visibilities in a single round-trip (batch save).
-    /// Reduces DB round-trips from N to 1 for a bulk of N comics.
+    /// Saves all computed visibilities in batched chunks to reduce change-tracker overhead
+    /// and avoid a single very large transaction (improves p95 latency).
     /// </summary>
+    private const int SaveVisibilityBatchSize = 500;
+
     private async Task SaveComputedVisibilitiesBulkAsync(
         IReadOnlyList<ComputedVisibilityData> computedVisibilities,
         string operationName)
@@ -110,30 +112,46 @@ public class VisibilityComputationService
             operationName,
             async () =>
             {
-                var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
+                var previousAutoDetect = _dbContext.ChangeTracker.AutoDetectChangesEnabled;
+                try
                 {
-                    ComicId = cv.ComicId,
-                    CountryCode = cv.CountryCode,
-                    CustomerSegmentId = cv.CustomerSegmentId,
-                    FreeChaptersCount = cv.FreeChaptersCount,
-                    LastChapterReleaseTime = cv.LastChapterReleaseTime,
-                    GenreId = cv.GenreId,
-                    PublisherId = cv.PublisherId,
-                    AverageRating = cv.AverageRating,
-                    SearchTags = cv.SearchTags,
-                    IsVisible = cv.IsVisible,
-                    ComputedAt = cv.ComputedAt,
-                    LicenseType = cv.LicenseType,
-                    CurrentPrice = cv.CurrentPrice,
-                    IsFreeContent = cv.IsFreeContent,
-                    IsPremiumContent = cv.IsPremiumContent,
-                    AgeRating = cv.AgeRating,
-                    ContentFlags = cv.ContentFlags,
-                    ContentWarning = cv.ContentWarning
-                }).ToList();
+                    _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+                    for (int i = 0; i < computedVisibilities.Count; i += SaveVisibilityBatchSize)
+                    {
+                        int count = Math.Min(SaveVisibilityBatchSize, computedVisibilities.Count - i);
+                        var chunk = computedVisibilities.Skip(i).Take(count);
+                        var dbVisibilities = chunk.Select(cv => new ComputedVisibility
+                        {
+                            ComicId = cv.ComicId,
+                            CountryCode = cv.CountryCode ?? string.Empty,
+                            CustomerSegmentId = cv.CustomerSegmentId,
+                            FreeChaptersCount = cv.FreeChaptersCount,
+                            LastChapterReleaseTime = cv.LastChapterReleaseTime,
+                            GenreId = cv.GenreId,
+                            PublisherId = cv.PublisherId,
+                            AverageRating = cv.AverageRating,
+                            SearchTags = cv.SearchTags ?? string.Empty,
+                            IsVisible = cv.IsVisible,
+                            ComputedAt = cv.ComputedAt,
+                            LicenseType = cv.LicenseType,
+                            CurrentPrice = cv.CurrentPrice,
+                            IsFreeContent = cv.IsFreeContent,
+                            IsPremiumContent = cv.IsPremiumContent,
+                            AgeRating = cv.AgeRating,
+                            ContentFlags = cv.ContentFlags,
+                            ContentWarning = cv.ContentWarning ?? string.Empty
+                        }).ToList();
 
-                await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
-                return await _dbContext.SaveChangesAsync();
+                        _dbContext.ComputedVisibilities.AddRange(dbVisibilities);
+                        await _dbContext.SaveChangesAsync();
+                        _dbContext.ChangeTracker.Clear();
+                    }
+                    return 0;
+                }
+                finally
+                {
+                    _dbContext.ChangeTracker.AutoDetectChangesEnabled = previousAutoDetect;
+                }
             });
     }
 
