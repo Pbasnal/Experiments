@@ -9,6 +9,7 @@ namespace ComicApiOop.Services;
 public class VisibilityComputationService
 {
     private readonly ComicDbContext _dbContext;
+    private readonly IDbContextFactory<ComicDbContext> _dbFactory;
     private readonly ILogger<VisibilityComputationService> _logger;
     private readonly MetricsReporter _metricsReporter;
     private readonly IAppMetrics _appMetrics;
@@ -16,12 +17,14 @@ public class VisibilityComputationService
 
     public VisibilityComputationService(
         ComicDbContext dbContext,
+        IDbContextFactory<ComicDbContext> dbFactory,
         ILogger<VisibilityComputationService> logger,
         MetricsReporter metricsReporter,
         IAppMetrics appMetrics,
         IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
+        _dbFactory = dbFactory;
         _logger = logger;
         _metricsReporter = metricsReporter;
         _appMetrics = appMetrics;
@@ -95,11 +98,9 @@ public class VisibilityComputationService
     }
 
     /// <summary>
-    /// Saves all computed visibilities in batched chunks to reduce change-tracker overhead
-    /// and avoid a single very large transaction (improves p95 latency).
+    /// Saves all computed visibilities using batched INSERT ... VALUES (same optimisation as DOD):
+    /// 1000 rows per batch, processed in parallel via raw MySQL when available; EF fallback otherwise.
     /// </summary>
-    private const int SaveVisibilityBatchSize = 500;
-
     private async Task SaveComputedVisibilitiesBulkAsync(
         IReadOnlyList<ComputedVisibilityData> computedVisibilities,
         string operationName)
@@ -107,51 +108,14 @@ public class VisibilityComputationService
         if (computedVisibilities.Count == 0)
             return;
 
+        var array = computedVisibilities as ComputedVisibilityData[] ?? computedVisibilities.ToArray();
         await _metricsReporter.TrackQueryAsync(
             "save_visibilities_bulk",
             operationName,
             async () =>
             {
-                var previousAutoDetect = _dbContext.ChangeTracker.AutoDetectChangesEnabled;
-                try
-                {
-                    _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-                    for (int i = 0; i < computedVisibilities.Count; i += SaveVisibilityBatchSize)
-                    {
-                        int count = Math.Min(SaveVisibilityBatchSize, computedVisibilities.Count - i);
-                        var chunk = computedVisibilities.Skip(i).Take(count);
-                        var dbVisibilities = chunk.Select(cv => new ComputedVisibility
-                        {
-                            ComicId = cv.ComicId,
-                            CountryCode = cv.CountryCode ?? string.Empty,
-                            CustomerSegmentId = cv.CustomerSegmentId,
-                            FreeChaptersCount = cv.FreeChaptersCount,
-                            LastChapterReleaseTime = cv.LastChapterReleaseTime,
-                            GenreId = cv.GenreId,
-                            PublisherId = cv.PublisherId,
-                            AverageRating = cv.AverageRating,
-                            SearchTags = cv.SearchTags ?? string.Empty,
-                            IsVisible = cv.IsVisible,
-                            ComputedAt = cv.ComputedAt,
-                            LicenseType = cv.LicenseType,
-                            CurrentPrice = cv.CurrentPrice,
-                            IsFreeContent = cv.IsFreeContent,
-                            IsPremiumContent = cv.IsPremiumContent,
-                            AgeRating = cv.AgeRating,
-                            ContentFlags = cv.ContentFlags,
-                            ContentWarning = cv.ContentWarning ?? string.Empty
-                        }).ToList();
-
-                        _dbContext.ComputedVisibilities.AddRange(dbVisibilities);
-                        await _dbContext.SaveChangesAsync();
-                        _dbContext.ChangeTracker.Clear();
-                    }
-                    return 0;
-                }
-                finally
-                {
-                    _dbContext.ChangeTracker.AutoDetectChangesEnabled = previousAutoDetect;
-                }
+                await ComputedVisibilityBulkSaveHelper.SaveComputedVisibilitiesBulkAsync(_dbFactory, array);
+                return 0;
             });
     }
 

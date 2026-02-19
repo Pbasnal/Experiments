@@ -25,11 +25,24 @@ public static class ServiceCollectionExtensions
             options.SerializerOptions.WriteIndented = true;
         });
 
-        // Add database context
+        // Add database context (scoped for normal reads and MetricsReporter)
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
         services.AddDbContext<ComicDbContext>(options =>
         {
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
+            options.UseMySql(connectionString, serverVersion,
+                mysqlOptions =>
+                {
+                    mysqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
+        });
+
+        // Add DbContext factory for parallel bulk save (same pattern as DOD)
+        services.AddDbContextFactory<ComicDbContext>(options =>
+        {
             options.UseMySql(connectionString, serverVersion,
                 mysqlOptions =>
                 {
