@@ -25,9 +25,19 @@ public class SimpleQueue<T> : ISimpleQueue
     {
         List<T?> messageBatch = new List<T?>(batchSize);
 
-        while (messageBatch.Count < batchSize && _queue.TryDequeue(out T? message))
+        long maxBatchingTime = 5;
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        while (messageBatch.Count < batchSize)
         {
-            messageBatch.Add(message);
+            if (_queue.TryDequeue(out T? message))
+            {
+                messageBatch.Add(message);
+            }
+            else if (maxBatchingTime <= sw.ElapsedMilliseconds)
+            {
+                break;
+            }
         }
 
         return messageBatch;
@@ -56,7 +66,7 @@ public class SimpleQueue<T> : ISimpleQueue
                 numberOfEmptyDequeue++;
                 if (numberOfEmptyDequeue > 5)
                 {
-                    period = TimeSpan.FromMilliseconds(10);
+                    period = TimeSpan.FromMilliseconds(2);
                 }
 
                 continue;

@@ -152,6 +152,86 @@ running (3m32.2s), 00/20 VUs, 1373 complete and 0 interrupted iterations
 default ✓ [======================================] 00/20 VUs  3m30s    
 
 
+### After optimizing db reads to 1 read per request
+ k6 run --env API_URL=http://localhost:8080 k6/load-test.js
+
+         /\      Grafana   /‾‾/                                                                       
+    /\  /  \     |\  __   /  /                                                                        
+   /  \/    \    | |/ /  /   ‾‾\                                                                      
+  /          \   |   (  |  (‾)  |                                                                     
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: k6/load-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 20 max VUs, 4m0s max duration (incl. graceful stop):
+              * default: Up to 20 looping VUs for 3m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ THRESHOLDS 
+
+    comic_visibility_computation_duration
+    ✓ 'p(95)<1000' p(95)=135.84ms
+
+    errors
+    ✓ 'rate<0.1' rate=0.00%
+
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=127.54ms
+
+      {endpoint:health}
+      ✓ 'p(99)<100' p(99)=15.78ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 5448    25.681978/s
+    checks_succeeded...: 100.00% 5448 out of 5448
+    checks_failed......: 0.00%   0 out of 5448
+
+    ✓ invalid request returns 400
+    ✓ compute single status is 200
+    ✓ compute single not timeout
+    ✓ compute single has results
+    ✓ compute single has computed visibilities
+    ✓ computation duration is reasonable
+    ✓ compute bulk status is 200
+    ✓ compute bulk not timeout
+    ✓ compute bulk has results
+    ✓ compute bulk has computed visibilities
+    ✓ compute bulk processed count matches limit
+    ✓ bulk computation duration is reasonable
+    ✓ health check status is 200
+
+    CUSTOM
+    comic_visibility_computation_duration...: avg=60.16ms min=15ms med=45ms    max=406ms    p(90)=121ms    p(95)=135.84ms
+    errors..................................: 0.00%  0 out of 0
+
+    HTTP
+    http_req_duration.......................: avg=42.1ms  min=0s   med=33.56ms max=405.87ms p(90)=108.73ms p(95)=127.54ms
+      { endpoint:health }...................: avg=3.51ms  min=0s   med=3.12ms  max=17.89ms  p(90)=6.06ms   p(95)=8.5ms   
+      { expected_response:true }............: avg=47.12ms min=0s   med=38.01ms max=405.87ms p(90)=112.1ms  p(95)=128.93ms
+    http_req_failed.........................: 11.58% 157 out of 1355
+    http_reqs...............................: 1355   6.387496/s
+
+    EXECUTION
+    iteration_duration......................: avg=2.08s   min=0s   med=2.03s   max=7.19s    p(90)=5.09s    p(95)=5.17s   
+    iterations..............................: 1310   6.175366/s
+    vus.....................................: 1      min=1           max=20
+    vus_max.................................: 20     min=20          max=20
+
+    NETWORK
+    data_received...........................: 6.5 MB 31 kB/s
+    data_sent...............................: 151 kB 710 B/s
+
+
+
+
+running (3m32.1s), 00/20 VUs, 1310 complete and 0 interrupted iterations
+default ✓ [======================================] 00/20 VUs  3m30s
+
 ## DOD Results
 k6 run --env API_URL=http://localhost:8081 k6/load-test.js
 
@@ -225,3 +305,86 @@ k6 run --env API_URL=http://localhost:8081 k6/load-test.js
     NETWORK
     data_received...........................: 5.6 MB 27 kB/s
     data_sent...............................: 130 kB 612 B/s
+
+
+
+
+### After parallel batch and reduced wait time
+k6 run --env API_URL=http://localhost:8081 k6/load-test.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: k6/load-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 20 max VUs, 4m0s max duration (incl. graceful stop):
+              * default: Up to 20 looping VUs for 3m30s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ THRESHOLDS 
+
+    comic_visibility_computation_duration
+    ✓ 'p(95)<1000' p(95)=43ms
+
+    errors
+    ✓ 'rate<0.1' rate=0.00%
+
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=41.31ms
+
+      {endpoint:health}
+      ✓ 'p(99)<100' p(99)=19.06ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 5553    26.353381/s
+    checks_succeeded...: 100.00% 5553 out of 5553
+    checks_failed......: 0.00%   0 out of 5553
+
+    ✓ health check status is 200
+    ✓ compute single status is 200
+    ✓ compute single not timeout
+    ✓ compute single has results
+    ✓ compute single has computed visibilities
+    ✓ computation duration is reasonable
+    ✓ compute bulk status is 200
+    ✓ compute bulk not timeout
+    ✓ compute bulk has results
+    ✓ compute bulk has computed visibilities
+    ✓ compute bulk processed count matches limit
+    ✓ bulk computation duration is reasonable
+    ✓ invalid request returns 400
+
+    CUSTOM
+    comic_visibility_computation_duration...: avg=25.57ms min=5ms     med=21ms    max=560ms    p(90)=38ms    p(95)=43ms   
+    errors..................................: 0.00%  0 out of 0
+
+    HTTP
+    http_req_duration.......................: avg=18.98ms min=509.1µs med=17.34ms max=558.93ms p(90)=35.54ms p(95)=41.31ms
+      { endpoint:health }...................: avg=3.37ms  min=509.1µs med=2.39ms  max=24.99ms  p(90)=5.86ms  p(95)=12.47ms
+      { expected_response:true }............: avg=20.77ms min=509.1µs med=18.14ms max=558.93ms p(90)=36.3ms  p(95)=41.95ms
+    http_req_failed.........................: 10.42% 140 out of 1343
+    http_reqs...............................: 1343   6.373598/s
+
+    EXECUTION
+    iteration_duration......................: avg=2.08s   min=0s      med=2.01s   max=7.07s    p(90)=5.04s   p(95)=5.06s  
+    iterations..............................: 1314   6.23597/s
+    vus.....................................: 1      min=1           max=20
+    vus_max.................................: 20     min=20          max=20
+
+    NETWORK
+    data_received...........................: 6.4 MB 31 kB/s
+    data_sent...............................: 150 kB 712 B/s
+
+
+
+
+running (3m30.7s), 00/20 VUs, 1314 complete and 0 interrupted iterations
+default ✓ [======================================] 00/20 VUs  3m30s

@@ -1,27 +1,14 @@
+using Common.Metrics;
 using ComicApiOop.Services;
-using Prometheus;
 using System.Diagnostics;
 
 namespace ComicApiOop.Endpoints;
 
 public static class ComicEndpoints
 {
-    private static readonly Histogram RequestProcessLatency = Prometheus.Metrics.CreateHistogram(
-        "request_process_duration_ms_oop",
-        "Time taken to process requests in the OOP API",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.01, 2, 10),
-            LabelNames = new[] { "query_type", "status" }
-        });
-
-    private static readonly Counter RequestCounter = Prometheus.Metrics.CreateCounter(
-        "request_count_total_oop",
-        "Total number of requests in the OOP API",
-        new CounterConfiguration
-        {
-            LabelNames = new[] { "query_type", "status" }
-        });
+    private const string ProcessName = "compute_visibilities";
+    /// <summary>Server-side request timeout; requests exceeding this return 504 so timeouts are visible in metrics.</summary>
+    private static readonly TimeSpan ProcessTimeout = TimeSpan.FromSeconds(2);
 
     public static void MapComicEndpoints(this WebApplication app)
     {
@@ -33,6 +20,7 @@ public static class ComicEndpoints
             int startId,
             int limit,
             VisibilityComputationService service,
+            IAppMetrics metrics,
             ILoggerFactory loggerFactory) =>
         {
             var logger = loggerFactory.CreateLogger("ComicApiOop.Endpoints.ComicEndpoints");
@@ -42,75 +30,66 @@ public static class ComicEndpoints
             // Validate input parameters upfront
             if (startId < 1)
             {
-                status = "bad_request";
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
+                var attrs = new Dictionary<string, string> { ["status"] = "bad_request" };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.BadRequest("startId must be greater than 0");
             }
 
             if (limit < 1 || limit > 20)
             {
-                status = "bad_request";
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
+                var attrs = new Dictionary<string, string> { ["status"] = "bad_request" };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.BadRequest("limit must be between 1 and 20");
             }
 
             try
             {
-                var result = await service.ComputeVisibilitiesBulkAsync(startId, limit);
-                
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
-                
+                var workTask = service.ComputeVisibilitiesBulkAsync(startId, limit);
+                var delayTask = Task.Delay(ProcessTimeout);
+                var completed = await Task.WhenAny(workTask, delayTask);
+                if (completed == delayTask)
+                {
+                    var timeoutAttrs = new Dictionary<string, string> { ["status"] = "timeout" };
+                    metrics.CaptureCount(ProcessName, 1, timeoutAttrs);
+                    metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, timeoutAttrs);
+                    return Results.Problem(
+                        detail: "Request timed out after 1 second",
+                        title: "Request Timeout",
+                        statusCode: 504);
+                }
+                var result = await workTask;
+                var attrs = new Dictionary<string, string> { ["status"] = status };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.Ok(result);
             }
             catch (ArgumentException ex)
             {
                 status = "bad_request";
                 logger.LogWarning(ex, "Invalid parameters for visibility computation");
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
+                var attrs = new Dictionary<string, string> { ["status"] = status };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.BadRequest(ex.Message);
             }
             catch (InvalidOperationException ex)
             {
                 status = "not_found";
                 logger.LogWarning(ex, "No comics found for visibility computation");
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
+                var attrs = new Dictionary<string, string> { ["status"] = status };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.NotFound(ex.Message);
             }
             catch (Exception ex)
             {
                 status = "failure";
                 logger.LogError(ex, "Error during bulk visibility computation");
-                RequestCounter
-                    .WithLabels("compute_visibilities", status)
-                    .Inc();
-                RequestProcessLatency
-                    .WithLabels("compute_visibilities", status)
-                    .Observe(sw.Elapsed.TotalSeconds);
+                var attrs = new Dictionary<string, string> { ["status"] = status };
+                metrics.CaptureCount(ProcessName, 1, attrs);
+                metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
                 return Results.Problem(
                     detail: ex.ToString(),
                     title: "Error computing visibilities",
@@ -123,6 +102,7 @@ public static class ComicEndpoints
         .Produces<BulkVisibilityComputationResult>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status504GatewayTimeout)
         .Produces(StatusCodes.Status500InternalServerError);
     }
 }

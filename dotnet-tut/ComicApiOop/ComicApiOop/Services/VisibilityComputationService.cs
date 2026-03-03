@@ -1,6 +1,6 @@
+using Common.Metrics;
 using Common.Models;
 using ComicApiOop.Data;
-using ComicApiOop.Metrics;
 using ComicApiOop.Middleware;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,19 +9,25 @@ namespace ComicApiOop.Services;
 public class VisibilityComputationService
 {
     private readonly ComicDbContext _dbContext;
+    private readonly IDbContextFactory<ComicDbContext> _dbFactory;
     private readonly ILogger<VisibilityComputationService> _logger;
     private readonly MetricsReporter _metricsReporter;
+    private readonly IAppMetrics _appMetrics;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public VisibilityComputationService(
         ComicDbContext dbContext,
+        IDbContextFactory<ComicDbContext> dbFactory,
         ILogger<VisibilityComputationService> logger,
         MetricsReporter metricsReporter,
+        IAppMetrics appMetrics,
         IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
+        _dbFactory = dbFactory;
         _logger = logger;
         _metricsReporter = metricsReporter;
+        _appMetrics = appMetrics;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -92,8 +98,8 @@ public class VisibilityComputationService
     }
 
     /// <summary>
-    /// Saves all computed visibilities in a single round-trip (batch save).
-    /// Reduces DB round-trips from N to 1 for a bulk of N comics.
+    /// Saves all computed visibilities using batched INSERT ... VALUES (same optimisation as DOD):
+    /// 1000 rows per batch, processed in parallel via raw MySQL when available; EF fallback otherwise.
     /// </summary>
     private async Task SaveComputedVisibilitiesBulkAsync(
         IReadOnlyList<ComputedVisibilityData> computedVisibilities,
@@ -102,35 +108,14 @@ public class VisibilityComputationService
         if (computedVisibilities.Count == 0)
             return;
 
+        var array = computedVisibilities as ComputedVisibilityData[] ?? computedVisibilities.ToArray();
         await _metricsReporter.TrackQueryAsync(
             "save_visibilities_bulk",
             operationName,
             async () =>
             {
-                var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
-                {
-                    ComicId = cv.ComicId,
-                    CountryCode = cv.CountryCode,
-                    CustomerSegmentId = cv.CustomerSegmentId,
-                    FreeChaptersCount = cv.FreeChaptersCount,
-                    LastChapterReleaseTime = cv.LastChapterReleaseTime,
-                    GenreId = cv.GenreId,
-                    PublisherId = cv.PublisherId,
-                    AverageRating = cv.AverageRating,
-                    SearchTags = cv.SearchTags,
-                    IsVisible = cv.IsVisible,
-                    ComputedAt = cv.ComputedAt,
-                    LicenseType = cv.LicenseType,
-                    CurrentPrice = cv.CurrentPrice,
-                    IsFreeContent = cv.IsFreeContent,
-                    IsPremiumContent = cv.IsPremiumContent,
-                    AgeRating = cv.AgeRating,
-                    ContentFlags = cv.ContentFlags,
-                    ContentWarning = cv.ContentWarning
-                }).ToList();
-
-                await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
-                return await _dbContext.SaveChangesAsync();
+                await ComputedVisibilityBulkSaveHelper.SaveComputedVisibilitiesBulkAsync(_dbFactory, array);
+                return 0;
             });
     }
 
@@ -167,7 +152,7 @@ public class VisibilityComputationService
         if (httpContext?.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime requestReceivedAtUtc)
         {
             var waitSeconds = (DateTime.UtcNow - requestReceivedAtUtc).TotalSeconds;
-            MetricsConfiguration.RequestWaitTimeSeconds.Observe(waitSeconds);
+            _appMetrics.RecordLatency("oop_request_wait", waitSeconds);
         }
 
         // Validate input parameters

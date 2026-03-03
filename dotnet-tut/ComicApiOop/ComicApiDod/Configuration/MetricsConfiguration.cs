@@ -11,6 +11,8 @@ public static class MetricsConfiguration
     private static readonly Gauge MemoryAllocatedBytes;
     private static readonly Gauge MemoryTotalBytes;
     private static readonly Counter GcCollectionCount;
+    private static readonly Counter ApiHttpRequestsTotal;
+    private static readonly Gauge GcPauseTimeRatio;
     private static readonly System.Timers.Timer MetricsUpdateTimer;
 
     // Thread pool metrics (from CLR: ThreadPool.ThreadCount, PendingWorkItemCount, CompletedWorkItemCount)
@@ -18,6 +20,9 @@ public static class MetricsConfiguration
     private static readonly Gauge ThreadPoolQueueLength;
     private static readonly Counter ThreadPoolCompletedWorkItemsTotal;
     private static long _lastCompletedWorkItemCount;
+
+    // Previous GC collection counts for delta-based reporting (so rate() in Prometheus is correct)
+    private static long _lastGen0, _lastGen1, _lastGen2;
 
     // Public metrics for database operations
     public static readonly Counter DbQueryCountTotal;
@@ -66,6 +71,24 @@ public static class MetricsConfiguration
             new CounterConfiguration
             {
                 LabelNames = new[] { "api_type", "generation" }
+            });
+
+        // Unified request counter for OOP vs DOD comparison (same metric name in both apps, label api_type)
+        ApiHttpRequestsTotal = Metrics.CreateCounter(
+            "api_http_requests_total",
+            "Total HTTP requests by API type (for GC-per-request comparison)",
+            new CounterConfiguration
+            {
+                LabelNames = new[] { "api_type", "status" }
+            });
+
+        // GC pause time ratio (fraction of time in GC pause); same metric in both apps for comparison
+        GcPauseTimeRatio = Metrics.CreateGauge(
+            "gc_pause_time_ratio",
+            "Fraction of time spent in GC pause (0-1), from GCMemoryInfo.PauseTimePercentage",
+            new GaugeConfiguration
+            {
+                LabelNames = new[] { "api_type" }
             });
 
         // Database query metrics
@@ -145,6 +168,7 @@ public static class MetricsConfiguration
             HttpRequestCounter
                 .WithLabels(method, path, status)
                 .Inc();
+            ApiHttpRequestsTotal.WithLabels("DOD", status).Inc();
 
             HttpRequestDuration
                 .WithLabels(method, path, status)
@@ -156,6 +180,7 @@ public static class MetricsConfiguration
             HttpRequestCounter
                 .WithLabels(method, path, status)
                 .Inc();
+            ApiHttpRequestsTotal.WithLabels("DOD", status).Inc();
 
             HttpRequestDuration
                 .WithLabels(method, path, status)
@@ -175,18 +200,18 @@ public static class MetricsConfiguration
         MemoryTotalBytes
             .WithLabels("DOD")
             .Set(gcInfo.TotalAvailableMemoryBytes);
-        
-        GcCollectionCount
-            .WithLabels("DOD", "0")
-            .Inc(GC.CollectionCount(0));
-        
-        GcCollectionCount
-            .WithLabels("DOD", "1")
-            .Inc(GC.CollectionCount(1));
-        
-        GcCollectionCount
-            .WithLabels("DOD", "2")
-            .Inc(GC.CollectionCount(2));
+
+        var gen0 = GC.CollectionCount(0);
+        var gen1 = GC.CollectionCount(1);
+        var gen2 = GC.CollectionCount(2);
+        if (gen0 - _lastGen0 > 0) GcCollectionCount.WithLabels("DOD", "0").Inc(gen0 - _lastGen0);
+        if (gen1 - _lastGen1 > 0) GcCollectionCount.WithLabels("DOD", "1").Inc(gen1 - _lastGen1);
+        if (gen2 - _lastGen2 > 0) GcCollectionCount.WithLabels("DOD", "2").Inc(gen2 - _lastGen2);
+        _lastGen0 = gen0;
+        _lastGen1 = gen1;
+        _lastGen2 = gen2;
+
+        GcPauseTimeRatio.WithLabels("DOD").Set(gcInfo.PauseTimePercentage / 100.0);
 
         // Thread pool (CLR-native APIs only)
         ThreadPoolThreadCount.WithLabels("DOD").Set(ThreadPool.ThreadCount);

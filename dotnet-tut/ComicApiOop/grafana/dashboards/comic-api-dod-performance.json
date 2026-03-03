@@ -120,10 +120,10 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "rate(request_count_total_dod{query_type=\"compute_visibilities\"}[$__rate_interval])",
+          "expr": "sum(rate(metric_counter{process=\"compute_visibilities\"}[$__rate_interval])) by (process, status)",
           "hide": false,
           "instant": false,
-          "legendFormat": "{{query_type}} call rate",
+          "legendFormat": "{{process}} {{status}}",
           "range": true,
           "refId": "B"
         }
@@ -432,8 +432,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=\"DOD\", generation=\"0\"}[5m])",
-          "legendFormat": "Gen 0 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 0",
           "refId": "A"
         },
         {
@@ -441,8 +441,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=\"DOD\", generation=\"1\"}[5m])",
-          "legendFormat": "Gen 1 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 1",
           "refId": "B"
         },
         {
@@ -450,12 +450,12 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=\"DOD\", generation=\"2\"}[5m])",
-          "legendFormat": "Gen 2 Collections",
+          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
+          "legendFormat": "{{api_type}} Gen 2",
           "refId": "C"
         }
       ],
-      "title": "Garbage Collection",
+      "title": "Garbage Collection (OOP vs DOD)",
       "type": "timeseries"
     },
     {
@@ -546,8 +546,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_allocated_bytes{api_type=\"DOD\"}",
-          "legendFormat": "Allocated Memory",
+          "expr": "dotnet_memory_allocated_bytes{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}} Allocated",
           "refId": "A"
         },
         {
@@ -555,12 +555,100 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_total_bytes{api_type=\"DOD\"}",
-          "legendFormat": "Total Memory",
+          "expr": "dotnet_memory_total_bytes{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}} Total",
           "refId": "B"
         }
       ],
-      "title": "Memory allocation",
+      "title": "Memory allocation (OOP vs DOD)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Gen 0 GC collections per 1000 HTTP requests; compare OOP vs DOD under same load",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "GC per 1000 req",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "scaleDistribution": { "type": "linear" }
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "id": 20,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "(rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(api_http_requests_total[5m])) by (api_type)) * 1000",
+          "legendFormat": "{{api_type}} Gen 0 per 1k req",
+          "refId": "A"
+        }
+      ],
+      "title": "GC per 1000 requests (Gen 0)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "Fraction of time spent in GC pause (0–1). Lower is better.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Pause ratio",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never",
+            "scaleDistribution": { "type": "linear" }
+          },
+          "max": 1,
+          "min": 0,
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "id": 21,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "gc_pause_time_ratio{api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}}",
+          "refId": "A"
+        }
+      ],
+      "title": "GC pause time ratio (OOP vs DOD)",
       "type": "timeseries"
     },
     {
@@ -624,7 +712,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 32,
         "w": 24,
         "h": 8
       },
@@ -739,7 +827,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 32,
+        "y": 40,
         "w": 12,
         "h": 8
       },
@@ -845,7 +933,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 32,
+        "y": 40,
         "w": 12,
         "h": 8
       },
@@ -1469,8 +1557,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "group by(type, status) (rate(comic_visibility_computation_total[1m]))",
-          "legendFormat": "{{type}} {{status}}",
+          "expr": "sum(rate(metric_counter{process=~\"visibility_batch_processing|comic_visibility_operation_.*\"}[1m])) by (process, status)",
+          "legendFormat": "{{process}} {{status}}",
           "range": true,
           "refId": "A"
         }
@@ -1567,13 +1655,223 @@
       "targets": [
         {
           "editorMode": "builder",
-          "expr": "group by(type, status) (histogram_quantile(0.9, comic_visibility_computation_duration_seconds_bucket))",
-          "legendFormat": "{{type}} - {{status}} p90",
+          "expr": "histogram_quantile(0.9, sum(rate(metric_latency_bucket{process=\"visibility_batch_processing\"}[1m])) by (le, process, status))",
+          "legendFormat": "{{process}} - {{status}} p90",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Computation Latencies",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "description": "FetchVisibilityBatchAsync: db_call = ExecuteReaderAsync, result_processing = Read + build DodVisibilityBatch. ComputeVisibilityDodStyle2 = visibility computation. Save = flatten + EF SaveChangesAsync.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Duration (seconds)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 24,
+        "h": 8
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "legendFormat": "Fetch db_call p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "legendFormat": "Fetch db_call p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "legendFormat": "Fetch result_processing p50",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "legendFormat": "Fetch result_processing p95",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
+          "legendFormat": "ComputeVisibilityDodStyle2 p50",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
+          "legendFormat": "ComputeVisibilityDodStyle2 p95",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
+          "legendFormat": "SaveComputedVisibility p50",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
+          "legendFormat": "SaveComputedVisibility p95",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "legendFormat": "Save DB (SaveChangesAsync) p50",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "legendFormat": "Save DB (SaveChangesAsync) p95",
+          "range": true,
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "legendFormat": "Save DB (SaveChangesAsync) p99",
+          "range": true,
+          "refId": "K"
+        }
+      ],
+      "title": "DB Fetch & Compute Visibility (DOD Pipeline)",
       "type": "timeseries"
     }
   ],

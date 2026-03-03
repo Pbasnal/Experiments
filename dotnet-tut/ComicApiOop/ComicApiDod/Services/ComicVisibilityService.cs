@@ -1,4 +1,5 @@
 using ComicApiDod.Data;
+using Common.Metrics;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
 using System.Diagnostics;
@@ -11,52 +12,9 @@ public class ComicVisibilityService
 {
     private readonly IDbContextFactory<ComicDbContext> _dbFactory;
     private readonly ILogger<ComicVisibilityService> _logger;
-    private readonly VisibilityMetricsService _metrics;
+    private readonly IAppMetrics _appMetrics;
 
-    // Prometheus metrics
-    private static readonly Histogram ComputeVisibilityDuration = Metrics.CreateHistogram(
-        "comic_visibility_computation_duration_seconds",
-        "Duration of comic visibility computation",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.01, 2, 10),
-            LabelNames = new[] { "type", "status" }
-        });
-
-    private static readonly Histogram OperationDuration = Metrics.CreateHistogram(
-        "comic_visibility_operation_duration_seconds",
-        "Duration of individual operations within visibility computation",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.001, 2, 12),
-            LabelNames = new[] { "operation", "status" }
-        });
-
-    private static readonly Histogram DbQueryDuration = Metrics.CreateHistogram(
-        "comic_visibility_db_query_duration_seconds",
-        "Duration of database queries in visibility computation",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.001, 2, 12),
-            LabelNames = new[] { "query_type" }
-        });
-
-    private static readonly Counter ComputeVisibilityCounter = Metrics.CreateCounter(
-        "comic_visibility_computation_total",
-        "Total number of visibility computations",
-        new CounterConfiguration
-        {
-            LabelNames = new[] { "type", "status" }
-        });
-
-    private static readonly Counter OperationCounter = Metrics.CreateCounter(
-        "comic_visibility_operation_total",
-        "Total number of operations within visibility computation",
-        new CounterConfiguration
-        {
-            LabelNames = new[] { "operation", "status" }
-        });
-
+    // Prometheus metrics (remaining: gauge and request-wait histogram)
     private static readonly Gauge RequestsInBatch = Metrics.CreateGauge(
         "comic_visibility_request_count_in_batch",
         "Number of requests in the current request batch");
@@ -73,11 +31,11 @@ public class ComicVisibilityService
     public ComicVisibilityService(
         IDbContextFactory<ComicDbContext> dbFactory,
         ILogger<ComicVisibilityService> logger,
-        VisibilityMetricsService metrics)
+        IAppMetrics appMetrics)
     {
         _dbFactory = dbFactory;
         _logger = logger;
-        _metrics = metrics;
+        _appMetrics = appMetrics;
     }
 
     public async Task ComputeVisibilities(int numOfRequest, List<VisibilityComputationRequest?> reqs)
@@ -92,22 +50,15 @@ public class ComicVisibilityService
             }
         }
 
+        CancellationToken tkn = new CancellationTokenSource().Token;
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
         try
         {
             // Sort requests
-            var sortSw = Stopwatch.StartNew();
+            Stopwatch sortSw = Stopwatch.StartNew();
             SortRequests(reqs);
-            OperationDuration
-                .WithLabels("sort_requests", "success")
-                .Observe(sortSw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("sort_requests", "success")
-                .Inc();
-
-            RequestsInBatch.Set(reqs.Count);
-            _metrics.RecordBatchProcessing(reqs.Count, TimeSpan.Zero, "started");
+            Metric.RecordReqMetrics(reqs, RequestsInBatch, _appMetrics, sortSw);
 
             // Validate requests (metrics recorded inside method)
             bool[] isReqValid = ValidateAllRequests(reqs, out IResult?[] validationResults);
@@ -116,28 +67,55 @@ public class ComicVisibilityService
             var filterSw = Stopwatch.StartNew();
             List<VisibilityComputationRequest> validatedRequests = FilterValidRequests(reqs, isReqValid,
                 out IDictionary<int, int> originalIndices);
-            OperationDuration
-                .WithLabels("filter_requests", "success")
-                .Observe(filterSw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("filter_requests", "success")
-                .Inc();
+            var filterAttrs = new Dictionary<string, string> { ["status"] = "success" };
+            _appMetrics.RecordLatency("comic_visibility_operation_filter_requests", filterSw.Elapsed.TotalSeconds, filterAttrs);
+            _appMetrics.CaptureCount("comic_visibility_operation_filter_requests", 1, filterAttrs);
 
             // Generate comic IDs
             var generateSw = Stopwatch.StartNew();
             long[][] allComicIds = GenerateAllComicIds(validatedRequests);
-            OperationDuration
-                .WithLabels("generate_comic_ids", "success")
-                .Observe(generateSw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("generate_comic_ids", "success")
-                .Inc();
+            var genAttrs = new Dictionary<string, string> { ["status"] = "success" };
+            _appMetrics.RecordLatency("comic_visibility_operation_generate_comic_ids", generateSw.Elapsed.TotalSeconds, genAttrs);
+            _appMetrics.CaptureCount("comic_visibility_operation_generate_comic_ids", 1, genAttrs);
 
             // Fetch batch data
-            ComicBook[][] comicBatchData = await FetchBatchDataForComics(allComicIds);
+            // ComicBook[][] comicBatchData = await FetchBatchDataForComics(allComicIds);
+            //
+            // // Compute visibility
+            // ComicVisibilityResult[][] visibilityResults = ComputeVisibility(comicBatchData);
 
-            // Compute visibility
-            ComicVisibilityResult[][] visibilityResults = ComputeVisibility(comicBatchData);
+            await using ComicDbContext db = _dbFactory.CreateDbContext();
+            long[] comicIds = allComicIds.SelectMany(i => i).ToHashSet().ToArray();
+
+            DodSqlHelper.DodVisibilityBatch dodVisibilityBatch;
+            var fetchSw = Stopwatch.StartNew();
+            try
+            {
+                dodVisibilityBatch = await DodSqlHelper.FetchVisibilityBatchAsync(db, comicIds, tkn);
+            }
+            finally
+            {
+                _appMetrics.RecordLatency("comic_visibility_db_query_fetch_visibility_batch", fetchSw.Elapsed.TotalSeconds);
+            }
+
+            ComicVisibilityResult[][] visibilityResults;
+            var computeSw = Stopwatch.StartNew();
+            string computeStatus = "success";
+            try
+            {
+                visibilityResults = ComputeVisibilityDod2(allComicIds, dodVisibilityBatch);
+            }
+            catch
+            {
+                computeStatus = "failure";
+                throw;
+            }
+            finally
+            {
+                var computeAttrs = new Dictionary<string, string> { ["status"] = computeStatus };
+                _appMetrics.RecordLatency("comic_visibility_operation_compute_visibility_dod_style2", computeSw.Elapsed.TotalSeconds, computeAttrs);
+                _appMetrics.CaptureCount("comic_visibility_operation_compute_visibility_dod_style2", 1, computeAttrs);
+            }
 
             // Save computed visibility
             await SaveComputedVisibility(visibilityResults);
@@ -147,16 +125,15 @@ public class ComicVisibilityService
         catch (Exception ex)
         {
             computationStatus = "batch_failure";
-            _metrics.RecordError(ex.GetType().Name, "batch_processing");
+            _appMetrics.CaptureCount("visibility_error", 1, new Dictionary<string, string> { ["status"] = $"{ex.GetType().Name}_batch_processing" });
             throw;
         }
         finally
         {
             var duration = sw.Elapsed;
-            ComputeVisibilityDuration
-                .WithLabels("batch_process", computationStatus)
-                .Observe(duration.TotalSeconds);
-            _metrics.RecordBatchProcessing(reqs.Count, duration, computationStatus);
+            var batchAttrs = new Dictionary<string, string> { ["status"] = computationStatus };
+            _appMetrics.RecordLatency("visibility_batch_processing", duration.TotalSeconds, batchAttrs);
+            _appMetrics.CaptureCount("visibility_batch_processing", 1, batchAttrs);
         }
     }
 
@@ -252,12 +229,9 @@ public class ComicVisibilityService
         }
 
         // Record validation metrics
-        OperationDuration
-            .WithLabels("validate_all_requests", "success")
-            .Observe(sw.Elapsed.TotalSeconds);
-        OperationCounter
-            .WithLabels("validate_all_requests", "success")
-            .Inc();
+        var validateAttrs = new Dictionary<string, string> { ["status"] = "success" };
+        _appMetrics.RecordLatency("comic_visibility_operation_validate_all_requests", sw.Elapsed.TotalSeconds, validateAttrs);
+        _appMetrics.CaptureCount("comic_visibility_operation_validate_all_requests", 1, validateAttrs);
 
         return isValid;
     }
@@ -286,9 +260,7 @@ public class ComicVisibilityService
             var querySw = Stopwatch.StartNew();
             IDictionary<long, ComicBook>
                 batchData = await DatabaseQueryHelper.GetComicBatchDataAsync(db, comicIds);
-            DbQueryDuration
-                .WithLabels("fetch_batch_data")
-                .Observe(querySw.Elapsed.TotalSeconds);
+            _appMetrics.RecordLatency("comic_visibility_db_query_fetch_batch_data", querySw.Elapsed.TotalSeconds);
 
             ComicBook[][] comicBookArrays = new ComicBook[allComicIds.Length][];
 
@@ -318,16 +290,155 @@ public class ComicVisibilityService
         }
         finally
         {
-            OperationDuration
-                .WithLabels("fetch_batch_data", status)
-                .Observe(sw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("fetch_batch_data", status)
-                .Inc();
+            var fetchAttrs = new Dictionary<string, string> { ["status"] = status };
+            _appMetrics.RecordLatency("comic_visibility_operation_fetch_batch_data", sw.Elapsed.TotalSeconds, fetchAttrs);
+            _appMetrics.CaptureCount("comic_visibility_operation_fetch_batch_data", 1, fetchAttrs);
         }
     }
 
-    private ComicVisibilityResult[][] ComputeVisibility(ComicBook[][] comicBooks)
+    private ComicVisibilityResult[][] ComputeVisibilityDod2(
+        long[][] requestComicIds,
+        DodSqlHelper.DodVisibilityBatch comicBatch)
+    {
+        try
+        {
+            IDictionary<long, ComicVisibilityResult> visibilities = ComputeVisibilityDodStyle2(comicBatch);
+
+            ComicVisibilityResult[][] results = new ComicVisibilityResult[requestComicIds.Length][];
+            for (int i = 0; i < requestComicIds.Length; i++)
+            {
+                int numOfComics = requestComicIds[i].Length;
+                results[i] = new ComicVisibilityResult[numOfComics];
+                for (int comicIdx = 0; comicIdx < numOfComics; comicIdx++)
+                {
+                    long comicId = requestComicIds[i][comicIdx];
+                    results[i][comicIdx] = visibilities[comicId];
+                }
+            }
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return new ComicVisibilityResult[0][];
+        }
+    }
+
+    private IDictionary<long, ComicVisibilityResult> ComputeVisibilityDodStyle2(
+        DodSqlHelper.DodVisibilityBatch comicBatch)
+    {
+        DateTime computationTime = DateTime.UtcNow;
+        // comicBooks -> Req x Comics per req
+
+        // compute pre-filters - Geo and Segment
+        // ComicGeoSegFilter[Comic] 
+        ComicGeoSegFilter geoSegFilters = ComicGeoSegFilter.GenerateGeoSegFilters(
+            comicBatch.GeoRules,
+            comicBatch.SegmentRules,
+            computationTime);
+
+        // ComicGeoSegFilter[Comic] 
+        DodSqlHelper.PricingRow[] pricingRows = comicBatch.Pricings;
+        IDictionary<PricingRegionKey, int> pricingIndex = new Dictionary<PricingRegionKey, int>();
+        for (int pricingIdx = 0; pricingIdx < pricingRows.Length; pricingIdx++)
+        {
+            PricingRegionKey key = PricingRegionKey.of(pricingRows[pricingIdx].ComicId,
+                pricingRows[pricingIdx].RegionCode);
+
+            if (pricingIndex.ContainsKey(key)) continue;
+
+            pricingIndex.Add(key, pricingIdx);
+        }
+
+
+        // ComicMeta[Comic] without content flags
+        IDictionary<long, ComicMeta> comicMetaMap = ComicMeta.GenerateComicMeta(comicBatch);
+
+        for (int pricingIdx = 0; pricingIdx < pricingRows.Length; pricingIdx++)
+        {
+            long comicId = pricingRows[pricingIdx].ComicId;
+            comicMetaMap[comicId].contentFlag[pricingIdx] = VisibilityProcessor.DetermineContentFlags(
+                (ContentFlag)comicBatch.ContentRatings[comicId].ContentFlags,
+                comicMetaMap[comicId].allChaptersFree,
+                comicMetaMap[comicId].freeChapterCount > 0,
+                pricingRows[pricingIdx].BasePrice
+            );
+        }
+
+        IDictionary<long, ComicVisibilityResult> results = new Dictionary<long, ComicVisibilityResult>();
+        for (int comicIdx = 0; comicIdx < comicBatch.Comics.Length; comicIdx++)
+        {
+            DodSqlHelper.ComicRow comic = comicBatch.Comics[comicIdx];
+            if (results.ContainsKey(comic.Id)) continue;
+
+            IList<int> geoRuleIdxList = geoSegFilters.comicToGeoIndex[comic.Id];
+            IList<int> segRuleIdxList = geoSegFilters.comicToSegIndex[comic.Id];
+            long numberOfVisibilities = geoSegFilters.totalVisibleCount[comic.Id];
+
+            ComputedVisibilityData[] computedVisibilityList = new ComputedVisibilityData[numberOfVisibilities];
+            int visIdx = 0;
+            foreach (int geoRuleId in geoRuleIdxList)
+            {
+                if (!geoSegFilters.geoFilter[geoRuleId]) continue;
+
+                // CountryCodes can't be empty since we set filter to false if it is.
+                // string countryCode = comicBatch.GeoRules[geoRuleId].CountryCodes.FirstOrDefault();
+                foreach (string countryCode in comicBatch.GeoRules[geoRuleId].CountryCodes)
+                {
+                    foreach (int segRuleId in segRuleIdxList)
+                    {
+                        if (!geoSegFilters.segmentFilter[segRuleId]) continue;
+                        PricingRegionKey pricingRegionKey = PricingRegionKey.of(comic.Id, countryCode);
+                        if (!pricingIndex.ContainsKey(pricingRegionKey)) continue;
+                        try
+                        {
+                            computedVisibilityList[visIdx++] = new ComputedVisibilityData
+                            {
+                                ComicId = comic.Id,
+                                CountryCode = countryCode,
+                                CustomerSegmentId = comicBatch.SegmentRules[segRuleId].SegmentId,
+                                FreeChaptersCount = comicMetaMap[comic.Id].freeChapterCount,
+                                LastChapterReleaseTime = comicMetaMap[comic.Id].lastChapterReleaseTime,
+                                GenreId = comic.GenreId,
+                                PublisherId = comic.PublisherId,
+                                AverageRating = comic.AverageRating,
+                                SearchTags = comicMetaMap[comic.Id].searchTags,
+                                IsVisible = true,
+                                ComputedAt = computationTime,
+                                LicenseType = (LicenseType)comicBatch.GeoRules[geoRuleId].LicenseType,
+                                CurrentPrice = pricingRows[pricingIndex[pricingRegionKey]].BasePrice,
+                                IsFreeContent = pricingRows[pricingIndex[pricingRegionKey]].IsFreeContent,
+                                IsPremiumContent = pricingRows[pricingIndex[pricingRegionKey]].IsPremiumContent,
+                                AgeRating = (AgeRating)comicBatch.ContentRatings[comic.Id].AgeRating,
+                                ContentFlags = comicMetaMap[comic.Id].contentFlag[pricingIndex[pricingRegionKey]],
+                                ContentWarning = comicBatch.ContentRatings[comic.Id].ContentWarning ?? string.Empty
+                            };
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+
+            results.Add(comic.Id, new ComicVisibilityResult
+            {
+                ComicId = comic.Id,
+                Success = true,
+                ErrorMessage = null,
+                ComputationTime = computationTime,
+                ComputedVisibilities = visIdx == 0
+                    ? new ComputedVisibilityData[0]
+                    : computedVisibilityList[0..(visIdx + 1)]
+            });
+        }
+
+        return results;
+    }
+
+    private ComicVisibilityResult[][] computeVisibilityOopStyle(ComicBook[][] comicBooks)
     {
         var sw = Stopwatch.StartNew();
         string computationStatus = "success";
@@ -382,9 +493,9 @@ public class ComicVisibilityService
                     };
 
                     // Record per-item computation latency
-                    OperationDuration
-                        .WithLabels("compute_visibility_item", computedVisibilities.Length > 0 ? "success" : "failure")
-                        .Observe(itemSw.Elapsed.TotalSeconds);
+                    var itemStatus = computedVisibilities.Length > 0 ? "success" : "failure";
+                    _appMetrics.RecordLatency("comic_visibility_operation_compute_visibility_item", itemSw.Elapsed.TotalSeconds,
+                        new Dictionary<string, string> { ["status"] = itemStatus });
                 }
             }
 
@@ -398,12 +509,9 @@ public class ComicVisibilityService
         }
         finally
         {
-            OperationDuration
-                .WithLabels("compute_visibility", computationStatus)
-                .Observe(sw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("compute_visibility", computationStatus)
-                .Inc();
+            var compAttrs = new Dictionary<string, string> { ["status"] = computationStatus };
+            _appMetrics.RecordLatency("comic_visibility_operation_compute_visibility", sw.Elapsed.TotalSeconds, compAttrs);
+            _appMetrics.CaptureCount("comic_visibility_operation_compute_visibility", 1, compAttrs);
         }
     }
 
@@ -419,13 +527,9 @@ public class ComicVisibilityService
                     .SelectMany(res => res.ComputedVisibilities))
                 .ToArray();
 
-            await using ComicDbContext db = _dbFactory.CreateDbContext();
-
             var querySw = Stopwatch.StartNew();
-            await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(db, visibilityResultsToSave);
-            DbQueryDuration
-                .WithLabels("save_computed_visibilities")
-                .Observe(querySw.Elapsed.TotalSeconds);
+            await DatabaseQueryHelper.SaveComputedVisibilitiesBulkAsync(_dbFactory, visibilityResultsToSave);
+            _appMetrics.RecordLatency("comic_visibility_db_query_save_computed_visibilities", querySw.Elapsed.TotalSeconds);
         }
         catch (Exception ex)
         {
@@ -435,12 +539,9 @@ public class ComicVisibilityService
         }
         finally
         {
-            OperationDuration
-                .WithLabels("save_computed_visibility", status)
-                .Observe(sw.Elapsed.TotalSeconds);
-            OperationCounter
-                .WithLabels("save_computed_visibility", status)
-                .Inc();
+            var saveAttrs = new Dictionary<string, string> { ["status"] = status };
+            _appMetrics.RecordLatency("comic_visibility_operation_save_computed_visibility", sw.Elapsed.TotalSeconds, saveAttrs);
+            _appMetrics.CaptureCount("comic_visibility_operation_save_computed_visibility", 1, saveAttrs);
         }
     }
 

@@ -1,3 +1,4 @@
+using Common.Metrics;
 using ComicApiOop.Services;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddComicApiServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<IAppMetrics, AppMetrics>();
+
         // Required for Request Wait Time metric (service reads request timestamp from HttpContext)
         services.AddHttpContextAccessor();
 
@@ -22,11 +25,24 @@ public static class ServiceCollectionExtensions
             options.SerializerOptions.WriteIndented = true;
         });
 
-        // Add database context
+        // Add database context (scoped for normal reads and MetricsReporter)
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
         services.AddDbContext<ComicDbContext>(options =>
         {
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
+            options.UseMySql(connectionString, serverVersion,
+                mysqlOptions =>
+                {
+                    mysqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
+        });
+
+        // Add DbContext factory for parallel bulk save (same pattern as DOD)
+        services.AddDbContextFactory<ComicDbContext>(options =>
+        {
             options.UseMySql(connectionString, serverVersion,
                 mysqlOptions =>
                 {
@@ -41,7 +57,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<MetricsReporter>(sp =>
         {
             var dbContext = sp.GetRequiredService<ComicDbContext>();
-            return new MetricsReporter(dbContext);
+            var appMetrics = sp.GetRequiredService<IAppMetrics>();
+            return new MetricsReporter(dbContext, appMetrics);
         });
 
         return services;

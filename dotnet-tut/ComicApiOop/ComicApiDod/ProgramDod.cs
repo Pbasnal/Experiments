@@ -1,5 +1,6 @@
 using ComicApiDod.Data;
 using ComicApiDod.Services;
+using Common.Metrics;
 using ComicApiDod.Configuration;
 using Common.Models;
 using Common.SimpleQueue;
@@ -43,7 +44,7 @@ builder.Services.AddDbContextFactory<ComicDbContext>((serviceProvider, options) 
 });
 
 // Add services
-builder.Services.AddSingleton<VisibilityMetricsService>();
+builder.Services.AddSingleton<IAppMetrics, AppMetrics>();
 builder.Services.AddScoped<ComicVisibilityService>();
 
 // Add Simple DOD Framework services as Singletons
