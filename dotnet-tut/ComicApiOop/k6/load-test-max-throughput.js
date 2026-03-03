@@ -2,46 +2,44 @@
  * Max throughput load test: find the highest request rate (RPS) the API can sustain
  * before timeouts (504) become a significant problem.
  *
- * Strategy: ramp arrival rate from low to high over time; track success vs timeout.
+ * Default: 1000 RPS test for DOD API — 5 min ramp up, then 10 min at 1000 RPS.
  * Run with: k6 run k6/load-test-max-throughput.js
- * Optional: API_URL=http://localhost:8081 MAX_RPS=80 k6 run k6/load-test-max-throughput.js
+ * DOD API (local): API_URL=http://localhost:8081 k6 run k6/load-test-max-throughput.js
+ * Override rate: MAX_RPS=500 k6 run k6/load-test-max-throughput.js
  */
 
 import http from 'k6/http';
 import { check } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
-const baseUrl = __ENV.API_URL || 'http://localhost:8080';
-const maxRps = __ENV.MAX_RPS ? parseInt(__ENV.MAX_RPS, 10) : 200;
+const baseUrl = __ENV.API_URL || 'http://localhost:8081';
+const maxRps = __ENV.MAX_RPS ? parseInt(__ENV.MAX_RPS, 10) : 500;
 
 // Custom metrics
 const timeoutRate = new Rate('timeouts');
 const successRate = new Rate('success');
 const reqDuration = new Trend('http_req_compute_duration', true);
 
-// Ramp request rate from 2 RPS up to maxRps over ~8 min, then hold at max for 2 min
+// 5 min ramp to maxRps, then 10 min at maxRps (e.g. 1000 RPS for DOD)
 export const options = {
   scenarios: {
     max_throughput: {
       executor: 'ramping-arrival-rate',
-      startRate: 2,
+      startRate: 0,
       timeUnit: '1s',
-      preAllocatedVUs: 4,
-      maxVUs: 200,
+      preAllocatedVUs: 50,
+      maxVUs: 1500,
       stages: [
-        { duration: '1m', target: 5 },           // 2 → 5 RPS
-        { duration: '1m', target: 10 },        // 5 → 10 RPS
-        { duration: '1m', target: 20 },        // 10 → 20 RPS
-        { duration: '1m', target: 30 },        // 20 → 30 RPS
-        { duration: '1m', target: 40 },        // 30 → 40 RPS
-        { duration: '1m', target: 50 },        // 40 → 50 RPS
-        { duration: '1m', target: maxRps },    // 50 → maxRps RPS
-        { duration: '2m', target: maxRps },    // hold at maxRps for 2 min
+        { duration: '1m', target: maxRps * 0.1 },   // 0 → 200 RPS
+        { duration: '1m', target: maxRps * 0.4 },   // 200 → 400 RPS
+        { duration: '1m', target: maxRps * 0.6 },   // 400 → 600 RPS
+        { duration: '1m', target: maxRps * 0.8 },   // 600 → 800 RPS
+        { duration: '1m', target: maxRps }, // 800 → maxRps (ramp done in 5 min)
+        { duration: '10m', target: maxRps }, // hold at maxRps for 10 min
       ],
     },
   },
   thresholds: {
-    // Fail only if timeouts are very high (test is for discovery; adjust as needed)
     timeouts: ['rate<0.15'],
     success: ['rate>0.85'],
   },
@@ -86,9 +84,8 @@ export function handleSummary(data) {
       `Avg latency:       ${(avgDuration / 1000).toFixed(3)}s`,
       `p95 latency:       ${(p95Duration / 1000).toFixed(3)}s`,
       '',
-      'Interpretation: Ramp went from 2 to ' + maxRps + ' RPS. If timeout rate is low,',
-      'the API can likely sustain at least that rate. Re-run with higher MAX_RPS',
-      'or inspect the Grafana/HTML report to see when timeouts started increasing.',
+      'Interpretation: 5 min ramp to ' + maxRps + ' RPS, then 10 min hold. If timeout rate is low,',
+      'the API can sustain that rate. Use API_URL=http://localhost:8081 for DOD.',
       '',
     ].join('\n'),
     'summary.json': JSON.stringify(data, null, 2),

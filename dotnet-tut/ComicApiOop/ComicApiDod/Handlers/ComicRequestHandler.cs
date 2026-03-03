@@ -10,7 +10,7 @@ namespace ComicApiDod.Handlers;
 public static class ComicRequestHandler
 {
     private const string ProcessName = "compute_visibilities";
-    private static TimeSpan processTimeout = TimeSpan.FromMilliseconds(1000);
+    private static TimeSpan processTimeout = TimeSpan.FromSeconds(1.5);
 
 
     public static async Task<IResult> HandleComputeVisibilities(

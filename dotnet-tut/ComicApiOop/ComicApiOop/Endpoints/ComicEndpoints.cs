@@ -8,7 +8,7 @@ public static class ComicEndpoints
 {
     private const string ProcessName = "compute_visibilities";
     /// <summary>Server-side request timeout; requests exceeding this return 504 so timeouts are visible in metrics.</summary>
-    private static readonly TimeSpan ProcessTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan ProcessTimeout = TimeSpan.FromSeconds(2);
 
     public static void MapComicEndpoints(this WebApplication app)
     {
@@ -55,7 +55,7 @@ public static class ComicEndpoints
                     metrics.CaptureCount(ProcessName, 1, timeoutAttrs);
                     metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, timeoutAttrs);
                     return Results.Problem(
-                        detail: "Request timed out after 10 seconds",
+                        detail: "Request timed out after 1 second",
                         title: "Request Timeout",
                         statusCode: 504);
                 }
