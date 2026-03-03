@@ -105,3 +105,257 @@ The air carried the wrong kind of salt—not the sea, but something older, like 
 
 Theron finally spoke, his voice carrying the weight of Silvercrest's formal training. "The town awaits. Let's see what you're made of."
 
+
+
+They rolled through Gravedawn at walking pace. No one had the heart for speed here.
+
+At one doorway, a woman in a good wool shawl and polished boots supervised two hired carters loading her lacquered trunks. Her children clutched a cage with a hen inside it, the bird fluttering blind with panic.
+
+Across the lane, at a different house with patched shutters and no cart at all, an old man knelt with a wooden bowl of salt and a trembling hand, redrawing a circle so carefully you’d think one crooked line might kill him.
+
+“Don’t forget the lintel, Da,” a younger woman called from inside. “You forgot the lintel yesterday.”
+
+“I forgot my son yesterday,” the old man snapped, then lowered his voice. “I’ll not forget the lintel.”
+
+The street answered with a dozen sounds that didn’t belong together: hammer blows on wagon wheels, prayer bells from the chapel, gulls screaming over an empty fish market, and a baby crying with the raw, exhausted rhythm of someone too young to understand fear and too old not to feel it.
+
+The air shifted as they moved deeper in. Brine and rotting kelp from the harbor. Burned sage from braziers set outside doorways. Spilled lamp oil. Wet wool. In the square ahead, the cobbles were swept cleaner than the side lanes, but the iron-tang sting of holy water still rode the breeze, sharp as coins on the tongue. Houses leaned close along the street, shutters patched, lintels marked in chalk, doors polished by worried hands.
+
+A file of priests in soot-gray robes moved from door to door, flicking brushes of juniper into buckets and casting droplets over thresholds, shutters, even cobblestones. One muttered blessings under his breath between coughs.
+
+“By the Flame’s keeping, by dawn’s clean light—” splash.
+
+“Save some for the living streets, Brother,” a fishmonger called from her stall, voice hoarse with irritation. “I’ve got three barrels to move and only one mule that still likes me.”
+
+“You’ll have four barrels if the ward holds,” the priest shot back without looking up.
+
+The fishmonger snorted. “If the ward held, my brother would still be here arguing prices.”
+
+Near the square, a handful of merchants unloaded rations in steady rhythm while a patient line waited without shoving. Sacks of flour, lamp fat, smoked eels, salt blocks, dried beans, vinegar, kindling—nothing pretty, everything necessary. One cooper called, “Barrels to the left, mind the queue!” A baker answered from behind a crate, “Everyone gets their turn. Keep your ration marks ready.”
+
+A narrow-faced grain seller shouted above the din. “Two loaves per household! Ration marks out, palms open!”
+
+A man with ink-stained fingers shoved forward. “My wife’s due in a week. I need extra grain.”
+
+The grain seller’s jaw tightened. “I’ll add half a sack. But no more. The rich can pay carters and run inland. The rest of us are staying and eating what we can carry. Next!”
+
+Cassius watched the exchange, expression tight. “Resource collapse under panic conditions,” he murmured. “Predictable, but… unpleasant in practice.”
+
+Lyra gave him a look. “People don’t eat predictions, mage.”
+
+Raven, perched on the cart’s rear plank, tracked rooftops and alley mouths instead of market stalls. “Eyes on us from three windows. No threats yet. Just scared people measuring if we look expensive enough to fail.”
+
+Elena’s fingers brushed the herbs braided into her hair as if taking inventory of what comfort she could offer. “The spirits are loud here,” she said quietly. “Not angry. Hungry. Like a whole town forgot how to grieve and started fermenting instead.”
+
+“Cheerful,” Lyra muttered.
+
+“Accurate,” Elena replied.
+
+When they reached the town square, they found a priest on the chapel steps, speaking to a knot of townsfolk wrapped in cloaks and worry. His robes were clean but worn shiny at the cuffs. Burn scars climbed his hands and disappeared into his sleeves like old roots under snow.
+
+His voice carried clearly over the square. “From the Book of Embers: *When night grows teeth, keep the hearth lit for one another, and the Flame will remember your names.* We endure together. We endure, and morning comes.”
+
+A few heads bowed. A woman cried quietly into her apron. A boy no older than ten held a lantern with both hands and stared at Brenn like he was trying to memorize courage.
+
+Mid-prayer, Brenn’s eyes flicked to the cart. No pause, no gesture. He bent toward a second acolyte near the chapel rail and murmured two quick instructions.
+
+Then he straightened and said aloud, “Brother Tovin, continue for me.”
+
+A thin acolyte stepped forward, voice wavering but audible. “The Eternal Flame watches over the fearful and the steadfast alike…”
+
+A minute later, the second acolyte approached the cart and gave a small bow. “Father asks for a word. In the chapel, if you please.”
+
+Inside the small temple across the street, incense and damp stone competed for the air. Brenn stood by a cracked mosaic of the Eternal Flame.
+
+“You’re Harbin’s adventurers,” he said. “Before you climb that hill, I need to know what kind of hands we’re placing this town in. What have you handled before?”
+
+Elena answered first, voice calm. “Enough to know what keeps people alive. Iron, salt, warded oil, clean lines of retreat, and not mistaking panic for strategy. We can handle ghosts, spirits, and cursed ground if we work as a unit.”
+
+She tilted her head. “What can you tell us about the situation before we see Harbin?”
+
+Brenn nodded once. He rubbed his thumb over the black soot line in the mosaic until charcoal dust streaked his skin, then set two fingers against the cracked tile as if steadying himself.
+
+“There is an ancient bell tower on the hill,” he said. “A century ago, a witch died there, and the story says she did not go quietly. What sits in that stone now is not one haunting. It is ghosts, spirits, wraiths—every hungry thing that gathers where grief rots.”
+
+His voice dropped. “In winter solstice season, it spills beyond the tower and into the surrounding land. Since last year, that spread has reached the town itself. Missing people between dusk and dawn. Doors found open. Lamps still burning. No bodies.”
+
+No one spoke. In the side pews, an old woman covered her mouth. Cassius stopped fidgeting with his sleeve. Even the acolyte at the door forgot his prayer and stared.
+
+“Harbin has the ledgers, names, and timelines,” Brenn said. “He can give you the rest. But hear me now—the witch’s curse on that tower is old, and it is strong. Be careful.” He lifted his scarred hand in a brief blessing. “May the Eternal Flame light your way to success.”
+
+Elena inclined her head. “Then we start with Harbin.”
+
+Brenn stepped aside. “Go straight down this lane to the market cross, then turn left at the boarded fountain. Town Hall is the stone building with the green door, beside the old well. In older days they’d call it the reeve’s office.”
+
+As they crossed back into the square, townsfolk shifted to let them pass. A child pointed at Lyra’s sword. A baker crossed himself at Elena. Two fishwives whispered, not softly enough: “Think they can do it?” “They came, didn’t they?”
+
+By the time the Town Hall came into full view—stone steps, weather-warped door, lanterns burning though it was still afternoon—the party had fallen quiet.
+
+Lyra broke first. “I’ve marched into war camps with better morale than this.”
+
+Raven clicked her tongue. “This isn’t morale. This is siege rot. No enemy line to hit, nowhere clean to retreat.”
+
+Cassius adjusted his glasses with a shaky hand. “The ambient resonance is everywhere. Streets, wells, household wards—this curse has municipal reach. I’ve never seen contamination this socially integrated.”
+
+Elena looked at the families still loading carts in the square. “They’re still feeding each other while packing to flee. That means they haven’t given up. Not fully.”
+
+Theron stopped at the Town Hall steps and turned to them. Behind him, Gravedawn breathed in ragged rhythms—hammers, prayers, crying, bargaining, gulls.
+
+“Often,” he said, voice steady enough to cut through all of it, “adventurers ride into towns where people are too tired to believe in justice and too hurt to believe in hope. We bring both anyway—or we have no right to wear a guild badge.”
+
+He pushed the door open. “Inside.”
+
+---
+Scene 3
+
+The chapel lamps had burned low by the time Brenn returned. Brother Tovin was stacking prayer books with the stiff, angry precision of a man trying not to break something.
+
+Tovin did not look up. “You sent them to Harbin.”
+
+“I did.” Brenn hung his cloak on the same peg he’d used for years and smoothed the sleeve where old wax had hardened.
+
+“Them.” Tovin finally turned, jaw set. “Steel and charms and academy words. Father, with respect—no blade cuts a spirit. This is our duty. Ours. We should be the ones cleansing the tower.”
+
+Brenn set a prayer book flat on the table between them. “Say all of it, Tovin.”
+
+Tovin blinked. “What?”
+
+“All of it. Not the polite version.”
+
+The words came out rough. “I’m tired of blessing doorframes while people vanish. I’m tired of telling mothers to keep faith when I can’t promise their children come home. I’m tired of feeling useless.”
+
+Brenn nodded, letting the silence settle before he answered. “Good. Now we can talk honestly.”
+
+Tovin’s mouth tightened. “Then why stand aside?”
+
+“Because courage is not the same as readiness.” Brenn lifted the cracked censer chain, watched one broken link swing, and set it down. “You can bless a threshold. You can quiet a room. You can keep a widow breathing through the night. Those are not small things.”
+
+Tovin opened his hands in frustration. “And when the dead come through the door?”
+
+“Then I want people beside us who can fight what claws and bites as well as what whispers.” Brenn met his eyes. “You saw that group. They hold formation, they listen, and they’ve worked cursed ground without breaking. We need steel, prayer, and sense in the same hour.”
+
+Tovin looked away, blinking too fast. “Feels like we’re failing them.”
+
+Brenn rested his palm briefly on the table, close to Tovin’s fist. “It feels that way because you care what happens to them.” He rose. “Today, I need you here. Take noon rites, evening petitions, and the infirmary roster. If Mira from Bell’s End sends for willowbark again, give her two bundles, not one. And lock the west vestry after dusk; the latch sticks.”
+
+Tovin frowned. “You’re giving me the whole ledger.”
+
+“Just for today.” Brenn offered a thin smile. “You’ve been ready longer than you think.”
+
+Tovin held his gaze long enough, then nodded. “I’ll manage it.”
+
+“I know.” Brenn lifted his prayer book. “Keep the lamps trimmed. If I’m late, don’t wait for me to start the final hymn.”
+
+Outside, the square had thinned, but not emptied. Life in Gravedawn never stopped; it only learned to move around dread.
+
+The first to catch him was Lysa Marek outside the chapel gate, one hand on her son’s shoulder, the other clutching a charm bag gone threadbare. The boy’s lip trembled each time the tower bell groaned in the wind.
+
+“Father,” Lysa said, trying for steady and missing by an inch. “He won’t sleep. Says shadows stand by his bed.”
+
+Brenn crouched until he was eye-level with the child. “Rurik, you still keeping that wooden sword under your pillow?”
+
+The boy nodded.
+
+“Good. Tonight we improve the fortress. Salt at the sill, lamp to the left, sword under the pillow, and your mother’s voice reading the ember psalm before sleep. Not shouted. Quiet works better on cowards.”
+
+“Ghosts are cowards?” Rurik whispered.
+
+“The worst kind.” Brenn tapped the charm bag. “And this one needs replacing. Bring it to me at dawn and I’ll stitch a stronger knot.”
+
+Lysa exhaled shakily. “Thank you.”
+
+“Walk him home before full dark,” Brenn said. “And Lysa—bolt both doors, not just the front. The back hinge looks loose.”
+
+He moved on to the fish lane where Old Joren sat on an overturned crate, staring at nets he had not mended. Joren had buried two sons and still cursed like a dockhand, but today his hands only shook.
+
+“You’ve left three knots unfinished,” Brenn said, settling beside him.
+
+Joren gave a humorless snort. “You counting my failures now, priest?”
+
+“Only the fixable ones.” Brenn took the net and threaded one knot himself, slow so Joren could follow. “You taught half this town to tie storm lines. Don’t let grief make a liar of your fingers.”
+
+Joren’s eyes went wet and angry all at once. “I hear that bell in my sleep. Harl used to sing over it while we patched nets. Deren kept saying we’d buy a second boat by spring. I saved for that boat, Brenn. Planks picked, nails counted. Now I’ve got two spare hammocks and no hands to fill them.”
+
+Brenn waited, letting the words spend themselves. “Then we honor them by keeping what they built from drowning with you.” He handed back the net. “Patch six lengths before sunset. Eat Mira’s fish stew even if it tastes like rope. Keep your lantern wick short, and don’t answer knocks after curfew. Not even if the voice knows your name.”
+
+Joren’s fingers still trembled. Brenn took both hands in his own, callus against callus, and bowed his head.
+
+“From the Crimson Canticle,” he murmured. “*Flame of the First Hearth, red as mercy and red as wrath, walk before us through the dark; burn what hunts us, leave what is ours unscarred.*”
+
+A soft heat gathered between Brenn’s palms, a coal-glow reflection with no lantern near enough to cast it. Joren’s breathing slowed. His shoulders dropped, inch by inch.
+
+Joren swallowed and nodded once. “You sound like you’re handing out instructions for winter after a long voyage.”
+
+Brenn rose, dusting salt from his robe, a tired smile touching one corner of his mouth. “It has been a very long voyage indeed.”
+
+At Bell’s End Tavern, Mira was arguing with a flour merchant over missing sacks while three patrons pretended not to listen. She spotted Brenn and pointed a ladle at him like a magistrate’s baton.
+
+“Tell this crow I paid for twelve.”
+
+“Eleven and a half,” the merchant protested. “One split in transit.”
+
+Mira rolled her eyes. “It split into your wagon, no doubt.”
+
+Brenn held out both palms. “Mira, how many mouths tonight?”
+
+“Thirty-two if no one new comes through. Forty if fear outruns sense.”
+
+“And your broth?”
+
+“Thin enough to read a prayer through.”
+
+Brenn nodded to the merchant. “Leave the extra half-sack and I’ll mark the church ledger to settle the difference after market day.”
+
+The merchant hesitated, then grunted. “Fine. But only because your pen scares me more than her ladle.”
+
+Mira snorted. “Liar.” She watched him until the merchant left with his empty cart. Then, after a long pause, she said, “Sit. And don’t give me that priest face. Where have you been all day?”
+
+Brenn sat on the bench by her stove. “Chapel gate first. Lysa and Rurik—night terrors again.”
+
+Mira nodded. “He still keeping the toy sword?”
+
+“Under his pillow.” Brenn took the chipped cup she handed him. “Then fish lane. Joren needed his hands steadied more than his nets.”
+
+Mira stirred the pot. “Anyone else?”
+
+“Danner’s widow. She swears she hears her husband on the back step after curfew. I had her move her cot to the front room and gave her a lamp prayer.”
+
+Mira’s brows lifted. “Good. She sleeps lighter near the street.”
+
+“Then the cooper row twins—Ena and Bel—running kindling for three elder houses.” Brenn blew across the cup. “And I stopped by Ferrit the cobbler. He’s patching boots for families who can’t pay till spring.”
+
+Mira clicked her tongue. “Stubborn fool. Good man.”
+
+Brenn nodded. “Also checked on Alma the midwife. She’s low on clean spirits and thread.”
+
+“I’ve got both in the back crate,” Mira said. “I’ll send them before dusk.” She studied him a beat longer. “Whole town is doing this now. Small fires, small circles, small hopes. If this keeps on till next solstice, there won’t be enough of us left to call this place a town.”
+
+She looked past him toward the door. “I grew up stealing crusts off these tables, you remember? If Gravedawn empties, I’ll be old and half-blind in some stranger’s harbor, learning new gutters.”
+
+Brenn’s expression softened. “You were eight, filthy, furious, and convinced the church bell was personally insulting you.”
+
+Mira barked a laugh. “It was too loud.”
+
+“You tried to throw a herring at me during my second week in the cloth.”
+
+“You ducked.”
+
+“I learned quickly.”
+
+Her smile faded to something gentler. “You’ve covered half the town in a single day, Brenn. There’ll be a tomorrow too. Save your strength.”
+
+Brenn said nothing for a moment. He turned the empty cup in his hands, thumb tracing a crack in the glaze.
+
+He set it down. “Keep feeding people. Keep the ration list strict. Keep the back tables for those who can’t sleep.”
+
+Mira nodded slowly. “Who else are you seeing tonight?”
+
+Brenn rose and straightened his sleeve. “The most troubled man in town. Harbin hasn’t slept in days, and he’s still trying to find a way through this.”
+
+Mira’s eyes flicked toward Town Hall. She nodded once. “Then go before he starts pretending he doesn’t need you.”
+
+Evening had begun its slow descent over Gravedawn by the time Brenn stepped back into the street. Lamps winked to life window by window. From somewhere uphill, the tower stood silent, which was worse than if it had spoken.
+
+He paused at the corner and looked back—at Lysa guiding Rurik across a threshold dusted white, at Joren knotting netline by lanternlight, at Mira ladling stew for three men with tired faces.
+
+He pressed his thumb over the burn scar in his palm, then turned toward Town Hall.
