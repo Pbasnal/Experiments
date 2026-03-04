@@ -32,9 +32,11 @@ Harbin's brow furrowed. The courier had arrived barely three hours ago, and he h
 
 "The town grows thin these days," Brenn cut in smoothly, taking another slow sip of wine. His eyes watered slightly as he finally managed to swallow the acrid vintage. "Word travels fast when there are fewer ears to catch it."
 
-"Too thin," Harbin said, watching the priest's careful movements. Brenn set his cup down and moved to the window—the same window he'd gravitated to during a hundred similar conversations over the years. His fingers traced the familiar groove in the weathered sill where he usually rested his prayer book. "Most of the population will be gone by next week. Winter solstice approaches, and no one stays for the full moon anymore. Not if they can help it." Harbin rubbed his temples. "Makes running the town a nightmare. But, by good grace, you should leave too, Brenn. No sense in staying."
+"Too thin," Harbin said, watching the priest's careful movements. Brenn set his cup down and moved to the window—the same window he'd gravitated to during a hundred similar conversations over the years. His fingers traced the familiar groove in the weathered sill where he usually rested his prayer book. "By next week, half the fine houses will be shuttered. The wealthy can afford to flee before the full moon. The rest of us stay and pray this second winter is kinder than the last." Harbin rubbed his temples. "Makes running the town a nightmare. By good grace, you should leave too, Brenn. No sense in staying."
 
-"Five of them coming, I hear," Brenn said instead, his back to Harbin as he stared out at the tower. His thin smile caught the candlelight in the window's reflection. "Five swords against one tower." The words fell like stones in still water.
+Brenn kept his eyes on the tower. "Leave for where, Harbin? This is the only place that still calls me by name."
+
+"Five of them coming, I hear," Brenn said then, his back to Harbin as he stared out at the tower. His thin smile caught the candlelight in the window's reflection. "Five swords against one tower." The words fell like stones in still water.
 
 He turned from the window, and Harbin felt the weight of centuries in the priest's gaze. "And you believe this will be enough? That these five will succeed where others have failed?"
 
