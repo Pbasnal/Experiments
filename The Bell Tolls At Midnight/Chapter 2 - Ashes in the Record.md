@@ -4,191 +4,168 @@
 
 Harbin’s office felt smaller with seven people in it.
 
-Theron stood near the window, one shoulder against the stone wall, tea cup balanced in his palm as though the room were a parlor and not a war table. Lyra had claimed the chair closest to the desk and sat forward with her forearms on her knees. Cassius occupied the second chair with a notebook open across his lap, quill tucked behind one ear. Raven leaned against a bookshelf in the corner where the shadows pooled thickest. Elena sat cross-legged on the floor beside the hearth, palms resting loosely on her satchel. 
+Theron stood by the window, sipping tea in silence. Lyra had claimed the chair closest to the desk, elbows on knees, ready to pounce on any useful detail. Cassius occupied the second chair with his notebook already open. Raven had taken the darkest corner near the bookshelf. Elena sat on a folded cloak by the hearth, close enough to feel its low heat.
 
-Harbin remained behind his desk, trying and failing to make the stacks of ledgers look orderly.
+Harbin stood behind his desk, palms on ledgers, as if papers and ink could hold a town together.
 
 A knock came once.
 
-Before Harbin answered, the door opened and Father Brenn stepped inside, rain scent clinging to his cloak.
+Before Harbin answered, the door opened and Father Brenn stepped inside.
 
-“Father Brenn,” Harbin said quickly, rising halfway from his chair. “Perfect timing. I was just about to introduce you to—”
+“Father Brenn,” Harbin said quickly. “Good. I was about to introduce you to—”
 
-“We’ve already met,” Brenn said.
+“We have already met,” Brenn said.
 
-Five sets of eyes shifted between them.
+Lyra gave a short nod. “At the chapel.”
 
-Lyra’s brow rose. “At the chapel.”
+“Briefly,” Elena said.
 
-“Briefly,” Elena corrected, offering Brenn a small nod.
+“Long enough,” Brenn replied, removing his gloves, “to know they ask the right questions.”
 
-Brenn returned it and removed his gloves finger by finger. “Long enough to know they listen before they speak. That puts them above most people who come hunting curses.”
+Harbin exhaled, unfolded a map, and tapped the hill north of town. “Then let’s not waste time. You wanted the official church account of the tower. Here it is as recorded.”
 
-Harbin cleared his throat, sat back down, and spread a map over the desk. “Right. Good. Then we can move straight to it.” He tapped the hill marked north of town. “You asked for the official account of the tower. What follows is what the church records state.”
+Cassius raised his quill. “As close to exact wording as possible, please.”
 
-Cassius straightened, quill ready. “Word for word, if possible.”
+Harbin nodded. “A hundred years ago, a witch lived in the tower. Church records call her a heretic who practiced forbidden rites and summoned celestial monsters. She grew powerful. Three acolytes confronted her, killed her, and crucified her on the observation deck. As she died, she cursed them and the land.”
 
-Harbin gave a weary smile. “I’ll give you the version I can recite without choking on old ink. A hundred years ago, a witch lived in the tower. Church archives describe her as a heretic who practiced forbidden rites and summoned celestial monsters. She grew powerful. Three brave acolytes confronted her, killed her, and crucified her at the observation deck at the top of the tower. Before she died, she cursed them and the land.”
+Raven spoke first. “Heresy can mean anything when institutions want clean language.”
 
-Silence held for two heartbeats.
+Cassius leaned forward. “If she was that dangerous, why acolytes? Why not sanctioned clergy or trained exorcists?”
 
-Then Raven spoke from the shelf, voice cool as drawn steel. “Heresy is a convenient word. Convenient words hide inconvenient facts.”
+Lyra added, “If those three were cursed too, what happened to them after?”
 
-Cassius added, “And if she was truly that powerful, why acolytes? Why not ordained exorcists, inquisitors, a sanctioned strike force?”
+Brenn answered before Harbin could. “Summoning celestial monsters is heresy. Demonic art is condemned in every faith worth naming.” He placed his gloves on the desk. “And those acolytes were not officially sent. They acted on their own.”
 
-Lyra drummed her fingers once against her knee. “And the three? Heroes in the record for the killing, then what? Medals? Burial rites? Promotions?”
+He pointed to the tower crest drawn on the map. “I also believe the witch’s body is the source of the curse. If her remains are still bound there, the curse has an anchor.”
 
-Harbin glanced at Brenn, and Brenn answered first.
+Cassius frowned. “Three junior acolytes took it upon themselves to strike a witch of that scale?”
 
-“Summoning celestial monsters is heresy,” the priest said. “Demonic art, celestial corruption—name changes by faith, not by sin. Every major religion condemns it.” He folded his gloves on Harbin’s desk with careful precision. “As for why acolytes: they were not sent by church command. They took the initiative themselves.”
-He tapped the map near the tower crest. “And I believe the witch’s body was never truly laid to rest. If the curse has a root, it is likely her remains.”
+Brenn held his gaze. “Do not underestimate what young acolytes will dare when they believe they are saving souls.”
 
-Cassius frowned. “You’re saying three junior clergy mounted a private assault on a century-defining supernatural threat?”
+Harbin rubbed his eyes. “There’s more. I pulled favors in church archives. Quietly. Those three were removed from church service not long after. No reason attached.”
 
-“I’m saying that is what the record preserves.” Brenn’s gaze did not waver. “And I do not know what became of them after.”
+Lyra looked to Harbin. “So they survived the witch and still got removed?”
 
-Harbin exhaled through his nose. “I do.”
+“Administrative phrasing,” Harbin said. “ ‘Struck from active service.’ ‘Privileges revoked.’ ‘Inquiry closed.’ ”
 
-Everyone looked at him.
+Brenn spoke quickly. “The church often hides details when members are suffering from curse effects. Not always to bury truth—sometimes to preserve dignity. Records exist, but access is restricted. Even I could not see those files unless we prove the knowledge is absolutely necessary.”
 
-He rubbed at the bridge of his nose, then pushed one ledger forward. “I called in favors with archivists who still answer my letters. Quietly. The official pages are sparse, but there are personnel entries. The three names vanish from commendation rolls within months. Not dead. Not reassigned publicly. Removed.”
+No one answered. Raven looked at Brenn for a second too long, then looked away. Cassius made a note he did not read back.
 
-“Removed how?” Lyra asked.
+Harbin broke the silence. “Whatever the reason, the file is buried. That much is fact.”
 
-“No reasons listed,” Harbin said. “Just administrative language. ‘Struck from active service.’ ‘Ecclesiastical privileges revoked.’ ‘Further inquiry closed.’”
+Brenn nodded once. “Then hold to the part that matters now. The curse remains. People keep disappearing. Solstice is tomorrow night.”
 
-Raven let out a dry laugh. “Closed inquiries are usually where truth goes to suffocate.”
+He turned toward the window.
 
-Elena’s fingers tightened on her satchel strap. “Or where grief is buried before it can ask questions.”
+Theron had not moved.
 
-Cassius tapped his quill against the notebook edge. “If they killed a witch and ended a threat, removal makes no doctrinal sense. Unless the official story was edited for stability.”
+Brenn studied him. “You have the oldest eyes in this room. You have said almost nothing. What is your role in this party?”
 
-Harbin gave him a look that was almost admiration. “You’re all very quick.”
+Lyra started to speak. Theron lifted two fingers, and she stopped.
 
-“Still alive,” Lyra said, “so we have to be.”
+Brenn continued, voice lower. “I am placing the future of this town in your hands. I need to know exactly whose hands those are.”
 
-Brenn’s eyes moved to the map, then to Harbin. “Whatever parts were trimmed, one fact remains. The curse is real. People are disappearing. The tower worsens every solstice cycle.”
+Theron set his cup on the sill and faced him. “I am their invigilator. I assess, correct, and keep them alive long enough to finish the job.”
 
-Then he turned toward the window.
+He looked around the room as he spoke. “They have already exorcised a powerful wraith. They also survived an engagement with a cursed creature backed by a dozen ghouls, without outside support. Based on my review of their work, they will become full-fledged guild members.”
 
-Theron stood there as if he’d been carved in place, tea gone cold in his hand, saying nothing.
+Brenn’s expression hardened. “Then the guild sent novices to a century curse while Gravedawn empties its treasury? We paid for veterans.”
 
-Brenn watched him for a long moment. “You,” he said at last.
+Theron did not flinch. “You paid for results. They deliver results.”
 
-Theron’s gaze shifted from the fogged glass to Brenn.
+He continued before Brenn could answer. “Their badge delay was not because they failed. In the wraith case, validation was incomplete. The body was cleared, but not all potential anchor sites were checked before closure.”
 
-Brenn gestured with two fingers. “You carry yourself like the only one in this room who has buried teammates before. You’ve said nothing. What is your role in this party?”
+Cassius covered his face with one hand. “In our defense, no one told us we had to check the man’s balls after the possession broke.”
 
-Lyra’s head snapped toward Theron, ready to answer for him.
+Raven muttered, “You shouted that across a sacred office.”
 
-Theron lifted his cup slightly, and she settled back.
+Lyra sighed. “He’s not wrong, unfortunately.”
 
-He set the tea on the window ledge and stepped closer to the desk. “My role?” His voice was even, without heat. “I am their invigilator and shield, depending on what the hour asks.”
+Harbin coughed into his fist, trying not to laugh. Even Brenn’s mouth twitched despite himself.
 
-Brenn said nothing.
+The tension thinned, but Harbin did not let it pass.
 
-Theron continued. “This team recently handled an exorcism involving a high-intensity wraith manifestation. The spirit had layered anchors and a predatory memory loop. They broke it.” He glanced to each of them in turn. “Because of an oversight in reporting protocol, the guild withheld formal badge issuance.”
+He looked at Theron, jaw tight. “No. I wrote clearly that this curse eats people and failed veterans by the dozen. I did not ask for probationers.”
 
-Cassius winced. Lyra clicked her tongue. Raven looked offended on principle.
+Theron met his stare. “And I reviewed what you sent. This team was chosen because they are highly skilled in exactly this kind of work. They may not hold the guild badge yet, but they were dealing with monsters long before they walked into our hall.”
 
-Theron’s mouth twitched, almost a smile. “Paperwork does not measure competence. They are capable. More than capable. If they misstep, I am there to correct the line before it breaks. The guild sent them because the guild trusts them.”
+Harbin held the stare, then gave a short nod. “Fine. Then we judge by what they do on that hill.”
 
-Brenn studied him, then the others.
+He tapped the map. “Logistics. Tower route and structure.”
 
-For the first time since entering, some of the tightness left Lyra’s shoulders. Elena looked down to hide a smile that almost surfaced. Raven examined her dagger hilt with suspicious intensity. Cassius pretended to rewrite the same sentence twice.
+Everyone leaned in.
 
-Then Cassius blurted, “For the record, the oversight was one signature box. One.”
+“The tower is on the hill crown,” Harbin said. “Main ascent is the old pilgrim road from the north bend. It’s exposed and broken in parts. There’s a narrower shepherd path on the east face—faster but steep. South side is a sheer drop with fractured stone shelves. One bad step and you disappear into black rock.”
 
-Raven muttered, “Three boxes.”
+Raven traced the east path with a fingertip. “Advance pair takes this. Less visible approach.”
 
-“Two and a half,” Lyra said.
+“Make it fast,” Brenn said. “Past teams attempted exorcism by day and by night. Most never saw the anchor spirit at all. Only one attempt reported seeing it clearly—at midnight. That team died before dawn.”
 
-Harbin barked a short laugh before he could stop himself, and even Brenn’s expression softened at the edges.
+Cassius stilled. “How do we know they saw it?”
 
-Theron reclaimed his tea. “Morale check complete,” he said dryly.
+“One ran,” Brenn said. “Barely. They dragged him back from the road at sunrise, half-mad, screaming about a knight and the witch. He died that evening.”
 
-Harbin clapped both palms onto the map. “Good. Then logistics.”
+Raven’s eyes sharpened instead of widening. “That sounds like a layered curse. The spirit is not only bound to place; it phases in and out of our plane by time and season.” She paused, almost impressed. “And somehow a dead witch is still maintaining it. That is… difficult to do.”
 
-The room leaned in.
+“Difficult or not,” Brenn said, “if the rite is not completed at midnight tomorrow, we lose the window.”
 
-“The tower sits on basalt bedrock with one main approach,” Harbin said, tracing a route with his finger. “Old pilgrim road from the north gate, half-collapsed in places. Secondary deer trails from the east through thorn scrub, narrower but with better cover. Marshland to the west—don’t use it unless you enjoy sinking.”
+That landed like cold iron.
 
-Raven stepped forward and planted two fingers on the eastern line. “We scout this at dawn. Main road for supply mule, deer trail for advance pair.”
+Lyra nodded. “Then we climb before dusk tomorrow, clear floor by floor, and hold the deck for the rite window.”
 
-Lyra nodded. “Agreed.”
+Harbin turned the map to reveal a cleaner interior sketch. “Four levels in the records. Level one: entrance hall, an old living room, and a small kitchen. Level two: a chamber full of books and study tables. Level three: storage, crates, old tools, rotted cloth. Level four: what appears to be a bedroom.”
 
-Harbin tapped the tower sketch. “Architecture from church records: lower hall, spiral service stair, three bell chambers, then the observation deck. There are service crawlways between the second and third levels—old maintenance routes, easy to miss.”
+He tapped the top margin. “Attached to level four is the observation deck. Above the bedroom sits the bell dome. That bell rings by itself now.”
 
-Cassius’ quill flew over paper. “Any notes on ward remnants? Sigils, sanctified iron, reliquaries?”
+Elena looked up. “Known hostiles?”
 
-“Fragmentary,” Harbin said. “Some mention of prayer seals in the lower hall, likely dead by now. Reports of chained doors on level two. No confirmation they still hold.”
+Harbin counted on his fingers. “Ghosts in the lower hallways. Ghouls near old feeding grounds on the approach. Undead around stair landings after dusk. Wraith signs near upper levels when the bell starts acting wrong. Mad animals around the hill too—dogs, goats, even birds. Curse-sick and aggressive. Beyond that, I won’t pretend certainty.”
 
-Elena looked up from her satchel. “Known entities?”
+“Good,” Raven said. “Uncertain is honest.”
 
-Harbin counted on his fingers. “Wraith class manifestations in winter. At least one bellbound revenant—locals hear ringing when no wind blows. Shadow drifters near the stair wells. Possibly other forms no one lived long enough to categorize.”
+Then the equipment planning began in overlapping bursts.
 
-“Cheerful,” Lyra murmured.
+“Rock salt, lots of it,” Lyra said.
 
-“Useful,” Raven corrected.
+“Blessed chalk, silver wire, mirror shards, ward nails,” Cassius added.
 
-They began listing needs, and the office turned into a quick, precise storm.
+“Bandages, burn salve, fever bark, willow tincture, sleeproot,” Elena said. “Also clean cloth, boiled water, and food that can be eaten cold.”
 
-“Salt by the sack,” Lyra said. “Not pouches. Sack.”
+“Climbing rope, pitons, spare lanterns, oil flasks, waxed tinder,” Raven said.
 
-“Blessed chalk, silver wire, mirror shards, wax-sealed lamp oil,” Cassius added.
+“No full ration packs,” Lyra said. “This is a one-night operation. Just light food—dried fruit, nuts, water, and a little salt to keep hands steady.”
 
-“Bandages, fever bark, willow tincture, sleeproot,” Elena said. “And clean water skins for everyone.”
+Cassius pointed at the map. “I need copies of every page on this layout, even damaged ones.”
 
-“Rations for three days minimum,” Theron said. “Hard bread, dried meat, lentils. Hunger makes bad choices.”
+Harbin nodded and started his own list. “Then I start procurement now.”
 
-“Two coils of climbing rope,” Raven said. “One to lose, one to live.”
-
-Cassius pointed his quill at Harbin. “I want copies of every architectural page you have, including damaged ones. Missing corners are still data.”
-
-Harbin nodded and began making his own list. “I can secure most of this by evening. Maybe all, if the quartermaster owes me more than he admits.”
-
-Brenn listened until the pace slowed, then placed both hands on the desk.
-
-“There is one more matter,” he said.
-
-Lyra glanced up. “What matter?”
-
-“I am coming with you.”
-
-The words landed harder than expected.
+Brenn placed both hands on the desk. “One more matter. I am coming with you.”
 
 Harbin stared. “Brenn—”
 
-Brenn met his eyes and held them. “You wanted the best chance for Gravedawn.” He looked to the party. “I know how to exorcise a spirit like this. Not from scripture alone—from practice. I can hold my own when things turn ugly.”
+“I know how to conduct a tower exorcism under pressure,” Brenn said. “Not from books. From field work. I can hold my own.”
 
-Theron tilted his head. “You understand we’re not climbing to perform a clean rite in a chapel. This will be close-quarters, uncertain, hostile.”
-
-“I understand,” Brenn said.
-
-Raven folded her arms. “Can you follow command in the field?”
+Raven’s eyes narrowed. “Can you follow command?”
 
 “Yes.”
 
-Cassius asked, “Can you identify anchor behavior under pressure?”
+Cassius asked, “Can you recognize shifting anchors mid-rite?”
 
 “Yes.”
 
-Elena’s voice was gentle. “Can you stop if we tell you to stop?”
+Elena’s gaze dropped to Brenn’s scarred hands. “Those scars weren’t made in chapel work.”
 
-A pause.
+Brenn looked at his palms. “No. Before I took vows, I ran with an adventuring party. Cursed ruins, breach cleansings, night escorts. I buried friends there. I learned.”
 
-Then Brenn said, “If your order keeps the team alive, yes.”
+Elena held his gaze, then nodded once. “You have my support, Father. Field calls will come fast in there—follow them without argument, and we’ll make this work.”
 
-Lyra looked at Theron. Theron looked at Harbin. Harbin looked at the map as if it might answer for him.
+Brenn inclined his head. “Understood.”
 
-Outside the window, the tower hill sat under fog like a fist under cloth.
+Lyra glanced at Elena, then at the others. No one objected.
 
-Theron spoke first. “Then we do this properly. We plan as six, move as six, and retreat as six.”
+Harbin swallowed. “I’ll have supplies staged by post noon tomorrow.”
 
-Harbin swallowed and nodded once. “I’ll have supplies staged at dawn.”
+Brenn gave a small nod. “Good. Then we move before first dark.”
 
-Brenn put his gloves back on, slower this time.
-
-“No,” he said quietly. “Stage them tonight.”
-
-No one argued.
+This time, no one argued.
