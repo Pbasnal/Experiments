@@ -177,7 +177,7 @@ FROM Comics c
 CROSS JOIN CustomerSegments s;
 
 -- Comic Pricing
-INSERT INTO ComicPricing (ComicId, RegionCode, BasePrice, IsFreeContent, IsPremiumContent, DiscountStartDate, DiscountEndDate, DiscountPercentage)
+INSERT INTO ComicPricings (ComicId, RegionCode, BasePrice, IsFreeContent, IsPremiumContent, DiscountStartDate, DiscountEndDate, DiscountPercentage)
 SELECT 
     c.Id as ComicId,
     region.code as RegionCode,

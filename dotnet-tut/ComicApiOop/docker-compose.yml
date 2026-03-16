@@ -4,9 +4,9 @@ services:
     container_name: comic_mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: ComicBookDb
+      MYSQL_DATABASE: comicdb
       MYSQL_USER: comicuser
-      MYSQL_PASSWORD: comicpassword
+      MYSQL_PASSWORD: comicpass
     ports:
       - "3306:3306"
     volumes:
@@ -20,7 +20,7 @@ services:
       - default
       - monitoring
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "comicuser", "-pcomicpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "comicuser", "-pcomicpass"]
       interval: 10s
       timeout: 5s
       retries: 5

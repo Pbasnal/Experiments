@@ -236,7 +236,7 @@ public static class DodSqlHelper
 
                 new MySqlBatchCommand($@"
                     SELECT ComicId, RegionCode, BasePrice, IsFreeContent, IsPremiumContent
-                    FROM ComicPricing
+                    FROM ComicPricings
                     WHERE ComicId IN ({inClause})
                     ORDER BY ComicId"),
 
