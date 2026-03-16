@@ -14,7 +14,7 @@ My expectation going in was simple: higher throughput under load, lower average 
 
 ## Motivation: Discord’s data-service and going deeper on coalescing
 
-The inspiration came from **Discord’s engineering blog**: their **data-service** uses request coalescing to fetch messages—many clients asking for data get batched into fewer DB round-trips. I wanted to try the same idea on a normal API. Before that, here’s a bit more on what coalescing can look like and how it differs from the usual flow.
+The inspiration came from [**Discord’s engineering blog**](https://discord.com/blog/how-discord-stores-trillions-of-messages): their **data-service** uses request coalescing to fetch messages—many clients asking for data get batched into fewer DB round-trips. I wanted to try the same idea on a normal API. Before that, here’s a bit more on what coalescing can look like and how it differs from the usual flow.
 
 ### Normal flow vs coalesced flow
 
@@ -293,9 +293,16 @@ A short rule of thumb: coalescing shines when the cost is dominated by **number 
 
 ---
 
+
+### Commands to reproduce the expriment
+Github Repo: https://github.com/Pbasnal/Experiments/tree/master/dotnet-tut/ComicApiOop
+
+---
+
 ## Conclusion
 
 **My takeaway:** Request coalescing is worth the effort when it fits the problem. **When each request does small reads or writes per I/O call** (e.g. a few rows, a few IDs), coalescing pays off: you reduce the number of round-trips and use network bandwidth more efficiently by packing many small operations into fewer, larger calls. **When each request already moves a lot of data in every I/O call**, coalescing is less beneficial—the bottleneck is often bandwidth or single-call cost, not the number of round-trips, so batching doesn't buy you as much. So the pattern fits best when the workload is many small, similar I/O operations that can be batched without blowing up payload size.
 
 
 I’m still learning, and I don’t want to present this as “the correct way.” It’s what I tried and what I measured. If you have experience with request coalescing, batching, or backend performance, I’d be glad to hear what you’d do differently or where this design might run into trouble at scale.
+

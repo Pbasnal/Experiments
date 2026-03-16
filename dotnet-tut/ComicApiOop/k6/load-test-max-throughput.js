@@ -13,7 +13,7 @@ import { check } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
 const baseUrl = __ENV.API_URL || 'http://localhost:8081';
-const maxRps = __ENV.MAX_RPS ? parseInt(__ENV.MAX_RPS, 10) : 500;
+const maxRps = __ENV.MAX_RPS ? parseInt(__ENV.MAX_RPS, 10) : 300;
 
 // Custom metrics
 const timeoutRate = new Rate('timeouts');
