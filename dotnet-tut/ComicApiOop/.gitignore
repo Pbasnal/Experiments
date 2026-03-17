@@ -148,3 +148,4 @@ TestResults/
 *.bak
 *.tmp
 *.temp
+summary.json
