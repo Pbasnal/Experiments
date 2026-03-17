@@ -1,6 +1,5 @@
 using ComicApiOop.Endpoints;
 using ComicApiOop.Extensions;
-using ComicApiOop.Metrics;
 using ComicApiOop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +9,6 @@ builder.Services.AddComicApiServices(builder.Configuration);
 
 // Register services
 builder.Services.AddScoped<VisibilityComputationService>();
-
-// Configure metrics
-MetricsConfiguration.ConfigureMetrics();
 
 var app = builder.Build();
 

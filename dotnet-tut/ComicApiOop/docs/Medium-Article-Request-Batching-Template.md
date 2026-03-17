@@ -89,7 +89,7 @@ Each request asks for visibility of multiple comics (e.g. `startId` and `limit`)
 - Incoming requests are enqueued; a background processor dequeues them in **batches** (see next section for how batching works).
 - One bulk fetch and one bulk save per batch; one compute pass over the batch. Results are mapped back to each original request via an index map so every client gets the right response.
 
-The next section has sequence diagrams and the concrete batching logic from the code.
+The next section has sequence diagrams and the concrete batching logic from the implementation.
 
 ### Why I expected improvement
 
@@ -128,7 +128,7 @@ sequenceDiagram
     E-->>C: 200 OK
 ```
 
-So for one request we do **1 fetch + 1 save**. Under load we still have **one pipeline per request**: no sharing of work across concurrent callers.
+So for one request we do **1 fetch + 1 save**. Under load we still have **one pipeline per request**: no sharing of work across concurrent requests.
 
 ### With request coalescing: Queue and batch processor
 
@@ -179,7 +179,7 @@ The batch processor is built on a small queue abstraction. Here’s how batching
   1. Calls `Dequeue(batchSize)` to get a batch (up to 10 items, or less after a 5 ms wait).
   2. If the batch is empty (no requests arrived in that window), we count empty cycles; after **5 consecutive empty dequeues**, we back off with a short delay (e.g. **2 ms**) so we don’t busy-spin when idle.
   3. If the batch has items, we invoke the **callback** with `(batchCount, messageBatch)`. The callback does the single bulk fetch, compute, bulk save, and `SetResponse` for each request in the batch.
-  4. After processing a batch, we wait **batchDequeueTimeoutMs** (e.g. **10 ms**) before the next `Dequeue`. That small gap helps avoid hammering the queue and gives a natural pacing between batches.
+  4. After processing a batch, we wait **batchDequeueTimeoutMs** (e. g. **10 ms**) before the next `Dequeue`. That small gap helps avoid hammering the queue and gives a natural pacing between batches.
 
 So the main knobs are: **batch size** (e.g. 10 requests per batch), **max batching time** (5 ms) when the queue is empty, and **delay between batches** (10 ms). In this experiment the API used `batchSize = 10`; the exact values can be tuned for latency vs throughput.
 

@@ -87,7 +87,7 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total[1m])) by (endpoint)",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=~\"DOD|OOP\"}[1m])) by (endpoint)",
           "legendFormat": "{{endpoint}}",
           "refId": "A"
         }
@@ -174,7 +174,7 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, endpoint))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=~\"DOD|OOP\"}[5m])) by (le, endpoint))",
           "legendFormat": "p95 - {{endpoint}}",
           "refId": "A"
         },
@@ -183,7 +183,7 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, endpoint))",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=~\"DOD|OOP\"}[5m])) by (le, endpoint))",
           "legendFormat": "p99 - {{endpoint}}",
           "refId": "B"
         }
@@ -468,8 +468,8 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collections_count_total[1m])",
-          "legendFormat": "Gen {{generation}}",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\"}[1m])",
+          "legendFormat": "{{api_type}} Gen {{generation}}",
           "refId": "A"
         },
         {
@@ -477,8 +477,8 @@
             "type": "Prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_pause_ratio[1m])",
-          "legendFormat": "GC Pause Ratio",
+          "expr": "app_metric_gauge{metric=\"gc_pause_time_ratio\", api_type=~\"DOD|OOP\"}",
+          "legendFormat": "{{api_type}} GC Pause Ratio",
           "refId": "B"
         }
       ],

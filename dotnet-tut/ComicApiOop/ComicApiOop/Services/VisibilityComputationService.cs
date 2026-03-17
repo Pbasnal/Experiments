@@ -152,7 +152,12 @@ public class VisibilityComputationService
         if (httpContext?.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime requestReceivedAtUtc)
         {
             var waitSeconds = (DateTime.UtcNow - requestReceivedAtUtc).TotalSeconds;
-            _appMetrics.RecordLatency("oop_request_wait", waitSeconds);
+            var labels = new Dictionary<string, string>
+            {
+                ["endpoint"] = httpContext.Request.Path.Value ?? "/",
+                ["method"] = httpContext.Request.Method
+            };
+            _appMetrics.Observe(MetricNames.RequestWaitTimeSeconds, waitSeconds, labels);
         }
 
         // Validate input parameters

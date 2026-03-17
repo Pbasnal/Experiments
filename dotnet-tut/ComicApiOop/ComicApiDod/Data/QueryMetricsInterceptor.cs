@@ -1,9 +1,9 @@
 using System.Data.Common;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Common.Metrics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Prometheus;
 
 namespace ComicApiDod.Data;
 
@@ -13,22 +13,12 @@ namespace ComicApiDod.Data;
 /// </summary>
 public class QueryMetricsInterceptor : DbCommandInterceptor
 {
-    private static readonly Histogram QueryDuration = Metrics.CreateHistogram(
-        "ef_query_duration_seconds",
-        "EF Core query duration",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.001, 2, 12),
-            LabelNames = new[] { "query_type", "table", "api_type" }
-        });
+    private readonly IAppMetrics _metrics;
 
-    private static readonly Counter QueryCount = Metrics.CreateCounter(
-        "ef_query_count_total",
-        "Total number of EF Core queries",
-        new CounterConfiguration
-        {
-            LabelNames = new[] { "query_type", "table", "api_type" }
-        });
+    public QueryMetricsInterceptor(IAppMetrics metrics)
+    {
+        _metrics = metrics;
+    }
 
     public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
         DbCommand command,
@@ -41,14 +31,13 @@ public class QueryMetricsInterceptor : DbCommandInterceptor
 
         var queryType = ExtractQueryType(command.CommandText);
         var table = ExtractTable(command.CommandText);
-
-        QueryDuration
-            .WithLabels(queryType, table, "DOD")
-            .Observe(sw.Elapsed.TotalSeconds);
-
-        QueryCount
-            .WithLabels(queryType, table, "DOD")
-            .Inc();
+        var labels = new Dictionary<string, string>
+        {
+            ["query_type"] = queryType,
+            ["table"] = table
+        };
+        _metrics.Observe("ef_query_duration_seconds", sw.Elapsed.TotalSeconds, labels);
+        _metrics.Inc("ef_query_count_total", 1, labels);
 
         return actualResult;
     }
@@ -63,14 +52,13 @@ public class QueryMetricsInterceptor : DbCommandInterceptor
 
         var queryType = ExtractQueryType(command.CommandText);
         var table = ExtractTable(command.CommandText);
-
-        QueryDuration
-            .WithLabels(queryType, table, "DOD")
-            .Observe(sw.Elapsed.TotalSeconds);
-
-        QueryCount
-            .WithLabels(queryType, table, "DOD")
-            .Inc();
+        var labels = new Dictionary<string, string>
+        {
+            ["query_type"] = queryType,
+            ["table"] = table
+        };
+        _metrics.Observe("ef_query_duration_seconds", sw.Elapsed.TotalSeconds, labels);
+        _metrics.Inc("ef_query_count_total", 1, labels);
 
         return actualResult;
     }

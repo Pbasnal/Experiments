@@ -1,5 +1,4 @@
 using Common.Metrics;
-using ComicApiOop.Metrics;
 using System.Diagnostics;
 
 namespace ComicApiOop.Middleware;
@@ -21,6 +20,8 @@ public class MetricsMiddleware
     {
         var sw = Stopwatch.StartNew();
         string status;
+        var path = context.Request.Path.Value ?? "/";
+        var method = context.Request.Method;
 
         try
         {
@@ -30,14 +31,24 @@ public class MetricsMiddleware
         catch
         {
             status = "500";
-            _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
-            _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
-            MetricsConfiguration.RecordApiRequest("OOP", status);
+            var labels = new Dictionary<string, string>
+            {
+                ["status"] = status,
+                ["endpoint"] = path,
+                ["method"] = method
+            };
+            _appMetrics.Inc(MetricNames.ApiHttpRequestsTotal, 1, labels);
+            _appMetrics.Observe(MetricNames.HttpRequestDuration, sw.Elapsed.TotalSeconds, labels);
             throw;
         }
 
-        _appMetrics.CaptureCount("oop_http_request", 1, new Dictionary<string, string> { ["status"] = status });
-        _appMetrics.RecordLatency("oop_http_request", sw.Elapsed.TotalSeconds, new Dictionary<string, string> { ["status"] = status });
-        MetricsConfiguration.RecordApiRequest("OOP", status);
+        var okLabels = new Dictionary<string, string>
+        {
+            ["status"] = status,
+            ["endpoint"] = path,
+            ["method"] = method
+        };
+        _appMetrics.Inc(MetricNames.ApiHttpRequestsTotal, 1, okLabels);
+        _appMetrics.Observe(MetricNames.HttpRequestDuration, sw.Elapsed.TotalSeconds, okLabels);
     }
 }
