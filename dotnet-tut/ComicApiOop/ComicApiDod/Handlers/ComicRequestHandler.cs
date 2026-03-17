@@ -40,7 +40,7 @@ public static class ComicRequestHandler
             metrics.CaptureCount(ProcessName, 1, attrs);
             metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
             return Results.Problem(
-                detail: "Request timed out after 10 seconds",
+                detail: "Request timed out after 1.5 seconds",
                 title: "Request Timeout",
                 statusCode: 504
             );
@@ -51,8 +51,8 @@ public static class ComicRequestHandler
             metrics.CaptureCount(ProcessName, 1, attrs);
             metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
             return Results.Problem(
-                detail: ex.Message,
-                title: "Internal Server Error",
+                detail: ex.ToString(),
+                title: "Error computing visibilities",
                 statusCode: 500
             );
         }

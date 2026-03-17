@@ -55,7 +55,7 @@ public static class ComicEndpoints
                     metrics.CaptureCount(ProcessName, 1, timeoutAttrs);
                     metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, timeoutAttrs);
                     return Results.Problem(
-                        detail: "Request timed out after 1 second",
+                        detail: "Request timed out after 2 seconds",
                         title: "Request Timeout",
                         statusCode: 504);
                 }
