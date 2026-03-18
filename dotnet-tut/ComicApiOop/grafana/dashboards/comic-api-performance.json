@@ -1050,8 +1050,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=~\"oop_db_query_.*|oop_operation_computation\", api_type=\"OOP\"}[1m])) by (le, metric)) or vector(0)",
-          "legendFormat": "p95 - {{metric}}",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"OOP\"}[1m])) by (le, query_type, table))",
+          "legendFormat": "p95 - {{query_type}} {{table}}",
           "refId": "A"
         },
         {
@@ -1059,8 +1059,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=~\"oop_db_query_.*|oop_operation_computation\", api_type=\"OOP\"}[1m])) by (le, metric)) or vector(0)",
-          "legendFormat": "p99 - {{metric}}",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"OOP\"}[1m])) by (le, query_type, table))",
+          "legendFormat": "p99 - {{query_type}} {{table}}",
           "refId": "B"
         }
       ],
@@ -1156,8 +1156,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(app_metric_counter{metric=~\"oop_db_query_.*\", api_type=\"OOP\"}[1m])) by (metric, status) or vector(0)",
-          "legendFormat": "{{metric}} {{status}}",
+          "expr": "sum(rate(app_metric_counter{metric=\"db_query_count_total\", api_type=\"OOP\"}[1m])) by (query_type, table)",
+          "legendFormat": "{{query_type}} {{table}}",
           "refId": "A"
         }
       ],

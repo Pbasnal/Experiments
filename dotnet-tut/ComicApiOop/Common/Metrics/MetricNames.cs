@@ -14,6 +14,12 @@ public static class MetricNames
     /// <summary>Database/query duration in seconds (histogram).</summary>
     public const string DbQueryDuration = "db_query_duration_seconds";
 
+    /// <summary>Total DB/query count (counter).</summary>
+    public const string DbQueryCountTotal = "db_query_count_total";
+
+    /// <summary>EF Core change tracker entity count (gauge).</summary>
+    public const string EfChangeTrackerEntities = "ef_change_tracker_entities";
+
     /// <summary>.NET memory allocated bytes (gauge).</summary>
     public const string DotNetMemoryAllocatedBytes = "dotnet_memory_allocated_bytes";
 

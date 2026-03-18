@@ -14,6 +14,19 @@ public class MetricsReporter
     private readonly DbContext _dbContext;
     private readonly IAppMetrics _appMetrics;
 
+    private static string GetTableForQueryType(string queryType)
+    {
+        // Best-effort mapping so dashboards can aggregate by a stable "table" label.
+        // If the query type is unknown, fall back to "unknown".
+        return queryType switch
+        {
+            "fetch_comics_bulk" => "comics",
+            "save_visibilities" => "computed_visibilities",
+            "save_visibilities_bulk" => "computed_visibilities",
+            _ => "unknown",
+        };
+    }
+
     public MetricsReporter(DbContext dbContext, IAppMetrics appMetrics)
     {
         _dbContext = dbContext;
@@ -34,18 +47,35 @@ public class MetricsReporter
         Func<Task<T>> queryFunc)
     {
         var sw = Stopwatch.StartNew();
+        string status;
+        // Default to "error" so the finally block always has a defined status value.
+        // (The compiler otherwise warns that status might be unassigned.)
+        status = "error";
         try
         {
             var result = await queryFunc();
+            status = "ok";
             return result;
+        }
+        catch
+        {
+            status = "error";
+            throw;
         }
         finally
         {
             sw.Stop();
-            var process = $"oop_db_query_{queryType}";
-            var attrs = new Dictionary<string, string> { ["status"] = "ok" };
-            _appMetrics.RecordLatency(process, sw.Elapsed.TotalSeconds, attrs);
-            _appMetrics.CaptureCount(process, 1, attrs);
+            var table = GetTableForQueryType(queryType);
+            var attrs = new Dictionary<string, string>
+            {
+                ["status"] = status,
+                ["query_type"] = queryType,
+                ["table"] = table,
+            };
+
+            // Standardized metric names so OOP+DOD dashboards can share PromQL.
+            _appMetrics.RecordLatency(MetricNames.DbQueryDuration, sw.Elapsed.TotalSeconds, attrs);
+            _appMetrics.CaptureCount(MetricNames.DbQueryCountTotal, 1, attrs);
         }
     }
 
@@ -85,7 +115,7 @@ public class MetricsReporter
     {
         var trackedEntities = _dbContext.ChangeTracker.Entries().Count();
         _appMetrics.Set(
-            "ef_change_tracker_entities",
+            MetricNames.EfChangeTrackerEntities,
             trackedEntities,
             new Dictionary<string, string> { ["operation"] = operationName });
     }

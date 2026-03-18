@@ -58,7 +58,6 @@ public static class ApplicationBuilderExtensions
 
         // Add metrics endpoint and middleware
         app.UseMetricServer();
-        app.UseHttpMetrics();
 
         // Add custom metrics middleware
         app.UseMiddleware<MetricsMiddleware>();
