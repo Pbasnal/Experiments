@@ -17,7 +17,7 @@ RUN dotnet tool install --global dotnet-ef --version 8.0.0
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
 # Install EF Core tools
-RUN #dotnet ef migrations add InitialCreate --project  "/src/ComicApiDod/ComicApiDod.csproj"
+# RUN #dotnet ef migrations add InitialCreate --project  "/src/ComicApiDod/ComicApiDod.csproj"
 RUN dotnet publish "ComicApiOop/ComicApiOop.csproj" -c Release -o /app/publish
 RUN mv /app/publish/ComicApiOop /app/publish/app
 RUN ls -la /app/publish
