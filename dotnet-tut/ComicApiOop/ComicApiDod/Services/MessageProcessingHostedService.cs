@@ -38,7 +38,7 @@ public class MessageProcessingHostedService : IHostedService
             using var scope = _serviceScopeFactory.CreateScope();
             var comicVisibilityService = scope.ServiceProvider.GetRequiredService<ComicVisibilityService>();
             await comicVisibilityService.ComputeVisibilities(batchSize, messages);
-            return new IValue[0];
+            return Array.Empty<IValue>();
         }
         
         _processingTasks.Add(_messageBus.StartBatchListener<VisibilityComputationRequest>(

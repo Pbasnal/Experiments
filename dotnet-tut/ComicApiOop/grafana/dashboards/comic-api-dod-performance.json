@@ -110,7 +110,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total_dod[1m])) by (method, endpoint)",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=\"DOD\"}[1m])) by (method, endpoint)",
           "legendFormat": "{{method}} {{endpoint}}",
           "refId": "A"
         },
@@ -120,10 +120,10 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "sum(rate(metric_counter{process=\"compute_visibilities\"}[$__rate_interval])) by (process, status)",
+          "expr": "sum(rate(app_metric_counter{metric=\"compute_visibilities\", api_type=\"DOD\"}[$__rate_interval])) by (status)",
           "hide": false,
           "instant": false,
-          "legendFormat": "{{process}} {{status}}",
+          "legendFormat": "{{status}}",
           "range": true,
           "refId": "B"
         }
@@ -223,7 +223,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le, method, endpoint) (rate(http_request_duration_seconds_dod_bucket{endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
+          "expr": "histogram_quantile(0.95, sum by(le, method, endpoint) (rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"DOD\", endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
           "hide": false,
           "legendFormat": "p95 - {{method}} {{endpoint}}",
           "range": true,
@@ -235,7 +235,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum by(le, method, endpoint) (rate(http_request_duration_seconds_dod_bucket{endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
+          "expr": "histogram_quantile(0.99, sum by(le, method, endpoint) (rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"DOD\", endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
           "hide": false,
           "legendFormat": "p99 - {{method}} {{endpoint}}",
           "range": true,
@@ -247,7 +247,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.5, sum by(le, method, endpoint) (rate(http_request_duration_seconds_dod_bucket{endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
+          "expr": "histogram_quantile(0.5, sum by(le, method, endpoint) (rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"DOD\", endpoint=\"/api/comics/compute-visibilities\"}[1m])))",
           "hide": false,
           "legendFormat": "p50 - {{method}} {{endpoint}}",
           "range": true,
@@ -320,7 +320,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(http_requests_total_dod{job=\"comic-api-dod\"}[1m])) by (status)",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=\"DOD\"}[1m])) by (status)",
           "legendFormat": "Status {{status}}",
           "refId": "A"
         }
@@ -432,7 +432,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
           "legendFormat": "{{api_type}} Gen 0",
           "refId": "A"
         },
@@ -441,7 +441,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
           "legendFormat": "{{api_type}} Gen 1",
           "refId": "B"
         },
@@ -450,7 +450,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
           "legendFormat": "{{api_type}} Gen 2",
           "refId": "C"
         }
@@ -546,7 +546,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_allocated_bytes{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_memory_allocated_bytes\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}} Allocated",
           "refId": "A"
         },
@@ -555,7 +555,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_total_bytes{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_memory_total_bytes\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}} Total",
           "refId": "B"
         }
@@ -598,7 +598,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "(rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(api_http_requests_total[5m])) by (api_type)) * 1000",
+          "expr": "(rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=~\"DOD|OOP\"}[5m])) by (api_type)) * 1000",
           "legendFormat": "{{api_type}} Gen 0 per 1k req",
           "refId": "A"
         }
@@ -643,7 +643,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "gc_pause_time_ratio{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"gc_pause_time_ratio\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}}",
           "refId": "A"
         }
@@ -740,7 +740,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_request_wait_seconds_bucket[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "p50",
           "refId": "A"
         },
@@ -749,7 +749,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_request_wait_seconds_bucket[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "p95",
           "refId": "B"
         },
@@ -758,7 +758,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(comic_visibility_request_wait_seconds_bucket[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "p99",
           "refId": "C"
         }
@@ -855,7 +855,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(ef_query_duration_seconds_bucket{api_type=\"DOD\"}[1m])) by (le, query_type, table))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"DOD\"}[1m])) by (le, query_type, table))",
           "legendFormat": "p95 - {{query_type}} {{table}}",
           "refId": "A"
         },
@@ -864,7 +864,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(ef_query_duration_seconds_bucket{api_type=\"DOD\"}[1m])) by (le, query_type, table))",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"DOD\"}[1m])) by (le, query_type, table))",
           "legendFormat": "p99 - {{query_type}} {{table}}",
           "refId": "B"
         }
@@ -961,7 +961,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(ef_query_count_total{api_type=\"DOD\"}[1m])) by (query_type, table)",
+          "expr": "sum(rate(app_metric_counter{metric=\"db_query_count_total\", api_type=\"DOD\"}[1m])) by (query_type, table)",
           "legendFormat": "{{query_type}} {{table}}",
           "refId": "A"
         }
@@ -1066,7 +1066,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "ef_change_tracker_entities{api_type=\"DOD\"}",
+          "expr": "app_metric_gauge{metric=\"ef_change_tracker_entities\", api_type=\"DOD\"}",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -1163,7 +1163,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "memory_allocated_bytes_per_operation{api_type=\"DOD\"}",
+          "expr": "app_metric_gauge{metric=\"memory_allocated_bytes_per_operation\", api_type=\"DOD\"}",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -1257,7 +1257,7 @@
         {
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "avg(comic_visibility_request_count_in_batch)",
+          "expr": "avg(app_metric_gauge{metric=\"requests_in_batch\", api_type=\"DOD\"})",
           "legendFormat": "Avg Request in Batch",
           "range": true,
           "refId": "A"
@@ -1268,7 +1268,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "max(comic_visibility_request_count_in_batch)",
+          "expr": "max(app_metric_gauge{metric=\"requests_in_batch\", api_type=\"DOD\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "Max Reqs In Batch",
@@ -1366,7 +1366,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_threadpool_thread_count{api_type=\"DOD\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_threadpool_thread_count\", api_type=\"DOD\"}",
           "legendFormat": "Thread Pool Thread Count",
           "refId": "A"
         }
@@ -1461,7 +1461,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_threadpool_queue_length{api_type=\"DOD\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_threadpool_queue_length\", api_type=\"DOD\"}",
           "legendFormat": "Thread Pool Queue Length",
           "refId": "A"
         }
@@ -1557,8 +1557,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "sum(rate(metric_counter{process=~\"visibility_batch_processing|comic_visibility_operation_.*\"}[1m])) by (process, status)",
-          "legendFormat": "{{process}} {{status}}",
+          "expr": "sum(rate(app_metric_counter{metric=~\"visibility_batch_processing|comic_visibility_operation_.*\", api_type=\"DOD\"}[1m])) by (metric, status)",
+          "legendFormat": "{{metric}} {{status}}",
           "range": true,
           "refId": "A"
         }
@@ -1655,8 +1655,8 @@
       "targets": [
         {
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.9, sum(rate(metric_latency_bucket{process=\"visibility_batch_processing\"}[1m])) by (le, process, status))",
-          "legendFormat": "{{process}} - {{status}} p90",
+          "expr": "histogram_quantile(0.9, sum(rate(app_metric_histogram_bucket{metric=\"visibility_batch_processing\", api_type=\"DOD\"}[1m])) by (le, status))",
+          "legendFormat": "visibility_batch_processing - {{status}} p90",
           "range": true,
           "refId": "A"
         }
@@ -1755,7 +1755,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"dod_fetch_phase_duration_seconds\", api_type=\"DOD\", stage=\"db_call\"}[1m])) by (le))",
           "legendFormat": "Fetch db_call p50",
           "range": true,
           "refId": "A"
@@ -1766,7 +1766,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"db_call\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"dod_fetch_phase_duration_seconds\", api_type=\"DOD\", stage=\"db_call\"}[1m])) by (le))",
           "legendFormat": "Fetch db_call p95",
           "range": true,
           "refId": "B"
@@ -1777,7 +1777,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"dod_fetch_phase_duration_seconds\", api_type=\"DOD\", stage=\"result_processing\"}[1m])) by (le))",
           "legendFormat": "Fetch result_processing p50",
           "range": true,
           "refId": "C"
@@ -1788,7 +1788,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(comic_visibility_fetch_batch_phase_duration_seconds_bucket{phase=\"result_processing\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"dod_fetch_phase_duration_seconds\", api_type=\"DOD\", stage=\"result_processing\"}[1m])) by (le))",
           "legendFormat": "Fetch result_processing p95",
           "range": true,
           "refId": "D"
@@ -1799,7 +1799,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_operation_compute_visibility_dod_style2\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "ComputeVisibilityDodStyle2 p50",
           "range": true,
           "refId": "E"
@@ -1810,7 +1810,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_compute_visibility_dod_style2\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_operation_compute_visibility_dod_style2\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "ComputeVisibilityDodStyle2 p95",
           "range": true,
           "refId": "F"
@@ -1821,7 +1821,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_operation_save_computed_visibility\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "SaveComputedVisibility p50",
           "range": true,
           "refId": "G"
@@ -1832,7 +1832,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_operation_save_computed_visibility\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_operation_save_computed_visibility\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "SaveComputedVisibility p95",
           "range": true,
           "refId": "H"
@@ -1843,7 +1843,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_db_query_save_computed_visibilities\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p50",
           "range": true,
           "refId": "I"
@@ -1854,7 +1854,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_db_query_save_computed_visibilities\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p95",
           "range": true,
           "refId": "J"
@@ -1865,7 +1865,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"comic_visibility_db_query_save_computed_visibilities\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"comic_visibility_db_query_save_computed_visibilities\", api_type=\"DOD\"}[1m])) by (le))",
           "legendFormat": "Save DB (SaveChangesAsync) p99",
           "range": true,
           "refId": "K"

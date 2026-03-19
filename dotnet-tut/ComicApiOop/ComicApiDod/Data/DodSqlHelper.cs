@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using Common.Metrics;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
-using Prometheus;
 
 namespace ComicApiDod.Data;
 
@@ -12,15 +12,6 @@ namespace ComicApiDod.Data;
 /// </summary>
 public static class DodSqlHelper
 {
-    private static readonly Histogram FetchPhaseDuration = Metrics.CreateHistogram(
-        "comic_visibility_fetch_batch_phase_duration_seconds",
-        "Duration of FetchVisibilityBatchAsync phases: db_call = ExecuteReaderAsync, result_processing = Read + build DodVisibilityBatch",
-        new HistogramConfiguration
-        {
-            Buckets = Histogram.ExponentialBuckets(0.0001, 2, 16),
-            LabelNames = new[] { "phase" }
-        });
-
     /// <summary>
     /// DOD-friendly row structs filled directly from SQL result sets.
     /// Flat, contiguous layout for cache efficiency.
@@ -179,6 +170,7 @@ public static class DodSqlHelper
     public static async Task<DodVisibilityBatch> FetchVisibilityBatchAsync(
         ComicDbContext db,
         long[] comicIds,
+        IAppMetrics metrics,
         CancellationToken ct = default)
     {
         if (comicIds.Length == 0)
@@ -277,7 +269,10 @@ public static class DodSqlHelper
         }
         finally
         {
-            FetchPhaseDuration.WithLabels("db_call").Observe(dbCallSw.Elapsed.TotalSeconds);
+            metrics.Observe(
+                MetricNames.DodFetchPhaseDuration,
+                dbCallSw.Elapsed.TotalSeconds,
+                new Dictionary<string, string> { ["stage"] = "db_call" });
         }
 
         await using (reader)
@@ -375,7 +370,10 @@ public static class DodSqlHelper
             }
             finally
             {
-                FetchPhaseDuration.WithLabels("result_processing").Observe(resultProcessingSw.Elapsed.TotalSeconds);
+                metrics.Observe(
+                    MetricNames.DodFetchPhaseDuration,
+                    resultProcessingSw.Elapsed.TotalSeconds,
+                    new Dictionary<string, string> { ["stage"] = "result_processing" });
             }
         }
     }

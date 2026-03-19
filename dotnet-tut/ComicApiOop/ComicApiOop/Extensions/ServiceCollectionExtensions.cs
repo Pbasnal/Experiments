@@ -9,7 +9,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddComicApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IAppMetrics, AppMetrics>();
+        services.AddSingleton<IAppMetrics>(_ => new AppMetrics("OOP"));
+        services.AddHostedService<OopRuntimeMetricsHostedService>();
 
         // Required for Request Wait Time metric (service reads request timestamp from HttpContext)
         services.AddHttpContextAccessor();

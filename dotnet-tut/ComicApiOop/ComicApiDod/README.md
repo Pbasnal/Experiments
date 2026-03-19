@@ -1,143 +1,33 @@
-# ComicApiDod - Data-Oriented Design Implementation
+# ComicApiDod (DOD) — article support
 
-This project is a data-oriented design (DOD) implementation of the Comic API, contrasting with the object-oriented programming (OOP) approach in ComicApiOop.
+This folder contains the **data-oriented design (DOD)** implementation used for the OOP vs DOD comparison article.
 
-## Data-Oriented Design Principles Applied
+## Run with Docker Compose
 
-### 1. **Separation of Data and Behavior**
-- **Data structures** are in `Models/ComicData.cs` - they only contain data, no methods
-- **Behavior/functions** are in `Data/VisibilityProcessor.cs` - pure functions that operate on data
-- This separation allows for better testing, parallelization, and cache efficiency
-
-### 2. **Value Types and Immutability**
-- Most data structures use `readonly struct` for value semantics
-- Immutable data reduces bugs and makes code more predictable
-- Examples: `ChapterData`, `ContentRatingData`, `PricingData`, `GeographicRuleData`, etc.
-
-### 3. **Array-Based Processing**
-- Data is organized in arrays for better cache locality
-- `ComicBatchData` uses arrays (`ChapterData[]`, `TagData[]`, etc.) instead of lists
-- Functions use `ReadOnlySpan<T>` for zero-allocation iteration
-
-### 4. **Pure Functions**
-- Functions in `VisibilityProcessor` are static and pure
-- They take data as input and return computed results without side effects
-- Examples:
-  - `EvaluateGeographicVisibility(in GeographicRuleData rule, DateTime currentTime)`
-  - `CalculateCurrentPrice(in PricingData pricing, DateTime currentTime)`
-  - `DetermineContentFlags(ContentFlag baseFlags, ReadOnlySpan<ChapterData> chapters, in PricingData? pricing)`
-
-### 5. **Batch Processing**
-- Database queries fetch data in batches
-- Processing happens on batches of data, not individual objects
-- `DatabaseQueryHelper` provides batch query methods
-
-### 6. **Minimal Object-Oriented Overhead**
-- No inheritance hierarchies (unlike OOP version with `VisibilityRule` base class)
-- No virtual method calls
-- No navigation properties with lazy loading
-
-## Key Differences from OOP Version
-
-| Aspect | OOP Version | DOD Version |
-|--------|-------------|-------------|
-| **Data Structures** | Classes with methods | Structs/classes with data only |
-| **Behavior** | Methods on classes | Static pure functions |
-| **Visibility Rules** | Abstract base class with virtual methods | Simple data structures + pure functions |
-| **Price Calculation** | `GetCurrentPrice()` method on `ComicPricing` | `CalculateCurrentPrice()` static function |
-| **Memory Layout** | Reference types scattered in heap | Value types with better cache locality |
-| **Computation** | Object method calls | Function calls with data passing |
-
-## Project Structure
-
-```
-ComicApiDod/
-├── Models/
-│   ├── Enums.cs              # Shared enumerations
-│   └── ComicData.cs          # Pure data structures (structs and simple classes)
-├── Data/
-│   ├── ComicDbContext.cs     # EF Core database context
-│   ├── DatabaseQueryHelper.cs # Helper functions for database queries
-│   └── VisibilityProcessor.cs # Pure functions for processing visibility
-├── Program.cs                # Minimal API setup
-└── appsettings.json          # Configuration
-```
-
-## Running the API
-
-### Option 1: Using Docker Compose (Recommended)
-
-The easiest way to start the service with all dependencies (MySQL, Prometheus, Grafana) is using Docker Compose:
+From the repo root:
 
 ```bash
-# Start all services (MySQL, API, Prometheus, Grafana)
-docker-compose -f docker-compose.dod.yml up -d --build
-
-# View logs
-docker-compose -f docker-compose.dod.yml logs -f comic-api-dod
-
-# Stop all services
-docker-compose -f docker-compose.dod.yml down
+docker-compose -f docker-compose.dod.yml up -d --build --force-recreate
 ```
 
-**What happens when you start:**
-1. **MySQL Database**: Starts and automatically initializes with schema and seed data
-   - Database: `comicdb`
-   - User: `comicuser`
-   - Password: `comicpass`
-   - Port: `3306`
-   - Seed data is automatically loaded from `mysql/init/seed/SeedData.sql`
+### URLs
 
-2. **ComicApiDod Service**: Starts after MySQL is healthy
-   - Port: `8081` (mapped from container port `8080`)
-   - Automatically runs database migrations on startup
-   - Registers message queues and starts background processing
+- **API**: `http://localhost:8081`
+- **Health**: `http://localhost:8081/health`
+- **Prometheus**: `http://localhost:9090`
+- **Grafana**: `http://localhost:3000` (default `admin/admin`)
 
-3. **Monitoring Services**: Prometheus and Grafana start for metrics collection
+### Seed data
 
-**Service URLs:**
-- API: `http://localhost:8081`
-- Health Check: `http://localhost:8081/health`
-- Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3000` (admin/admin)
+MySQL initializes with schema and seed data automatically. Seed file:
+- `mysql/init/seed/SeedData.sql`
 
-### Option 2: Running Locally (Development)
-
-For local development without Docker:
+### Load test
 
 ```bash
-# 1. Ensure MySQL is running locally
-# Create database and user:
-mysql -u root -p
-CREATE DATABASE comicdb;
-CREATE USER 'comicuser'@'localhost' IDENTIFIED BY 'comicpass';
-GRANT ALL PRIVILEGES ON comicdb.* TO 'comicuser'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-
-# 2. Update connection string in appsettings.Development.json:
-# ConnectionStrings__DefaultConnection=Server=localhost;Port=3306;Database=comicdb;User=comicuser;Password=comicpass;
-
-# 3. Run database migrations
-dotnet ef database update --project ComicApiDod.csproj
-
-# 4. Seed the database (optional - if you have seed data)
-mysql -u comicuser -pcomicpass comicdb < mysql/init/seed/SeedData.sql
-
-# 5. Restore dependencies
-dotnet restore
-
-# 6. Build the project
-dotnet build
-
-# 7. Run the API
-dotnet run --project ComicApiDod.csproj
+k6 run --env API_URL=http://localhost:8081 k6/load-test.js
+k6 run --env API_URL=http://localhost:8081 k6/load-test-max-throughput.js
 ```
-
-The API will be available at `http://localhost:5000` (or as configured in `appsettings.Development.json`).
-
-### Option 3: Hybrid Approach - Dependencies in Docker, API in IDE Debug Mode
-
 This approach is ideal for debugging endpoints in your IDE while using containerized dependencies:
 
 ```bash

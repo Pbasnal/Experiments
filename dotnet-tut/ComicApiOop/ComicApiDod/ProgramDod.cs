@@ -38,14 +38,13 @@ builder.Services.AddDbContextFactory<ComicDbContext>((serviceProvider, options) 
                 maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
         })
-        .EnableSensitiveDataLogging()  // Shows parameter values
-        .LogTo(Console.WriteLine, LogLevel.Information)  // Logs all queries
         .AddInterceptors(interceptor);  // Add query metrics interceptor
 });
 
 // Add services
-builder.Services.AddSingleton<IAppMetrics, AppMetrics>();
+builder.Services.AddSingleton<IAppMetrics>(_ => new AppMetrics("DOD"));
 builder.Services.AddScoped<ComicVisibilityService>();
+builder.Services.AddHostedService<DodRuntimeMetricsHostedService>();
 
 // Add Simple DOD Framework services as Singletons
 builder.Services.AddSingleton<SimpleMessageBus>();
@@ -55,11 +54,8 @@ builder.Services.AddHostedService<MessageProcessingHostedService>();
 
 var app = builder.Build();
 
-// Get SimpleMessageBus instance for queue registration
-var messageBus = app.Services.GetRequiredService<SimpleMessageBus>();
-
-// Configure metrics
-MetricsConfiguration.ConfigureMetrics(app);
+// Configure app pipeline (Swagger, Prometheus endpoints, custom metrics middleware)
+ApplicationPipeline.ConfigurePipeline(app);
 
 // Configure routes
 RouteConfiguration.ConfigureRoutes(app);

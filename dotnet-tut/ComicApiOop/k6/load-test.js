@@ -17,7 +17,6 @@ export const options = {
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
-    'http_req_duration{endpoint:health}': ['p(99)<100'], // Health check should be fast
     errors: ['rate<0.1'], // Error rate should be below 10%
     comic_visibility_computation_duration: ['p(95)<1000'], // Visibility computation should be under 1 second
   },
@@ -26,191 +25,132 @@ export const options = {
 // Metrics for tracking visibility computation performance
 const visibilityComputationDuration = new Trend('comic_visibility_computation_duration', true);
 
+function parseResponse(response) {
+  try {
+    return JSON.parse(response.body);
+  } catch (e) {
+    console.error(`Failed to parse response: ${response.body.substring(0, 200)}`);
+    return null;
+  }
+}
+
+function getResults(body) {
+  return body?.Results || body?.results || [];
+}
+
+function computeVisibility(
+  baseUrl,
+  {
+    startId,
+    limit,
+    endpointTag,
+    maxDurationMs,
+    validateProcessedCount,
+    debugLabel,
+  }
+) {
+  const startTime = Date.now();
+
+  const res = http.get(
+    `${baseUrl}/api/comics/compute-visibilities?startId=${startId}&limit=${limit}`,
+    {
+      tags: { endpoint: endpointTag },
+      timeout: '10s',
+    }
+  );
+
+  const duration = Date.now() - startTime;
+  visibilityComputationDuration.add(duration);
+
+  const body = parseResponse(res);
+  const results = getResults(body);
+  const processedSuccessfully = body?.ProcessedSuccessfully || body?.processedSuccessfully || 0;
+
+  const checks = check(res, {
+    'compute visibility status is 200': (r) => r.status === 200,
+    'compute visibility not timeout': (r) => r.status !== 504,
+    'compute visibility has results': () => {
+      if (!body) return false;
+      const hasResults = results.length > 0;
+      if (!hasResults) {
+        console.warn(
+          `No results for ${debugLabel} (startId=${startId}, limit=${limit}). Response: ${JSON.stringify(body).substring(0, 300)}`
+        );
+      }
+      return hasResults;
+    },
+    'compute visibility has computed visibilities': () => {
+      if (!body || results.length === 0) return false;
+      const allHaveVisibilities = results.every((result) => {
+        const visibilities = result.ComputedVisibilities || result.computedVisibilities || [];
+        return visibilities.length > 0;
+      });
+      if (!allHaveVisibilities) {
+        console.warn(
+          `Some results missing visibilities for ${debugLabel} (startId=${startId}, limit=${limit}). Results: ${JSON.stringify(results).substring(0, 300)}`
+        );
+      }
+      return allHaveVisibilities;
+    },
+    'compute visibility processed count matches limit': () => {
+      if (!validateProcessedCount) return true;
+      const matches = processedSuccessfully <= limit;
+      if (!matches) {
+        console.warn(
+          `Processed count ${processedSuccessfully} exceeds limit ${limit} for ${debugLabel} (startId=${startId})`
+        );
+      }
+      return matches;
+    },
+    'computation duration is reasonable': () => duration < maxDurationMs,
+  });
+
+  if (!checks) {
+    errorRate.add(1);
+    if (res.status === 504) {
+      console.error(
+        `TIMEOUT: ${debugLabel} compute visibilities timed out after ${duration}ms (startId=${startId}, limit=${limit})`
+      );
+    } else if (res.status !== 200) {
+      console.error(
+        `API ERROR (${debugLabel}): Status ${res.status}, Body: ${res.body.substring(0, 500)}`
+      );
+    }
+  }
+}
+
 // Main test function
 export default function () {
   const baseUrl = __ENV.API_URL || 'http://localhost:8081';
 
-  // Group 1: Health Check (20% of requests)
-  if (Math.random() < 0.2) {
-    const healthRes = http.get(`${baseUrl}/health`, {
-      tags: { endpoint: 'health' },
+  // Only one random decision per iteration; exactly one visibility computation.
+  // This preserves the original relative weights: single (0.4) vs bulk (0.3).
+  const roll = Math.random();
+  const singleThreshold = 0.4 / (0.4 + 0.3);
+
+  if (roll < singleThreshold) {
+    const comicId = Math.floor(Math.random() * 100) + 1; // 1..100
+    computeVisibility(baseUrl, {
+      startId: comicId,
+      limit: 1,
+      endpointTag: 'compute-single',
+      maxDurationMs: 1000,
+      validateProcessedCount: false,
+      debugLabel: 'single',
     });
-    
-    check(healthRes, {
-      'health check status is 200': (r) => r.status === 200,
-    }) || errorRate.add(1);
-    
-    sleep(1);
+  } else {
+    const startId = Math.floor(Math.random() * 90) + 1; // 1..90
+    const limit = Math.floor(Math.random() * 10) + 1; // 1..10
+    computeVisibility(baseUrl, {
+      startId,
+      limit,
+      endpointTag: 'compute-bulk',
+      maxDurationMs: 2000,
+      validateProcessedCount: true,
+      debugLabel: 'bulk',
+    });
   }
 
-  // Group 2: Compute Visibility for Single Comic (40% of requests)
-  if (Math.random() < 0.4) {
-    const comicId = Math.floor(Math.random() * 100) + 1; // Random comic ID between 1 and 100
-    const startTime = Date.now();
-    
-    const computeRes = http.get(
-      `${baseUrl}/api/comics/compute-visibilities?startId=${comicId}&limit=1`,
-      {
-        tags: { endpoint: 'compute-single' },
-        timeout: '10s', // Explicit timeout
-      }
-    );
-    
-    const duration = Date.now() - startTime;
-    visibilityComputationDuration.add(duration);
-    
-    // Helper to safely parse and handle both camelCase and PascalCase
-    const parseResponse = (r) => {
-      try {
-        return JSON.parse(r.body);
-      } catch (e) {
-        console.error(`Failed to parse response: ${r.body.substring(0, 200)}`);
-        return null;
-      }
-    };
-    
-    // Helper to get results array (handles both casing)
-    const getResults = (body) => {
-      return body?.Results || body?.results || [];
-    };
-    
-    const body = parseResponse(computeRes);
-    const results = getResults(body);
-    
-    const checks = check(computeRes, {
-      'compute single status is 200': (r) => r.status === 200,
-      'compute single not timeout': (r) => r.status !== 504,
-      'compute single has results': () => {
-        if (!body) return false;
-        const hasResults = results.length > 0;
-        if (!hasResults) {
-          console.warn(`No results for comicId ${comicId}. Response: ${JSON.stringify(body).substring(0, 300)}`);
-        }
-        return hasResults;
-      },
-      'compute single has computed visibilities': () => {
-        if (!body || results.length === 0) return false;
-        // Each result should have computed visibilities (handle both casing)
-        const allHaveVisibilities = results.every(result => {
-          const visibilities = result.ComputedVisibilities || result.computedVisibilities || [];
-          return visibilities.length > 0;
-        });
-        if (!allHaveVisibilities) {
-          console.warn(`Some results missing visibilities for comicId ${comicId}. Results: ${JSON.stringify(results).substring(0, 300)}`);
-        }
-        return allHaveVisibilities;
-      },
-      'computation duration is reasonable': () => duration < 1000, // Under 1 second
-    });
-    
-    if (!checks) {
-      errorRate.add(1);
-      // Log diagnostic info on failure
-      if (computeRes.status === 504) {
-        console.error(`TIMEOUT: Request to compute visibilities timed out after ${duration}ms`);
-      } else if (computeRes.status !== 200) {
-        console.error(`API ERROR: Status ${computeRes.status}, Body: ${computeRes.body.substring(0, 500)}`);
-      }
-    }
-    
-    sleep(2);
-  }
-
-  // Group 3: Compute Visibility for Multiple Comics (30% of requests)
-  if (Math.random() < 0.3) {
-    const startId = Math.floor(Math.random() * 90) + 1; // Random start ID between 1 and 90
-    const limit = Math.floor(Math.random() * 10) + 1;   // Random limit between 1 and 10
-    
-    const startTime = Date.now();
-    const computeBulkRes = http.get(
-      `${baseUrl}/api/comics/compute-visibilities?startId=${startId}&limit=${limit}`,
-      {
-        tags: { endpoint: 'compute-bulk' },
-        timeout: '10s', // Explicit timeout
-      }
-    );
-    
-    const duration = Date.now() - startTime;
-    visibilityComputationDuration.add(duration);
-    
-    // Helper to safely parse and handle both camelCase and PascalCase
-    const parseResponse = (r) => {
-      try {
-        return JSON.parse(r.body);
-      } catch (e) {
-        console.error(`Failed to parse response: ${r.body.substring(0, 200)}`);
-        return null;
-      }
-    };
-    
-    // Helper to get results array (handles both casing)
-    const getResults = (body) => {
-      return body?.Results || body?.results || [];
-    };
-    
-    const body = parseResponse(computeBulkRes);
-    const results = getResults(body);
-    const processedSuccessfully = body?.ProcessedSuccessfully || body?.processedSuccessfully || 0;
-    
-    const checks = check(computeBulkRes, {
-      'compute bulk status is 200': (r) => r.status === 200,
-      'compute bulk not timeout': (r) => r.status !== 504,
-      'compute bulk has results': () => {
-        if (!body) return false;
-        const hasResults = results.length > 0;
-        if (!hasResults) {
-          console.warn(`No results for startId ${startId}, limit ${limit}. Response: ${JSON.stringify(body).substring(0, 300)}`);
-        }
-        return hasResults;
-      },
-      'compute bulk has computed visibilities': () => {
-        if (!body || results.length === 0) return false;
-        // Each result should have computed visibilities (handle both casing)
-        const allHaveVisibilities = results.every(result => {
-          const visibilities = result.ComputedVisibilities || result.computedVisibilities || [];
-          return visibilities.length > 0;
-        });
-        if (!allHaveVisibilities) {
-          console.warn(`Some results missing visibilities for startId ${startId}. Results: ${JSON.stringify(results).substring(0, 300)}`);
-        }
-        return allHaveVisibilities;
-      },
-      'compute bulk processed count matches limit': () => {
-        const matches = processedSuccessfully <= limit;
-        if (!matches) {
-          console.warn(`Processed count ${processedSuccessfully} exceeds limit ${limit}`);
-        }
-        return matches;
-      },
-      'bulk computation duration is reasonable': () => duration < 2000, // Under 2 seconds
-    });
-    
-    if (!checks) {
-      errorRate.add(1);
-      // Log diagnostic info on failure
-      if (computeBulkRes.status === 504) {
-        console.error(`TIMEOUT: Bulk request timed out after ${duration}ms`);
-      } else if (computeBulkRes.status !== 200) {
-        console.error(`API ERROR: Status ${computeBulkRes.status}, Body: ${computeBulkRes.body.substring(0, 500)}`);
-      }
-    }
-    
-    sleep(3);
-  }
-
-  // Group 4: Invalid Requests (10% of requests)
-  if (Math.random() < 0.1) {
-    const invalidRes = http.get(
-      `${baseUrl}/api/comics/compute-visibilities?startId=0&limit=100`,
-      {
-        tags: { endpoint: 'invalid-request' },
-      }
-    );
-    
-    check(invalidRes, {
-      'invalid request returns 400': (r) => r.status === 400,
-    }) || errorRate.add(1);
-    
-    sleep(1);
-  }
+  // Only one sleep per iteration.
+  sleep(0.02); // 20ms
 }

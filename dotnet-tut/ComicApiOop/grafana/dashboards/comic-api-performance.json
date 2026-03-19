@@ -110,8 +110,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(metric_counter{process=\"oop_http_request\"}[1m])) by (process, status)",
-          "legendFormat": "{{process}} {{status}}",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=\"OOP\"}[1m])) by (method, endpoint, status)",
+          "legendFormat": "{{method}} {{endpoint}} {{status}}",
           "refId": "A"
         }
       ],
@@ -209,8 +209,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"oop_http_request\"}[5m])) by (le, process, status))",
-          "legendFormat": "p95 - {{process}} {{status}}",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"OOP\"}[5m])) by (le, method, endpoint, status))",
+          "legendFormat": "p95 - {{method}} {{endpoint}} {{status}}",
           "refId": "A"
         },
         {
@@ -218,8 +218,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"oop_http_request\"}[5m])) by (le, process, status))",
-          "legendFormat": "p99 - {{process}} {{status}}",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"OOP\"}[5m])) by (le, method, endpoint, status))",
+          "legendFormat": "p99 - {{method}} {{endpoint}} {{status}}",
           "refId": "B"
         },
         {
@@ -227,8 +227,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(metric_latency_bucket{process=\"oop_http_request\", le=\"+Inf\"}[5m])) by (process, status)",
-          "legendFormat": "Total - {{process}} {{status}}",
+          "expr": "sum(rate(app_metric_histogram_bucket{metric=\"http_request_duration_seconds\", api_type=\"OOP\", le=\"+Inf\"}[5m])) by (method, endpoint, status)",
+          "legendFormat": "Total - {{method}} {{endpoint}} {{status}}",
           "refId": "C"
         }
       ],
@@ -317,7 +317,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(metric_counter{process=\"oop_http_request\"}[1m])) by (status)",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=\"OOP\"}[1m])) by (status)",
           "legendFormat": "Status {{status}}",
           "refId": "A"
         }
@@ -413,7 +413,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(metric_counter{process=\"oop_http_request\", status=\"504\"}[1m])) or vector(0)",
+          "expr": "sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=\"OOP\", status=\"504\"}[1m])) or vector(0)",
           "legendFormat": "OOP 504 timeouts",
           "refId": "A"
         }
@@ -511,8 +511,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"oop_operation_total\"}[1m])) by (le, process, status)) or vector(0)",
-          "legendFormat": "p50 - {{process}} {{status}}",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"oop_operation_total\", api_type=\"OOP\"}[1m])) by (le, status)) or vector(0)",
+          "legendFormat": "p50 - {{status}}",
           "refId": "A"
         },
         {
@@ -520,8 +520,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"oop_operation_total\"}[1m])) by (le, process, status)) or vector(0)",
-          "legendFormat": "p95 - {{process}} {{status}}",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"oop_operation_total\", api_type=\"OOP\"}[1m])) by (le, status)) or vector(0)",
+          "legendFormat": "p95 - {{status}}",
           "refId": "B"
         },
         {
@@ -529,8 +529,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"oop_operation_total\"}[1m])) by (le, process, status)) or vector(0)",
-          "legendFormat": "p99 - {{process}} {{status}}",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"oop_operation_total\", api_type=\"OOP\"}[1m])) by (le, status)) or vector(0)",
+          "legendFormat": "p99 - {{status}}",
           "refId": "C"
         }
       ],
@@ -626,7 +626,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"0\"}[5m])",
           "legendFormat": "{{api_type}} Gen 0",
           "refId": "A"
         },
@@ -635,7 +635,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"1\"}[5m])",
           "legendFormat": "{{api_type}} Gen 1",
           "refId": "B"
         },
@@ -644,7 +644,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
+          "expr": "rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"2\"}[5m])",
           "legendFormat": "{{api_type}} Gen 2",
           "refId": "C"
         }
@@ -742,7 +742,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_allocated_bytes{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_memory_allocated_bytes\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}} Allocated",
           "refId": "A"
         },
@@ -751,7 +751,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "dotnet_memory_total_bytes{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"dotnet_memory_total_bytes\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}} Total",
           "refId": "B"
         }
@@ -794,7 +794,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "(rate(dotnet_gc_collection_count{api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(api_http_requests_total[5m])) by (api_type)) * 1000",
+          "expr": "(rate(app_metric_counter{metric=\"dotnet_gc_collection_count\", api_type=~\"DOD|OOP\", generation=\"0\"}[5m]) / on(api_type) group_left () sum(rate(app_metric_counter{metric=\"api_http_requests_total\", api_type=~\"DOD|OOP\"}[5m])) by (api_type)) * 1000",
           "legendFormat": "{{api_type}} Gen 0 per 1k req",
           "refId": "A"
         }
@@ -839,7 +839,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "gc_pause_time_ratio{api_type=~\"DOD|OOP\"}",
+          "expr": "app_metric_gauge{metric=\"gc_pause_time_ratio\", api_type=~\"DOD|OOP\"}",
           "legendFormat": "{{api_type}}",
           "refId": "A"
         }
@@ -935,7 +935,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum(rate(metric_latency_bucket{process=\"oop_request_wait\"}[1m])) by (le)) or vector(0)",
+          "expr": "histogram_quantile(0.50, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"OOP\"}[1m])) by (le)) or vector(0)",
           "legendFormat": "p50",
           "refId": "A"
         },
@@ -944,7 +944,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=\"oop_request_wait\"}[1m])) by (le)) or vector(0)",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"OOP\"}[1m])) by (le)) or vector(0)",
           "legendFormat": "p95",
           "refId": "B"
         },
@@ -953,7 +953,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=\"oop_request_wait\"}[1m])) by (le)) or vector(0)",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"request_wait_time_seconds\", api_type=\"OOP\"}[1m])) by (le)) or vector(0)",
           "legendFormat": "p99",
           "refId": "C"
         }
@@ -1050,8 +1050,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(metric_latency_bucket{process=~\"oop_db_query_.*|oop_operation_computation\"}[1m])) by (le, process)) or vector(0)",
-          "legendFormat": "p95 - {{process}}",
+          "expr": "histogram_quantile(0.95, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"OOP\"}[1m])) by (le, query_type, table))",
+          "legendFormat": "p95 - {{query_type}} {{table}}",
           "refId": "A"
         },
         {
@@ -1059,8 +1059,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(metric_latency_bucket{process=~\"oop_db_query_.*|oop_operation_computation\"}[1m])) by (le, process)) or vector(0)",
-          "legendFormat": "p99 - {{process}}",
+          "expr": "histogram_quantile(0.99, sum(rate(app_metric_histogram_bucket{metric=\"db_query_duration_seconds\", api_type=\"OOP\"}[1m])) by (le, query_type, table))",
+          "legendFormat": "p99 - {{query_type}} {{table}}",
           "refId": "B"
         }
       ],
@@ -1156,8 +1156,8 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "sum(rate(metric_counter{process=~\"oop_db_query_.*\"}[1m])) by (process, status) or vector(0)",
-          "legendFormat": "{{process}} {{status}}",
+          "expr": "sum(rate(app_metric_counter{metric=\"db_query_count_total\", api_type=\"OOP\"}[1m])) by (query_type, table)",
+          "legendFormat": "{{query_type}} {{table}}",
           "refId": "A"
         }
       ],
@@ -1261,7 +1261,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "ef_change_tracker_entities{api_type=\"OOP\"} or vector(0)",
+          "expr": "app_metric_gauge{metric=\"ef_change_tracker_entities\", api_type=\"OOP\"} or vector(0)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -1358,7 +1358,7 @@
             "type": "prometheus",
             "uid": "Prometheus"
           },
-          "expr": "memory_allocated_bytes_per_operation{api_type=\"OOP\"} or vector(0)",
+          "expr": "app_metric_gauge{metric=\"memory_allocated_bytes_per_operation\", api_type=\"OOP\"} or vector(0)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }

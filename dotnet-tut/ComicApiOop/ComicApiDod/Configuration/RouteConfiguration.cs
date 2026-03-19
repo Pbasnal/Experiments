@@ -1,5 +1,4 @@
 using ComicApiDod.Handlers;
-using Prometheus;
 
 namespace ComicApiDod.Configuration;
 
@@ -7,17 +6,6 @@ public static class RouteConfiguration
 {
     public static void ConfigureRoutes(WebApplication app)
     {
-        // Configure the HTTP request pipeline
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        // Add metrics endpoint
-        app.UseMetricServer();
-        app.UseHttpMetrics();
-
         // Configure endpoints
         ConfigureComicEndpoints(app);
         ConfigureHealthEndpoint(app);

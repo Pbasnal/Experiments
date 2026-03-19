@@ -1,6 +1,6 @@
+using ComicApiOop.Data;
 using Common.Metrics;
 using Common.Models;
-using ComicApiOop.Data;
 using ComicApiOop.Middleware;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,42 +61,6 @@ public class VisibilityComputationService
         return comics.ToDictionary(c => c.Id);
     }
 
-    private async Task SaveComputedVisibilitiesAsync(
-        ComputedVisibilityData[] computedVisibilities,
-        string operationName)
-    {
-        await _metricsReporter.TrackQueryAsync(
-            "save_visibilities",
-            operationName,
-            async () =>
-            {
-                var dbVisibilities = computedVisibilities.Select(cv => new ComputedVisibility
-                {
-                    ComicId = cv.ComicId,
-                    CountryCode = cv.CountryCode,
-                    CustomerSegmentId = cv.CustomerSegmentId,
-                    FreeChaptersCount = cv.FreeChaptersCount,
-                    LastChapterReleaseTime = cv.LastChapterReleaseTime,
-                    GenreId = cv.GenreId,
-                    PublisherId = cv.PublisherId,
-                    AverageRating = cv.AverageRating,
-                    SearchTags = cv.SearchTags,
-                    IsVisible = cv.IsVisible,
-                    ComputedAt = cv.ComputedAt,
-                    LicenseType = cv.LicenseType,
-                    CurrentPrice = cv.CurrentPrice,
-                    IsFreeContent = cv.IsFreeContent,
-                    IsPremiumContent = cv.IsPremiumContent,
-                    AgeRating = cv.AgeRating,
-                    ContentFlags = cv.ContentFlags,
-                    ContentWarning = cv.ContentWarning
-                }).ToList();
-
-                await _dbContext.ComputedVisibilities.AddRangeAsync(dbVisibilities);
-                return await _dbContext.SaveChangesAsync();
-            });
-    }
-
     /// <summary>
     /// Saves all computed visibilities using batched INSERT ... VALUES (same optimisation as DOD):
     /// 1000 rows per batch, processed in parallel via raw MySQL when available; EF fallback otherwise.
@@ -131,18 +95,6 @@ public class VisibilityComputationService
         };
     }
 
-    private static ComicVisibilityResult CreateErrorResult(long comicId, string errorMessage)
-    {
-        return new ComicVisibilityResult
-        {
-            ComicId = comicId,
-            Success = false,
-            ErrorMessage = errorMessage,
-            ComputationTime = DateTime.UtcNow,
-            ComputedVisibilities = Array.Empty<ComputedVisibilityData>()
-        };
-    }
-
     public async Task<BulkVisibilityComputationResult> ComputeVisibilitiesBulkAsync(int startId, int limit)
     {
         const string operationName = "ComputeVisibilitiesBulkAsync";
@@ -152,7 +104,12 @@ public class VisibilityComputationService
         if (httpContext?.Items[RequestWaitTimeMiddleware.RequestReceivedAtUtcKey] is DateTime requestReceivedAtUtc)
         {
             var waitSeconds = (DateTime.UtcNow - requestReceivedAtUtc).TotalSeconds;
-            _appMetrics.RecordLatency("oop_request_wait", waitSeconds);
+            var labels = new Dictionary<string, string>
+            {
+                ["endpoint"] = httpContext.Request.Path.Value ?? "/",
+                ["method"] = httpContext.Request.Method
+            };
+            _appMetrics.Observe(MetricNames.RequestWaitTimeSeconds, waitSeconds, labels);
         }
 
         // Validate input parameters
