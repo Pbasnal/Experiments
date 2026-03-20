@@ -4,7 +4,12 @@
 
 I came across **Discord’s engineering blog** where they describe their **data-service** using **request coalescing** to fetch messages from the database: instead of one DB round-trip per client request, they batch many incoming requests and serve them with fewer, larger fetches. It’s a backend design pattern—same idea as bulk loads or batch inserts, but applied at the request boundary.
 
-I wanted to see what impact this pattern would have if a normal API used it. So I took a small, read-heavy endpoint (compute visibility for a range of comics), added a queue and a batch processor that coalesces requests, and compared it to the version that handles each request on its own. This article is what I tried and what I measured.
+I wanted to see what impact this pattern would have if a normal API used it. In this repo I compare two implementations of the same endpoint:
+
+- **OOP API (baseline):** no request coalescing; each HTTP request runs its own pipeline.
+- **DOD API (coalesced):** request coalescing enabled via queue + batch processor.
+
+This article is what I tried and what I measured.
 
 **What request coalescing is:** When many clients hit the same kind of work at once (e.g. “give me data for these IDs”), instead of running one pipeline per request you collect requests over a short time window, process them together in a **batch** (one DB round-trip, one compute pass), then map results back to each caller. You trade a bit of queueing delay for fewer DB round-trips and less per-request overhead. In backend terms, that’s request coalescing (or request batching).
 
@@ -60,7 +65,7 @@ Coalescing can be implemented in a few ways; the choice affects latency and thro
 
 - **Key-based / deduplication:** Multiple requests for the *same* key (e.g. same resource ID, same query) are merged into one backend call; all waiters get the same result. Common in caches and read-through layers (e.g. “many callers ask for user X → one fetch, then fan-out”). Best when you expect duplicate requests for the same key.
 
-In this experiment I used the **batch size + max wait** approach: a background loop dequeues up to 10 requests or waits up to 5 ms, then runs one DB fetch and one compute pass for the batch and maps results back. The next sections describe the setup and the exact batching logic from the code.
+In this experiment I used the **batch size + max wait** approach on the DOD implementation: a background loop dequeues up to 10 requests or waits up to 5 ms, then runs one DB fetch and one compute pass for the batch and maps results back. The OOP implementation is the non-coalesced baseline.
 
 I decided to try it on a small API: an endpoint that computes visibility for a range of comics (each request asks for a few comic IDs). Under load, many requests would hit the same kind of work—fetch data, compute, maybe save. I added a queue and a background batch processor, then compared it to the version that handled each request on its own. This article is not “I found the perfect architecture.” It’s “here’s what I tried and what I learned.”
 
@@ -77,14 +82,17 @@ Imagine an API that computes comic book visibility based on:
 - release timing
 - pricing and other content flags
 
-Each request asks for visibility of multiple comics (e.g. `startId` and `limit`). During load, many requests come in around the same time. Instead of handling each request independently, I coalesced them: incoming requests are enqueued, and a background processor handles them in batches.
+Each request asks for visibility of multiple comics (e.g. `startId` and `limit`). During load, many requests come in around the same time.
 
-### Baseline (no coalescing)
+- In **OOP baseline**, requests are handled independently.
+- In **DOD coalesced**, incoming requests are enqueued and a background processor handles them in batches.
+
+### Baseline: OOP (no coalescing)
 
 - One request processed at a time: each HTTP call runs its own pipeline (one bulk fetch, compute, one bulk save). No sharing across concurrent requests.
 - 10 concurrent clients mean 10 separate DB round-trips and 10 separate compute passes.
 
-### With request coalescing
+### Coalesced: DOD request batching
 
 - Incoming requests are enqueued; a background processor dequeues them in **batches** (see next section for how batching works).
 - One bulk fetch and one bulk save per batch; one compute pass over the batch. Results are mapped back to each original request via an index map so every client gets the right response.
@@ -105,7 +113,7 @@ The biggest expected gain was from changing the *shape of work*:
 
 The main difference is *when* work runs and *how many* requests share one DB round-trip. Below is the flow for each design, then the batching details from the implementation.
 
-### Without coalescing: One request, one pipeline
+### OOP baseline (without coalescing): one request, one pipeline
 
 Each HTTP request is handled on its own. The endpoint calls the service and waits for the full computation. There is no batching across requests: 10 concurrent clients mean 10 separate pipelines, each doing its own fetch and save.
 
@@ -130,9 +138,9 @@ sequenceDiagram
 
 So for one request we do **1 fetch + 1 save**. Under load we still have **one pipeline per request**: no sharing of work across concurrent requests.
 
-### With request coalescing: Queue and batch processor
+### DOD coalesced implementation: queue and batch processor
 
-Here, the HTTP handler does **not** do the work. It validates the request, enqueues a small message (with a `TaskCompletionSource` so the HTTP call can wait), and returns only when that request has been processed as part of a **batch**. A background host dequeues requests in batches, merges all their comic IDs, does **one** fetch and **one** save for the whole batch, then completes every request in that batch by setting their result on the TCS. So multiple HTTP requests share one DB round-trip and one compute pass.
+In DOD, the HTTP handler does **not** do the full work. It validates the request, enqueues a small message (with a `TaskCompletionSource` so the HTTP call can wait), and returns only when that request has been processed as part of a **batch**. A background host dequeues requests in batches, merges all their comic IDs, does **one** fetch and **one** save for the whole batch, then completes every request in that batch by setting their result on the TCS. So multiple HTTP requests share one DB round-trip and one compute pass.
 
 ```mermaid
 sequenceDiagram
@@ -178,7 +186,7 @@ The batch processor is built on a small queue abstraction. Here’s how batching
 - **BatchDequeue loop:** A long-running loop runs in the background. Each iteration:
   1. Calls `Dequeue(batchSize)` to get a batch (up to 10 items, or less after a 5 ms wait).
   2. If the batch is empty (no requests arrived in that window), we count empty cycles; after **5 consecutive empty dequeues**, we back off with a short delay (e.g. **2 ms**) so we don’t busy-spin when idle.
-  3. If the batch has items, we invoke the **callback** with `(batchCount, messageBatch)`. The callback does the single bulk fetch, compute, bulk save, and `SetResponse` for each request in the batch.
+  3. If the batch has items, we invoke the **callback** with `(batchCount, messageBatch)`. In code this callback is triggered by the queue loop (not awaited in that loop), and it performs the single bulk fetch, compute, bulk save, then `SetResponse` for each request in the batch.
   4. After processing a batch, we wait **batchDequeueTimeoutMs** (e. g. **10 ms**) before the next `Dequeue`. That small gap helps avoid hammering the queue and gives a natural pacing between batches.
 
 So the main knobs are: **batch size** (e.g. 10 requests per batch), **max batching time** (5 ms) when the queue is empty, and **delay between batches** (10 ms). In this experiment the API used `batchSize = 10`; the exact values can be tuned for latency vs throughput.
@@ -211,23 +219,31 @@ flowchart LR
 
 ## Load test results
 
-I ran the same load test against both versions to compare how much traffic each could sustain before timeouts became a problem.
+I ran the same load tests against both versions (OOP baseline vs DOD coalesced) to compare how much traffic each could sustain before timeouts became a problem.
 
 ### Test setup
 
-I used **k6** with a ramping-arrival-rate scenario: request rate starts at 2 RPS and ramps up over 7 minutes (2 → 5 → 10 → 20 → 30 → 40 → 50 → target RPS), then holds at the target for 2 minutes. Each request hits the compute-visibilities endpoint with a small range of comic IDs (`startId` and `limit`). Requests use a 1.5s timeout so we can tell when the server returns 504. The idea is to find the highest RPS the API can handle while keeping success rate high and timeouts low.
+I used two k6 scripts for different goals:
 
-Same script, same machine, same target RPS for both—only whether the backend used request coalescing or not.
+- **`k6/load-test.js`** for regular comparative load testing (staged VUs, mixed single/bulk requests).
+- **`k6/load-test-max-throughput.js`** for max-throughput discovery (ramping-arrival-rate, hold at configured target RPS).
+
+Both scripts hit the same endpoint (`/api/comics/compute-visibilities`), but they model load differently.
+
+Timeout language is important:
+
+- **Server timeout:** API returns **504** when its server-side timeout is exceeded (DOD handler is 1.5s; OOP endpoint timeout is 2s).
+- **Client timeout (k6):** k6 HTTP timeout in script (`load-test.js` uses 10s; `load-test-max-throughput.js` uses 12s) so the client can still observe server 504 responses instead of timing out first.
 
 ### Results
 
-**Without coalescing:**
+**Without coalescing (OOP baseline):**
 
 - **Max sustainable throughput:** ~60 RPS. Beyond that, timeouts dominate.
 - Total requests: 23,199 | Success rate: 36.53% | Timeout rate: 63.06%
 - Avg latency: 1.481s | p95 latency: 2.686s
 
-**With request coalescing:**
+**With request coalescing (DOD):**
 
 - **Max sustainable throughput:** ~200 RPS—about **4–5×** the other version.
 - Total requests: 39,023 | Success rate: 100% | Timeout rate: 0%
