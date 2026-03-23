@@ -1,4 +1,4 @@
-# Request Coalescing (4–5× Throughput)
+# Request Coalescing
 
 ## Expectation
 
@@ -13,11 +13,17 @@ This article is what I tried and what I measured.
 
 **What request coalescing is:** When many clients hit the same kind of work at once (e.g. “give me data for these IDs”), instead of running one pipeline per request you collect requests over a short time window, process them together in a **batch** (one DB round-trip, one compute pass), then map results back to each caller. You trade a bit of queueing delay for fewer DB round-trips and less per-request overhead. In backend terms, that’s request coalescing (or request batching).
 
-My expectation going in was simple: higher throughput under load, lower average and tail latency, and less per-request overhead by doing work in batches. I didn’t expect magic, but I did expect enough improvement to justify the added complexity (queue, batch logic, mapping results back).
+My expectation going in was simple: higher throughput under load, and less overall per-request overhead by doing work in batches.
+
+Higher throughput: in many backend systems the bottleneck under concurrency is I/O. If I reduce the number of expensive I/O calls (DB round-trips) by batching, the server should be able to complete more work per unit time before it saturates.
+
+Latency: batching adds a bit of queueing delay because each request has to wait until the batch is formed. So I expected average and tail latency to be *slightly higher* at the margin (bounded by the max wait time) even if throughput improves.
+
+I didn’t expect magic, but I did expect enough improvement to justify the added complexity (queue, batch logic, mapping results back).
 
 ---
 
-## Motivation: Discord’s data-service and going deeper on coalescing
+## Motivation: Request coalescing
 
 The inspiration came from [**Discord’s engineering blog**](https://discord.com/blog/how-discord-stores-trillions-of-messages): their **data-service** uses request coalescing to fetch messages—many clients asking for data get batched into fewer DB round-trips. I wanted to try the same idea on a normal API. Before that, here’s a bit more on what coalescing can look like and how it differs from the usual flow.
 
@@ -67,7 +73,7 @@ Coalescing can be implemented in a few ways; the choice affects latency and thro
 
 In this experiment I used the **batch size + max wait** approach on the DOD implementation: a background loop dequeues up to 10 requests or waits up to 5 ms, then runs one DB fetch and one compute pass for the batch and maps results back. The OOP implementation is the non-coalesced baseline.
 
-I decided to try it on a small API: an endpoint that computes visibility for a range of comics (each request asks for a few comic IDs). Under load, many requests would hit the same kind of work—fetch data, compute, maybe save. I added a queue and a background batch processor, then compared it to the version that handled each request on its own. This article is not “I found the perfect architecture.” It’s “here’s what I tried and what I learned.”
+I decided to try it on a small API: an endpoint that computes visibility for a range of comics (each request asks for a few comic IDs). Under load, many requests would hit the same kind of work—fetch data, compute, maybe save. I added a queue and a background batch processor, then compared it to the version that handled each request on its own. 
 
 ---
 
@@ -99,17 +105,9 @@ Each request asks for visibility of multiple comics (e.g. `startId` and `limit`)
 
 The next section has sequence diagrams and the concrete batching logic from the implementation.
 
-### Why I expected improvement
-
-The biggest expected gain was from changing the *shape of work*:
-
-- fewer DB round-trips (one per batch instead of one per request)
-- one compute pass per batch instead of per request
-- less per-request overhead on the hot path
-
 ---
 
-## Architecture: Without vs with request coalescing
+## Architecture
 
 The main difference is *when* work runs and *how many* requests share one DB round-trip. Below is the flow for each design, then the batching details from the implementation.
 
@@ -185,11 +183,11 @@ The batch processor is built on a small queue abstraction. Here’s how batching
 
 - **BatchDequeue loop:** A long-running loop runs in the background. Each iteration:
   1. Calls `Dequeue(batchSize)` to get a batch (up to 10 items, or less after a 5 ms wait).
-  2. If the batch is empty (no requests arrived in that window), we count empty cycles; after **5 consecutive empty dequeues**, we back off with a short delay (e.g. **2 ms**) so we don’t busy-spin when idle.
+  2. If the batch is empty (no requests arrived in that window), we count empty cycles; after **5 consecutive empty dequeues**, we increase the pacing period (e.g. to **2 ms**) so the next batches don’t resume too aggressively after idling.
   3. If the batch has items, we invoke the **callback** with `(batchCount, messageBatch)`. In code this callback is triggered by the queue loop (not awaited in that loop), and it performs the single bulk fetch, compute, bulk save, then `SetResponse` for each request in the batch.
-  4. After processing a batch, we wait **batchDequeueTimeoutMs** (e. g. **10 ms**) before the next `Dequeue`. That small gap helps avoid hammering the queue and gives a natural pacing between batches.
+  4. After processing a batch, the loop applies pacing between batch iterations: it optionally waits a small computed delay (0 ms normally, ~2 ms after repeated empty dequeues).
 
-So the main knobs are: **batch size** (e.g. 10 requests per batch), **max batching time** (5 ms) when the queue is empty, and **delay between batches** (10 ms). In this experiment the API used `batchSize = 10`; the exact values can be tuned for latency vs throughput.
+So the main knobs are: **batch size** (e.g. 10 requests per batch) and **max batching time** (5 ms) in `Dequeue`, plus (1) an **idle backoff** that increases pacing after repeated empty dequeues. In this experiment the API used `batchSize = 10`; the exact values can be tuned for latency vs throughput.
 
 ### Side-by-side: where the difference comes from
 
@@ -217,69 +215,109 @@ flowchart LR
 
 ---
 
+## System configuration
+
+Minimal context for the numbers below (same machine for APIs, DB, and metrics unless noted):
+
+- **Runtime:** .NET 8 (ASP.NET Core), EF Core + **MySQL 8.0** (`comicdb` via Docker Compose).
+- **Services:** **OOP** API `http://localhost:8080`, **DOD** API `http://localhost:8081`; each API container **8 CPUs / 8 GiB** (`docker-compose.yml` / `docker-compose.dod.yml`).
+- **Load generator:** **k6** run on the **host** against those URLs (not inside the API containers).
+- **Observability:** Prometheus + Grafana on the same compose stack (used for throughput/latency panels in the detailed result write-ups).
+
+---
+
 ## Load test results
 
-I ran the same load tests against both versions (OOP baseline vs DOD coalesced) to compare how much traffic each could sustain before timeouts became a problem.
+I ran the same staged k6 load profile against both implementations (OOP baseline vs DOD coalesced) to compare effective throughput and latency under concurrent load.
 
 ### Test setup
 
-I used two k6 scripts for different goals:
+These updated results come from **`k6/load-test.js`** (staged VUs). The script mixes:
 
-- **`k6/load-test.js`** for regular comparative load testing (staged VUs, mixed single/bulk requests).
-- **`k6/load-test-max-throughput.js`** for max-throughput discovery (ramping-arrival-rate, hold at configured target RPS).
+- health checks
+- single-comic visibility computation
+- bulk visibility computation
+- invalid-request handling
 
-Both scripts hit the same endpoint (`/api/comics/compute-visibilities`), but they model load differently.
+Both APIs are exercised via the same endpoint (`/api/comics/compute-visibilities`) with the same traffic model; only the backend implementation differs.
 
 Timeout language is important:
 
-- **Server timeout:** API returns **504** when its server-side timeout is exceeded (DOD handler is 1.5s; OOP endpoint timeout is 2s).
-- **Client timeout (k6):** k6 HTTP timeout in script (`load-test.js` uses 10s; `load-test-max-throughput.js` uses 12s) so the client can still observe server 504 responses instead of timing out first.
+- **Server timeout:** API returns **504** when its server-side timeout is exceeded (both OOP and DOD use a **~2s** application timeout on this endpoint).
+- **Client timeout (k6):** `load-test.js` uses a larger client HTTP timeout so we can observe server 504s if they happen.
+
+In the latest staged runs captured in `docs/oop-load-test-results.md` and `docs/dod-load-test-results.md`, **no timeouts were observed** (error checks succeeded, 0.00% failed HTTP requests).
 
 ### Results
 
-**Without coalescing (OOP baseline):**
+**Without coalescing (OOP baseline, `API_URL=http://localhost:8080`):**
 
-- **Max sustainable throughput:** ~60 RPS. Beyond that, timeouts dominate.
-- Total requests: 23,199 | Success rate: 36.53% | Timeout rate: 63.06%
-- Avg latency: 1.481s | p95 latency: 2.686s
+- Throughput (effective request rate): **~127.5 req/s** (`http_reqs` 26,777 total)
+- Avg latency: **~79.9 ms** | p95 latency: **~178.0 ms** (`http_req_duration`)
+- Errors/timeouts: **0.00%** (all checks succeeded; `http_req_failed` was 0)
 
-**With request coalescing (DOD):**
+**With request coalescing (DOD, `API_URL=http://localhost:8081`):**
 
-- **Max sustainable throughput:** ~200 RPS—about **4–5×** the other version.
-- Total requests: 39,023 | Success rate: 100% | Timeout rate: 0%
-- Avg latency: 0.242s | p95 latency: 0.861s
+- Throughput (effective request rate): **~196.3 req/s** (`http_reqs` 41,225 total)
+- Avg latency: **~44.4 ms** | p95 latency: **~68.0 ms** (`http_req_duration`)
+- Errors/timeouts: **0.00%** (all checks succeeded; `http_req_failed` was 0)
 
-| Metric | Without coalescing | With request coalescing |
-|--------|-------------------:|------------------------:|
-| Throughput | ~60 | ~200 (4–5×) |
-| Success rate | 36.53% | 100% |
-| Timeout rate | 63.06% | 0% |
-| Avg latency | 1.481s | 0.242s |
-| p95 latency | 2.686s | 0.861s |
+Compared under the same staged load profile, DOD delivered:
 
-The jump in throughput and the drop in latency came **directly from request coalescing**: batching incoming requests (batch size 10, up to 5 ms to fill a batch), then one DB round-trip and one compute pass per batch, then fan-out to responses.
+- **~1.5× higher throughput** (req/s)
+- **~2.6× lower p95 latency** (178ms → 68ms)
+
+The improved latency and throughput come **directly from request coalescing**: batching incoming requests (batch size 10, up to ~5 ms to form a batch), then one DB round-trip and one compute pass per batch, followed by fan-out to each waiting request.
+
+### Max throughput
+
+I also ran **`k6/load-test-max-throughput.js`**: **ramping-arrival-rate** to a **300 req/s** target, steady calls to `GET /api/comics/compute-visibilities?startId=1&limit=5` (OOP on **8080**, DOD on **8081**). Grafana panels and notes are in `docs/oop-load-test-results.md` and `docs/dod-load-test-results.md`.
+
+| Metric | OOP (no coalescing) | DOD (request coalescing) |
+|--------|--------------------:|-------------------------:|
+| Offered arrival rate (target) | 300 req/s | 300 req/s |
+| Peak **200 OK** rate (before cliff) | ~**62** req/s | ~**286** req/s |
+| After cliff | **504** ≈ offered rate (~300 req/s) | **504** ≈ offered rate (~300 req/s) |
+| Mean **200** rate over full run* | ~**8** req/s | ~**53** req/s |
+| Latency at saturation | **200** tail very slow (e.g. p95 ~**15s**); **504** p99 ~**4s** | **p95 / p99** plateau ~**2s** (timeout wall) |
+
+\*Mean 200 over the whole chart is low because most wall-clock time is spent past the breaking point, where successes are rare.
+
+**Interpretation:** Under the **same** aggressive arrival profile, DOD sustained successful responses into the **high-200s req/s** before hitting the **2s** timeout wall; OOP lost **200** around **~60 req/s**. That is roughly a **~4.5×** higher peak “green” throughput for DOD in this test. Both implementations eventually **504 at line rate** if you keep offering **300 req/s** past capacity—the difference is **where** the cliff appears. The gentler **`load-test.js`** runs (~127 vs ~196 req/s) sit **below** both cliffs, which is why they stayed all-200.
+
+### Latency explanation (why latency dropped even though batching waits)
+Coalescing introduces a small bounded wait while requests accumulate into a batch (the queue drains with a max batching time of ~5 ms). The key difference is that the expensive work is amortized:
+
+- the coalesced path reduces DB round-trips per request
+- it reduces per-request allocation churn
+
+As a result, the system spends less time in GC and less time waiting on overloaded I/O, so both avg latency and tail latency improve substantially (especially p95).
 
 ### GC and memory
 
-I also compared garbage collection and allocation. The coalescing version did better:
+I also compared garbage collection and allocation. The coalescing version did better (based on `docs/dod-load-test-results.md` and `docs/oop-load-test-results.md`):
 
-| Metric | Without coalescing | With request coalescing |
-|--------|-------------------:|------------------------:|
-| GC rate (per second) | 1.5 | 0.09 |
-| GC pause time (% of total) | 6.79% | 2% |
-| Memory allocation | 3.84 GB | 1.5 GB |
+- **Gen 0 collections normalized by load**
+  - OOP (baseline): mean **110** Gen0 collections per 1000 requests (max 122)
+  - DOD (coalesced): mean **1.72** per 1000 requests (max 1.82)
+- **GC pause time ratio**
+  - OOP: mean **0.814%**, max **2.82%**
+  - DOD: mean **0.0694%**, max **0.230%**
+- **Allocation**
+  - DOD: allocated mean **70.9 MiB** (max 221 MiB), total allocation ~**6 GiB** over the run
+  - OOP: allocated volume rises into **GiB scale** territory and stays high under load
 
-Fewer allocations and less GC mean less pause time and more headroom for tail latencies over long runs. Processing a batch in one pass tends to reduce per-request allocation churn.
+Fewer allocations and less GC activity mean fewer stop-the-world pauses and more headroom for tail latency over longer runs. Processing a batch in one pass tends to reduce per-request allocation churn.
 
 ---
 
 ## What I learned
 
 1. **The biggest gain came from I/O and batching.**  
-   Coalescing requests and doing one DB round-trip and one compute pass per batch gave the 4–5× throughput and much lower latency. That’s request coalescing doing the heavy lifting.
+   Coalescing requests and doing one DB round-trip and one compute pass per batch amortized the expensive work, increasing effective throughput (~1.5× in the staged load runs) while substantially reducing latency (p95 ~2.6× lower). That’s request coalescing doing the heavy lifting.
 
 2. **Batching parameters matter.**  
-   Batch size (e.g. 10), max time to wait for a full batch (5 ms), and delay between batches (10 ms) trade off latency vs throughput. Worth tuning for your workload.
+   Batch size (e.g. 10), max time to wait for a full batch (5 ms), and idle backoff when the queue is empty (2 ms after repeated empty dequeues) trade off latency vs throughput. Worth tuning for your workload.
 
 3. **Trade-offs are real.**  
    Coalescing adds queueing delay (requests wait until their batch is formed and processed), mapping logic (which result goes to which request), and operational tuning. Worth it when the payoff is there.
@@ -310,7 +348,7 @@ A short rule of thumb: coalescing shines when the cost is dominated by **number 
 ---
 
 
-### Commands to reproduce the expriment
+### Code
 Github Repo: https://github.com/Pbasnal/Experiments/tree/master/dotnet-tut/ComicApiOop
 
 ---

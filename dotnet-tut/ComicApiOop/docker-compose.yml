@@ -20,6 +20,8 @@ services:
       retries: 10
 
   api:
+    cpus: 8
+    mem_limit: 8g
     build:
       context: .
       dockerfile: ComicApiOop/Dockerfile

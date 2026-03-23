@@ -12,10 +12,6 @@ public class SimpleQueue<T> : ISimpleQueue
 {
     private ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
 
-    private long _dequeueTimeoutMs = 2000;
-
-    private int _batchDequeueTimeoutMs = 10;
-
     public void Enqueue(T item)
     {
         _queue.Enqueue(item);
@@ -25,7 +21,7 @@ public class SimpleQueue<T> : ISimpleQueue
     {
         List<T?> messageBatch = new List<T?>(batchSize);
 
-        long maxBatchingTime = 5;
+        long maxBatchingTime = 100;
         Stopwatch sw = new Stopwatch();
         sw.Start();
         while (messageBatch.Count < batchSize)
@@ -48,11 +44,9 @@ public class SimpleQueue<T> : ISimpleQueue
         Func<int, List<T?>, Task<IValue[]>> callback,
         CancellationToken cancellationToken = default)
     {
-        if (batchSize <= 0) batchSize = 10;
+        if (batchSize <= 0) batchSize = 50;
 
-        TimeSpan period = TimeSpan.FromMilliseconds(0);
-        Stopwatch sw = Stopwatch.StartNew();
-        long nextTick = 0;
+        TimeSpan queueIterationDelay = TimeSpan.FromMilliseconds(0);
 
         int numberOfEmptyDequeue = 0;
 
@@ -65,49 +59,22 @@ public class SimpleQueue<T> : ISimpleQueue
             {
                 numberOfEmptyDequeue++;
                 if (numberOfEmptyDequeue > 5)
+                    queueIterationDelay = TimeSpan.FromMilliseconds(2);
+            }
+            else
+            {
+                numberOfEmptyDequeue = 0;
+                queueIterationDelay = TimeSpan.FromMilliseconds(0);
+                try
                 {
-                    period = TimeSpan.FromMilliseconds(2);
+                    callback(messageBatch.Count, messageBatch);
                 }
-
-                continue;
+                catch (Exception)
+                {
+                }
             }
-
-            numberOfEmptyDequeue = 0;
-            period = TimeSpan.FromMilliseconds(0);
-
-            try
-            {
-                callback(messageBatch.Count, messageBatch);
-            }
-            catch (Exception)
-            {
-                continue;
-            }
-
-            nextTick += period.Ticks;
-            long delay = nextTick - sw.Elapsed.Ticks;
-            try
-            {
-                if (delay > 0)
-                    await Task.Delay(TimeSpan.FromTicks(delay), cancellationToken);
-                else
-                    await Task.Yield();
-                await Task.Delay(_batchDequeueTimeoutMs, cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
+            await Task.Delay(queueIterationDelay, cancellationToken);
         }
-
-        // Task[] remaining;
-        // lock (inFlightLock)
-        // {
-        //     remaining = inFlightTasks.ToArray();
-        // }
-        //
-        // if (remaining.Length > 0)
-        //     await Task.WhenAll(remaining);
 
         return new List<IValue>();
     }

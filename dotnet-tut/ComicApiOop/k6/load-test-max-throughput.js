@@ -35,7 +35,7 @@ export const options = {
         { duration: '1m', target: maxRps * 0.6 },   // 400 → 600 RPS
         { duration: '1m', target: maxRps * 0.8 },   // 600 → 800 RPS
         { duration: '1m', target: maxRps }, // 800 → maxRps (ramp done in 5 min)
-        { duration: '10m', target: maxRps }, // hold at maxRps for 10 min
+        { duration: '3m', target: maxRps }, // hold at maxRps for 10 min
       ],
     },
   },

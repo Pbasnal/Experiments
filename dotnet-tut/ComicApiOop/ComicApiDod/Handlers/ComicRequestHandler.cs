@@ -10,7 +10,7 @@ namespace ComicApiDod.Handlers;
 public static class ComicRequestHandler
 {
     private const string ProcessName = "compute_visibilities";
-    private static TimeSpan processTimeout = TimeSpan.FromSeconds(1.5);
+    private static TimeSpan processTimeout = TimeSpan.FromSeconds(2);
 
 
     public static async Task<IResult> HandleComputeVisibilities(
@@ -40,7 +40,7 @@ public static class ComicRequestHandler
             metrics.CaptureCount(ProcessName, 1, attrs);
             metrics.RecordLatency(ProcessName, sw.Elapsed.TotalSeconds, attrs);
             return Results.Problem(
-                detail: "Request timed out after 1.5 seconds",
+                detail: "Request timed out after 2 seconds",
                 title: "Request Timeout",
                 statusCode: 504
             );
