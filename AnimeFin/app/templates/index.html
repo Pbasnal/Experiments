@@ -1,46 +1,50 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flask Anime Downloader</title>
-    <link rel="stylesheet" href="/static/styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <h1>Flask Anime Downloader</h1>
-      <p class="hint">Downloads root: <code>{{ downloads_dir }}</code></p>
 
-      <section class="card">
-        <h2>Search Shows</h2>
-        <div class="row">
-          <input id="query" type="text" placeholder="Search title" />
-          <select id="mode">
-            <option value="sub" selected>sub</option>
-            <option value="dub">dub</option>
-          </select>
-          <button id="search-btn">Search</button>
-        </div>
-        <ul id="search-results"></ul>
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flask Anime Downloader</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
 
-      <section class="card">
-        <h2>Episode Selection</h2>
-        <div class="row">
-          <input id="show-id" type="text" placeholder="Show id (auto-filled)" readonly />
-          <input id="show-title" type="text" placeholder="Show title (auto-filled)" readonly />
-          <button id="load-episodes-btn">Load Episodes</button>
-        </div>
-        <p class="hint">Enter episodes as comma-separated values (example: <code>1,2,3</code>).</p>
-        <textarea id="episodes" rows="3" placeholder="1,2,3"></textarea>
-        <div class="row">
-          <input id="quality" type="text" value="best" />
-          <button id="enqueue-btn">Enqueue Download</button>
-          <a href="/downloads" class="button-link">Open Downloads Page</a>
-        </div>
-        <pre id="action-output"></pre>
-      </section>
-    </main>
-    <script src="/static/app.js"></script>
-  </body>
+<body>
+  <main class="container">
+    <h1>Flask Anime Downloader</h1>
+    <p class="hint">Downloads root: <code>{{ downloads_dir }}</code></p>
+
+    <section class="card">
+      <h2>Search Shows</h2>
+      <div class="row">
+        <input id="query" type="text" placeholder="Search title" />
+        <select id="mode">
+          <option value="dub" selected>dub</option>
+          <option value="sub">sub</option>
+
+        </select>
+        <button id="search-btn">Search</button>
+      </div>
+      <ul id="search-results"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Episode Selection</h2>
+      <div class="row">
+        <input id="show-id" type="text" placeholder="Show id (auto-filled)" readonly />
+        <input id="show-title" type="text" placeholder="Show title (auto-filled)" readonly />
+        <button id="load-episodes-btn">Load Episodes</button>
+      </div>
+      <p class="hint">Enter episodes as comma-separated values (example: <code>1,2,3</code>).</p>
+      <textarea id="episodes" rows="3" placeholder="1,2,3"></textarea>
+      <div class="row">
+        <input id="quality" type="text" value="best" />
+        <button id="enqueue-btn">Enqueue Download</button>
+        <a href="/downloads" class="button-link">Open Downloads Page</a>
+      </div>
+      <pre id="action-output"></pre>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+
 </html>
