@@ -248,3 +248,11 @@ captures/
 **/mysql_data/
 **/mysql/mysql_data/
 *.sock
+
+AnimeFin/.pytest_cache/
+AnimeFin/venv/
+AnimeFin/downloads
+AnimeFin/ani-cli/.github
+AnimeFin/data/
+
+
