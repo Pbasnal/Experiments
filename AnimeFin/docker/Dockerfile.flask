@@ -1,0 +1,33 @@
+FROM python:3.12-slim-bookworm
+
+WORKDIR /opt/rough
+
+# Runtime tools for ani-cli and download executors (yt-dlp / ffmpeg / aria2).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    ffmpeg \
+    grep \
+    sed \
+    openssl \
+    aria2 \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /opt/rough/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+  && pip install --no-cache-dir -r /opt/rough/requirements.txt \
+  && pip install --no-cache-dir yt-dlp
+
+COPY app /opt/rough/app
+COPY app.py /opt/rough/app.py
+COPY ani-cli /opt/rough/ani-cli
+
+RUN chmod +x /opt/rough/ani-cli/ani-cli
+
+EXPOSE 5001
+
+ENV FLASK_HOST=0.0.0.0
+ENV FLASK_PORT=5001
+
+CMD ["python", "/opt/rough/app.py"]

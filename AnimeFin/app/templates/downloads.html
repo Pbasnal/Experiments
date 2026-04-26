@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Downloads Monitor</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Downloads Monitor</h1>
+      <p class="hint">Downloads root: <code>{{ downloads_dir }}</code></p>
+      <p><a href="/">Back to search</a></p>
+
+      <section class="card">
+        <h2>Jobs</h2>
+        <button id="refresh-jobs-btn">Refresh</button>
+        <table id="jobs-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Episode</th>
+              <th>Status</th>
+              <th>Progress</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-body"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>Job Events</h2>
+        <pre id="job-events"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Downloaded Media</h2>
+        <button id="refresh-media-btn">Refresh</button>
+        <ul id="media-list"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

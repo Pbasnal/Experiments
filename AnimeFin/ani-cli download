@@ -1,0 +1,5 @@
+brew install curl grep ffmpeg git fzf yt-dlp aria2
+brew install --cask iina   
+git clone "https://github.com/pystardust/ani-cli.git" && cd ./ani-cli
+cp ./ani-cli "$(brew --prefix)"/bin
+cd .. && rm -rf ./ani-cli   

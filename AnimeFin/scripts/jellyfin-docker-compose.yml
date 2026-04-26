@@ -1,0 +1,34 @@
+# Two services: Flask downloader + Jellyfin, sharing the same host ./downloads folder.
+# Run: ./scripts/setup-jellyfin.sh (uses --project-directory so paths resolve correctly).
+
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.flask
+    container_name: rough-flask-app
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./downloads:/media/downloads
+      - ./data/app-data:/data
+    environment:
+      - FLASK_HOST=0.0.0.0
+      - FLASK_PORT=5001
+      - DOWNLOADS_DIR=/media/downloads
+      - DATABASE_PATH=/data/jobs.sqlite3
+      - ANI_CLI_PATH=/opt/rough/ani-cli/ani-cli
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: rough-jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./data/jellyfin-config:/config
+      - ./data/jellyfin-cache:/cache
+      - ./downloads:/media/downloads:ro
+    environment:
+      - TZ=${TZ:-UTC}
