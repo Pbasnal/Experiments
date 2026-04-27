@@ -32,7 +32,7 @@ Raven hooked a thumb at the bed. "That doesn't answer the charge."
 
 She stole the chair by the same window, turned it half toward the room and half toward the shutter, and propped one boot on the sill while working a knot from her wrist bracer with her teeth.
 
-"You nearly did," she said. "When Brenn asked about prior fieldwork, you looked one breath from diving out the window and yelling that the balls of the manor were haunted."
+"You nearly did," she said. "When Brenn asked about prior fieldwork, you looked one breath from diving out the window and yelling that the halls of the manor were haunted."
 
 Cassius lowered his hands. "That was relevant."
 
@@ -92,7 +92,7 @@ Cassius bent to retrieve a notebook from the floor. "Fine. Suppose Brenn held so
 
 Raven's brow lifted. "It should. I said as much in the town office." She tilted her head toward the notes. "The tower's bad enough. The fact that things are spilling beyond it is worse."
 
-"But there is more!" Cassius slid from the bed to the floor and began spreading notes across the boards between them. The cautious, measured answers he'd been feeding Theron all day vanished; in their place came quick hands, restless movement, and a mind finally allowed to run. "Forget theory for a moment. Facts. The curse is drawing monsters and spirits toward the tower and down into the town. That means negative energy, concentrated, active and increasing. I checked old reports: missing people, deaths by maddened animals, monster sightings—every date clusters around the full moon. And it'll peak on the winter solstice, if Brenn's right. Priests have already tried to exorcise the tower before. It should have weakened by now. Instead it returned."
+"And there's more." Cassius slid from the bed to the floor and began spreading notes across the boards between them. The cautious, measured answers he'd been feeding Theron all day vanished; in their place came quick hands, restless movement, and a mind finally allowed to run. "Forget theory for a moment. Facts. The curse is drawing monsters and spirits toward the tower and down into the town. That means negative energy, concentrated, active and increasing. I checked old reports: missing people, deaths by maddened animals, monster sightings—every date clusters around the full moon. And it'll peak on the winter solstice, if Brenn's right. Priests have already tried to exorcise the tower before. It should have weakened by now. Instead it returned."
 
 Elena crouched beside the spread notes. "So either the curse renews itself, or the exorcisms only scraped the surface."
 
@@ -116,7 +116,7 @@ Lyra exhaled through her nose. "And where exactly are we finding clean history b
 
 Elena's expression flattened with clinical focus. "If we force destruction when peace is possible, the town may sleep again, but the tower and the nearby ground won't. Lingering negative energy. Haunt activity that can last for decades."
 
-Lyra held his gaze. "People are vanishing now. I won't gamble the living on perfect knowledge of the dead."
+Lyra held her gaze. "People are vanishing now. I won't gamble the living on perfect knowledge of the dead."
 
 Elena met her gaze and nodded once. "Then I choose the town. If we must leave the hill scarred to keep people alive, we do it."
 
@@ -128,9 +128,9 @@ Raven looked from Lyra to Cassius, jaw tight. "People are in danger, and we stil
 
 Silence pooled between them. Lyra looked at each face in turn, measuring what had shifted. "Elena?"
 
-Elena answered without hesitation. "We investigate and classify first. But if the room turns, if civilians are at risk, or if we lose control of the fight, we switch to kill doctrine immediately. No hesitation."
+Elena answered without hesitation. "We read it first. But if the room turns, if civilians are at risk, or if we lose control of the fight, we stop trying to redeem it and put it down. No hesitation."
 
-Lyra's jaw flexed once. "Fine. We try it your way first. Investigation and classification on contact."
+Lyra's jaw flexed once. "Fine. We try it your way first. Read on contact, then decide."
 
 She looked directly at Cassius. "What do you need to identify it if Brenn and Harbin keep dodging the truth?"
 
@@ -144,11 +144,11 @@ Cassius listened, then nodded, taking it in. "Right. I can work with that."
 
 Lyra drew a breath and made the call. "Then this is the order. Investigation first, before we march. Brenn and Harbin get one more chance to speak plainly. If you still can't give me a clean spirit read by departure, we do it my way at the tower door."
 
-Elena's gaze flicked between them. "Dual prep stands either way."
+Elena's gaze flicked between them. "We prepare both paths either way."
 
 Lyra nodded once. "Good. Then we have a path. You read the curse, Raven and I hold the line, and Elena keeps us alive long enough to end it."
 
-"Then before tomorrow afternoon, before dusk," Lyra said, "we need entry order, fallback calls, and agreement on when not to advance." Her gaze shifted to Raven. "And we need to stop pretending the danger begins at the tower door."
+"Before tomorrow afternoon—before dusk—we settle marching order, fallback calls, and who can shout stop when things go wrong." Her gaze shifted to Raven. "And we need to stop pretending the danger begins at the tower door."
 
 Raven's boot heel stopped tapping. She glanced at Lyra once, brief and checking, then leaned forward when no correction came.
 
@@ -162,7 +162,7 @@ Lyra braced both hands on the table edge behind her. "Shortest route. We leave i
 
 Cassius looked up sharply. "That gets us to the tower cleaner, yes. It also leaves us inside fighting until midnight, and the witch materializes at midnight. We'll be exhausted before we even face her."
 
-Lyra gave one short nod. "Then we make that survivable. We clear one room, ward it, and hold it as a camp. We rest close to midnight, recover what we can with magic and potions, and then hit the witch. If that's not enough, we rough it out and keep moving. That's the reality."
+Lyra gave one short nod. "Then we make that survivable. We clear one room, ward it, and hold it as a camp. We rest close to midnight, recover what we can with magic and potions, and then hit the witch. If that fails, we grit our teeth and move anyway. That's the work."
 
 Raven's eyes narrowed with quick approval. "Inside the tower?"
 
@@ -194,15 +194,15 @@ Cassius winced. "So you think we were picked because we were expendable."
 
 Lyra didn't blink. "No clear answer, and no point spinning theories. The problem stands no matter how we got here. We keep our guard up—even around Theron."
 
-Elena shifted one of his pages toward herself. "Adventurers almost never get the whole truth before they are sent in. The work is learning what matters before it kills you."
+Elena shifted one of his pages toward herself. "Adventurers are almost never told the whole truth before they're sent in. The work is learning which lie kills you first."
 
 Cassius stared at the notes until the ink blurred. His jaw locked; his fingers curled over the page edges hard enough to crease them.
 
-Raven's frustration finally broke through. "We're walking into a cursed tower half-blind with scraps for truth. That's not a plan. That's a wager with our throats."
+Raven's frustration finally broke through. "We're walking into a cursed tower half-blind with scraps for truth. That's not a plan. That's dice in a graveyard."
 
 Elena's mouth thinned. "Ignorance kills."
 
-Lyra let the words hang, then spoke evenly. "Then we stop being ignorant before dusk. We collect what we can, we prepare for what we can't, and we walk in together. Panic wastes time. Discipline buys us a chance."
+Lyra let the words hang, then spoke evenly. "Then we stop being ignorant before dusk. We collect what we can, we prepare for what we can't, and we walk in together. Panic burns daylight. Discipline buys a chance."
 
 Cassius swallowed, still pale, then gave one stiff nod. "All right. Then we build for uncertainty."
 
@@ -212,7 +212,7 @@ Elena rose and crossed to the washstand, returning with a small salt vial and a 
 
 She lifted a second finger.
 
-"Second, kill stock. Weapon enchantments for steel and arrows. Oils by spirit class." She glanced at Cassius.
+"Second, strike stock. Weapon enchantments for steel and arrows. Oils by spirit class." She glanced at Cassius.
 
 Cassius answered at once. "Three tiers if we can afford them: Moonbane baseline, Specter if available, Soulbane if the church stores any for sanctioned exorcists. If we carry only one and meet the wrong class, we burn stamina for nothing."
 
@@ -228,9 +228,9 @@ Raven gave a curt nod. "In and out. No heroics."
 
 Cassius nodded, still pale but steadier. "I can do that."
 
-"I press Brenn for what he is still hiding, prepare scrolls, and make sure he is ready to step into that tower with us," Elena said.
+"I'll press Brenn for what he's still hiding, prepare scrolls, and make sure he's ready to step into that tower with us," Elena said.
 
-Lyra held her gaze. "Then Theron and Harbin are mine."
+Lyra held her gaze. "Then Theron and Harbin are my problem."
 
 Elena inclined her head. "All of us buy what we can while we run those tasks. No one returns empty-handed."
 
@@ -256,6 +256,6 @@ He pointed a charcoal finger at her. "Not at my face. I need this face for credi
 
 "Put it on the expense list."
 
-Elena smiled despite herself. Lyra barked out a short laugh, surprised by it, then shook her head.
+Elena smiled before she could stop herself. Lyra laughed once, short and sharp, like a blade tapping stone.
 
-Outside the door, Theron stood in the dim hall, listening to the softened voices through old wood and plaster. He said nothing. After a moment, a thin smile touched his mouth, and he moved on down the corridor without a sound.
+Outside the door, Theron stood in the dim hall with one hand on the railing, listening to their voices soften through old wood and plaster. He did not knock. He did not speak. After a moment, a thin smile touched his mouth, and he went down the corridor without a sound.
