@@ -1,0 +1,205 @@
+{
+  "info": {
+    "_postman_id": "d3f12a62-8f69-4eec-9f03-7f2fc1c5d8ee",
+    "name": "PictureTales v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Smoke tests for PictureTales API."
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Health payload', function () {",
+              "  pm.expect(json.status).to.eql('UP');",
+              "  pm.expect(json.repositoryKind).to.exist;",
+              "  pm.expect(json.apiVersion || '1').to.exist;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Series",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/series?sort=popular&page=1&limit=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('List shape', function () {",
+              "  pm.expect(json.items).to.be.an('array');",
+              "  pm.expect(json.total).to.be.a('number');",
+              "});",
+              "if (json.items.length > 0) {",
+              "  pm.collectionVariables.set('seriesId', json.items[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Series",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/search?q={{query}}&page=1&limit=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Search shape', function () {",
+              "  pm.expect(json.items).to.be.an('array');",
+              "});",
+              "if (json.items.length > 0) {",
+              "  pm.collectionVariables.set('seriesId', json.items[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Series Detail",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/series/{{seriesId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Detail shape', function () {",
+              "  pm.expect(json.id).to.eql(pm.collectionVariables.get('seriesId'));",
+              "  pm.expect(json.title).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Chapters",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/series/{{seriesId}}/chapters"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Chapter shape', function () {",
+              "  pm.expect(json.chapters).to.be.an('array');",
+              "});",
+              "if (json.chapters.length > 0) {",
+              "  pm.collectionVariables.set('chapterId', json.chapters[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Pages",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/series/{{seriesId}}/chapters/{{chapterId}}/pages"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Pages shape', function () {",
+              "  pm.expect(json.pages).to.be.an('array');",
+              "});",
+              "if (json.pages.length > 0) {",
+              "  pm.collectionVariables.set('pageIndex', String(json.pages[0].index));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Page Image",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/content/series/{{seriesId}}/chapters/{{chapterId}}/images/{{pageIndex}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Image content type', function () {",
+              "  const ct = pm.response.headers.get('Content-Type') || '';",
+              "  pm.expect(ct.startsWith('image/')).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unknown Series -> 404",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/series/does-not-exist"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "query", "value": "Fixture" },
+    { "key": "seriesId", "value": "fixture-series" },
+    { "key": "chapterId", "value": "chapter-001" },
+    { "key": "pageIndex", "value": "0" }
+  ]
+}
