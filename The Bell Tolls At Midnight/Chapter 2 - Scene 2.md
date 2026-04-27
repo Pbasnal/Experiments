@@ -2,9 +2,9 @@
 
 The room was too good for a dying town.
 
-That was the first thing Lyra noticed.
+Lyra noticed that first.
 
-Bell's End had given them a chamber big enough to pace in, with two broad beds, a wardrobe with one warped hinge, a washstand with an actual basin instead of a bucket, and windows that looked over a lane so empty the silence felt rented. The plaster was cracked in one corner and the hearth had gone cold hours ago, but the bones of the place were solid. In another season it might have smelled of travelers' boots, spilled ale, and damp horse blankets. Tonight it smelled of old ash, clean linen, and the sea creeping in under the shutters.
+Bell's End had given them a chamber big enough to pace in, with two broad beds, a wardrobe with one warped hinge, a washstand with an actual basin instead of a bucket, and windows over a lane so empty the silence felt borrowed. The plaster was cracked in one corner and the hearth had gone cold hours ago, but the bones of the place were solid. In another season it might have smelled of travelers' boots, spilled ale, and damp horse blankets. Tonight it smelled of old ash, clean linen, and the sea creeping in under the shutters.
 
 Too many people had left for the room to be this available. Too few servants remained for it to feel alive.
 
@@ -30,25 +30,27 @@ Raven hooked a thumb at the bed. "That doesn't answer the charge."
 
 "Reasonable," Raven said. "Petty, but reasonable."
 
-She stole the chair by the same window instead, turned it half toward the room, half toward the shutter, and propped one boot on the sill while she worked a knot from her wrist bracer with her teeth.
+She stole the chair by the same window, turned it half toward the room and half toward the shutter, and propped one boot on the sill while working a knot from her wrist bracer with her teeth.
 
-"You nearly did," she said. "When Brenn asked about prior fieldwork, you looked one question away from explaining moon phases."
+"You nearly did," she said. "When Brenn asked about prior fieldwork, you looked one breath from diving out the window and yelling that the balls of the manor were haunted."
 
 Cassius lowered his hands. "That was relevant."
 
-"To whom?"
+"The diving, or the shouting?"
+
+"Both."
 
 "To any serious discussion of haunt manifestation."
 
 Raven pulled the knot free and smiled around the leather. "There he is."
 
-Lyra set her sword belt on the table with a hard wooden thump. "If you're done resurrecting his soul, we should decide what we're walking into tomorrow."
+Lyra set her sword belt on the table with a hard wooden thump. "If you're done arguing over furniture rights, we should decide what we're walking into tomorrow."
 
 Cassius blinked at her. "How have you been this calm all day? Theron was breathing down our necks from dawn onward, and you sounded exactly like this then too."
 
 Lyra gave him a flat look. "By opening my mouth and speaking."
 
-"You know what I mean," he said. He pushed himself upright on the bed, suddenly younger again than he'd looked all day. "If this goes badly, Theron writes us up as a failed first team, the Guild thanks us for our enthusiasm, and we're back to waiting for pity work."
+"You know what I mean," he said. He pushed himself upright on the bed, suddenly younger again than he'd looked all day. "If this goes badly, Theron writes us up as a failed first team, the Guild thanks us for our enthusiasm, and we go back to waiting for pity work."
 
 Raven tipped her chair back onto two legs. "He's got a point. You and Elena are acting like we misplaced a mule, not our membership."
 
@@ -58,7 +60,7 @@ At the washstand, Elena folded a linen strip in half, then in half again. "There
 
 Raven let the chair legs drop back to the floor and gave a short nod.
 
-The room settled into work: Cassius's crystals clicked together as he emptied his pockets, Elena unrolled ward-linen across the washstand, and Raven's boot heel tapped the floor under the window.
+The room settled into work: Cassius's crystals clicked as he emptied his pockets, Elena unrolled ward-linen across the washstand, and Raven's boot heel tapped the floor under the window.
 
 Elena laid out her medical kit with the same care she used in chapel light and roadside mud: bone needles, salves, salt vials, linen, charcoal chalk. One strip she retied because the knot displeased her. Another she checked against the light before setting it down. When she finally looked up, her mismatched eyes moved from Cassius's heap of notes to Lyra's posture to Raven by the shutter.
 
@@ -90,7 +92,7 @@ Cassius bent to retrieve a notebook from the floor. "Fine. Suppose Brenn held so
 
 Raven's brow lifted. "It should. I said as much in the town office." She tilted her head toward the notes. "The tower's bad enough. The fact that things are spilling beyond it is worse."
 
-"But there is more!" Cassius slid from the bed to the floor and began spreading notes across the boards between them. The cautious, measured answers he'd been feeding Theron all day vanished; in their place came quick hands, restless movement, and a mind finally allowed to run. "Forget theory for a moment. Facts. The curse is drawing monsters and spirits toward the tower and down into the town. That means negative energy, concentrated, active and increasing. I checked old paranormal reports, missing people, killed by mad animals, monster sightings— all the dates cluster around the full moon. And it'll peak on winter solstice as per Brenn. Priests have already tried to exorcise the tower before. It should have weakened by now. Instead it returned."
+"But there is more!" Cassius slid from the bed to the floor and began spreading notes across the boards between them. The cautious, measured answers he'd been feeding Theron all day vanished; in their place came quick hands, restless movement, and a mind finally allowed to run. "Forget theory for a moment. Facts. The curse is drawing monsters and spirits toward the tower and down into the town. That means negative energy, concentrated, active and increasing. I checked old reports: missing people, deaths by maddened animals, monster sightings—every date clusters around the full moon. And it'll peak on the winter solstice, if Brenn's right. Priests have already tried to exorcise the tower before. It should have weakened by now. Instead it returned."
 
 Elena crouched beside the spread notes. "So either the curse renews itself, or the exorcisms only scraped the surface."
 
@@ -108,23 +110,27 @@ Cassius swallowed. "Depending on how and why a person died, a spirit can be anyt
 
 Raven folded her arms. "So what do you think this witch is?"
 
-Cassius did, forcing himself into shorter lines. "Based on Brenn and Harbin? This witch could be a Wraith, a Cursed spirit, or Umbra-grade. Each one needs a different method, and guessing wrong wastes our only window."
+Cassius pushed his glasses up. "Based on Brenn and Harbin? This witch could be a Wraith, a Cursed spirit, or Umbra-grade. Each one needs a different method, and guessing wrong wastes our only window."
 
 Lyra exhaled through her nose. "And where exactly are we finding clean history by tomorrow? Brenn is holding back, the tower is hostile, and dusk is coming whether we like it or not." She pointed to his notes. "We do it my way: moonbane, Specter if available, Soulfire on my blade, Consecration if Elena can sustain it. We go in ready to kill the thing before it kills us."
 
-Elena's expression flattened with clinical focus. "And if we force destruction when peace is possible?"
-
-"Then we solve the immediate crisis and still leave a scar," Cassius said. "Some negative energy will linger, and the site may never heal cleanly."
+Elena's expression flattened with clinical focus. "If we force destruction when peace is possible, the town may sleep again, but the tower and the nearby ground won't. Lingering negative energy. Haunt activity that can last for decades."
 
 Lyra held his gaze. "People are vanishing now. I won't gamble the living on perfect knowledge of the dead."
 
-Cassius's voice dropped, but it stopped shaking. "I know. I saw them in the square." He put a hand flat over the pages, as though holding them still might hold himself still too. "I'm not asking for perfect knowledge. I'm asking for one honest attempt before we turn her into ash. If she was wronged in life and we answer with steel in death, then we're just the next ones to wrong her."
+Elena met her gaze and nodded once. "Then I choose the town. If we must leave the hill scarred to keep people alive, we do it."
+
+Cassius set both palms on the papers to stop their tremor, then folded one hand tight over the other. "I know. I saw them in the square." He kept his eyes on the notes until the last moment, then looked up. "I'm not asking for perfect knowledge. I'm asking for one honest attempt before we turn her into ash. If she was wronged in life and we answer with steel in death, then we're just the next ones to wrong her."
 
 Silence tightened again, then softened.
 
-Raven looked from one to the other. "He isn't stalling. He's trying to stop us from finishing somebody else's crime."
+Raven looked from Lyra to Cassius, jaw tight. "People are in danger, and we still don't know what we'll be fighting. We're not heroes for the dead." She paused, thumb worrying the seam of her glove. "But the thought of wronging someone twice—once in life, once in death—turns my stomach."
 
-Lyra's jaw flexed once. "Fine. We try it your way first. Investigation and classification on contact." She lifted a finger before he could speak. "But if the room turns, if civilians are at risk, or if we lose control of the fight, we switch to kill doctrine immediately. No hesitation."
+Silence pooled between them. Lyra looked at each face in turn, measuring what had shifted. "Elena?"
+
+Elena answered without hesitation. "We investigate and classify first. But if the room turns, if civilians are at risk, or if we lose control of the fight, we switch to kill doctrine immediately. No hesitation."
+
+Lyra's jaw flexed once. "Fine. We try it your way first. Investigation and classification on contact."
 
 She looked directly at Cassius. "What do you need to identify it if Brenn and Harbin keep dodging the truth?"
 
@@ -140,7 +146,7 @@ Lyra drew a breath and made the call. "Then this is the order. Investigation fir
 
 Elena's gaze flicked between them. "Dual prep stands either way."
 
-Lyra nodded once. "Good. Then we have a path. You read the curse, I hold the line, and we keep each other alive long enough to end it."
+Lyra nodded once. "Good. Then we have a path. You read the curse, Raven and I hold the line, and Elena keeps us alive long enough to end it."
 
 "Then before tomorrow afternoon, before dusk," Lyra said, "we need entry order, fallback calls, and agreement on when not to advance." Her gaze shifted to Raven. "And we need to stop pretending the danger begins at the tower door."
 
@@ -156,106 +162,100 @@ Lyra braced both hands on the table edge behind her. "Shortest route. We leave i
 
 Cassius looked up sharply. "That gets us to the tower cleaner, yes. It also leaves us inside fighting until midnight, and the witch materializes at midnight. We'll be exhausted before we even face her."
 
-Lyra gave one short nod. "Then we make that survivable. We clear one room, sanitize it, and hold it as a camp. We rest close to midnight, recover what we can with magic and potions, and then hit the witch. If that's not enough, we rough it out and keep moving. That's the reality."
+Lyra gave one short nod. "Then we make that survivable. We clear one room, ward it, and hold it as a camp. We rest close to midnight, recover what we can with magic and potions, and then hit the witch. If that's not enough, we rough it out and keep moving. That's the reality."
 
 Raven's eyes narrowed with quick approval. "Inside the tower?"
 
 Lyra only nodded again.
 
-Elena nodded slowly. "It can be done." She was already counting supplies with her eyes. "Salt, chalk, iron nails, ward strips, lamp oil, and at least one intact door if the tower is feeling generous. I can secure a room well enough for a short rest and emergency treatment." Her mouth thinned. "A few hours, no more. After that I would not trust the ward to hold."
+Elena nodded slowly. "It can be done. I can secure a room well enough for a short rest and emergency treatment." Her mouth thinned. "A few hours, no more. After that I would not trust the ward to hold."
 
 "A few hours is still better than none," Lyra said.
 
 A bell sounded somewhere outside, low and blunt through the shutters.
 
-Silence fell in the room. Cassius brought out the one question no one had an answer to.
+Silence fell in the room until Raven broke it with the one question no one had an answer to. "Brenn asked the right question, didn't he?"
 
-Cassius broke the silence first. "Brenn asked the right question, didn't he?"
+She gave the shutter latch an idle test with two fingers. "Back in the town office. Why send novices after something like this? I thought Theron answered well enough then, but now I'm not sure."
 
-He pushed his glasses higher again. "Back in the town office. Why send novices after something like this? I thought Theron answered him well enough then, but now—" He gestured vaguely with a charcoal-smudged hand. "Now I'm not sure."
-
-Raven gave the shutter latch an idle test with two fingers. "He answered like a man already committed. Not like a man who proved anything."
+Cassius pushed his glasses higher again. "He answered like a man already committed. Not like a man who proved anything."
 
 Lyra looked from one to the other. "Good. So we're all awake now." She pushed off the table and began pacing, slow, measured, one end of the rug to the other.
 
-Elena spoke first. "The Guild sent who it had ready. Or Theron vouched for us and the Guild trusted his field judgment. Or Brenn asked for a priest, a curse-breaker, and fighters in a hurry, and we happened to fit the shape of the request better than anyone else on short notice."
+Elena answered, voice low. "The Guild sent who it had ready. Or Theron vouched for us and the Guild trusted his field judgment. Or Brenn asked for a priest, a curse-breaker, and fighters in a hurry, and we happened to fit the shape of the request better than anyone else on short notice."
 
-Cassius frowned. "Those all sound plausible."
+Cassius glanced up. "But why would Theron lie? Isn't it possible we were sent because we're capable?"
 
-Lyra kept pacing. "The darker version: the Guild did not have anyone better to spare. Or it did and decided not to spend them on Gravedawn. Or someone saw a cursed backwater and a novice team and decided the arithmetic was clean enough." She looked at Cassius. "And Theron may have been under pressure to see us succeed whether or not he had reason to be certain. He's watched us in one real operation. One. Yet when Brenn challenged him, all he had was trust in our capability. That's thin." 
+Lyra kept pacing. "Maybe. Maybe not. What matters is this: Theron has seen us in one real operation. One. Yet when Brenn challenged him, all he had was trust in our capability. That's thin."
 
 Raven rubbed a thumb along the shutter latch. "Thin enough to sound rehearsed."
 
 Cassius winced. "So you think we were picked because we were expendable."
 
-Lyra didn't blink. "I think we were picked because we were available. Sometimes that's the same thing."
+Lyra didn't blink. "No clear answer, and no point spinning theories. The problem stands no matter how we got here. We keep our guard up—even around Theron."
 
 Elena shifted one of his pages toward herself. "Adventurers almost never get the whole truth before they are sent in. The work is learning what matters before it kills you."
 
-Cassius stared at the notes long enough for Lyra to stop pacing.
+Cassius stared at the notes until the ink blurred. His jaw locked; his fingers curled over the page edges hard enough to crease them.
 
-Then he exhaled through his nose. "Fine. I can work with that." He tapped the margin where he'd been sketching circles inside circles. "Brenn and Harbin may not even know which detail is the one that matters. They may think they hid one shame and leave us to discover the real problem halfway up the stairs."
+Raven's frustration finally broke through. "We're walking into a cursed tower half-blind with scraps for truth. That's not a plan. That's a wager with our throats."
 
-Raven nodded slowly. "That's better. Less trust. More use."
+Elena's mouth thinned. "Ignorance kills."
 
-"You make encouragement sound criminal," Cassius muttered.
+Lyra let the words hang, then spoke evenly. "Then we stop being ignorant before dusk. We collect what we can, we prepare for what we can't, and we walk in together. Panic wastes time. Discipline buys us a chance."
 
-"Practice," Raven said.
+Cassius swallowed, still pale, then gave one stiff nod. "All right. Then we build for uncertainty."
 
-This time even Lyra's mouth threatened a smile.
+Elena rose and crossed to the washstand, returning with a small salt vial and a stub of chalk. She set both beside the notes and began in clipped, orderly lines.
 
-Elena rose and crossed to the washstand, returning with a small salt vial and a stub of chalk. She set both beside the notes. "Before we move, we need holy water, holy symbols, and formal blessings from the church. Weapon enchantments for spirits. Poison oils for beasts and monsters. One magical lantern and backup torches. Empty spell scrolls—I can fill them with warding. Nutrient-dense rations mixed with healing tonic. Energy draughts for recovery from exhaustion."
+"First, survival stock. Healing potions. Rations infused with recovery tonic. Warding strips, chalk, salt, iron, holy water, and one enchanted lantern with spare torches. I will prepare spell scrolls for barriers and emergency fallback."
 
-Cassius raised a finger. "Not one oil. Three tiers if we can afford them. Moonbane as baseline, Specter if the alchemist has it, Soulbane if the church stores any for sanctioned exorcists. If we only buy one tier and meet the wrong class, we burn through stamina for no gain."
+She lifted a second finger.
 
-Raven leaned in. "And iron shavings in sealed pouches. Not sacks that spill in my pack. Plus cedar resin for the censer smoke."
+"Second, kill stock. Weapon enchantments for steel and arrows. Oils by spirit class." She glanced at Cassius.
 
-Elena added, "Nullifying salt, if any remains in town. Consecrated ash too. We may need to reverse bindings, not just cut them."
+Cassius answered at once. "Three tiers if we can afford them: Moonbane baseline, Specter if available, Soulbane if the church stores any for sanctioned exorcists. If we carry only one and meet the wrong class, we burn stamina for nothing."
 
-Lyra looked at Cassius. "What worries you most?"
+Raven leaned forward, voice rough with focus. "Iron shavings in sealed pouches. Cedar resin for smoke. Nothing loose in my pack."
 
-The question caught him off guard. He answered anyway. "That we enter with apprentice assumptions and veteran consequences. That I call a type too late and you pay for my delay. That we spend everything on the wrong combination, then hit midnight empty." He rubbed the bridge of his nose, then met Lyra's eyes. "So I want contingency bundles. One for pursuit outside the tower, one for static defense room, one reserved for midnight only."
+Elena nodded once. "Nullifying salt and consecrated ash too. We may need to unbind before we strike."
 
-Raven nodded once, serious now. "Good. That's not panic. That's planning."
+She drew a careful breath, then shifted from supplies to roles. "Morning assignments. Raven scouts the route in daylight and checks approach points without taking contact. On the way back, she slips through the town office and church archive for records."
 
-Elena touched the edge of the salt vial. "Then we buy by phase, not by category. Travel phase. Entry phase. Midnight phase."
+Raven gave a curt nod. "In and out. No heroics."
 
-Lyra stared at her a beat. "Anything else? A spare sunrise?"
+"Cassius covers library shelves, shop rumors, and anything whispered near the alchemists' counters," Elena continued. "Names, dates, family feuds, old tower accounts."
 
-Elena's mouth twitched. "If I find one, you'll get first watch."
+Cassius nodded, still pale but steadier. "I can do that."
+
+"I press Brenn for what he is still hiding, prepare scrolls, and make sure he is ready to step into that tower with us," Elena said.
+
+Lyra held her gaze. "Then Theron and Harbin are mine."
+
+Elena inclined her head. "All of us buy what we can while we run those tasks. No one returns empty-handed."
+
+Lyra looked around the room and made it official. "Good. That's the plan."
+
+For a heartbeat Elena's control slipped; something older moved behind her eyes, grief worn smooth by years. She closed her fingers around the salt vial, bowed her head a fraction, and whispered, "Keep them through the night." Lyra noticed, and said nothing.
 
 Outside, the bell sounded again. Closer this time. Or perhaps the night had simply thinned.
 
 Lyra dragged the chair from the table and finally sat. It made more impression than any speech she could have given.
 
-"All right," she said after a moment. "Final plan. We move tomorrow afternoon before dusk. I handle weapons—sharpening, repairs, replacements, and enchantment work. Raven, you buy potions and prep rations to Elena's specifications. Cassius, you hit the library, the church records, and the townmaster's office. Bring back anything useful." Her gaze locked on Elena. "You get the hardest assignment. Talk to Theron and Brenn. Make sure they understand the plan and our signals. Get as much out of Brenn as he'll give before we step off."
-
-She pointed around the table as she spoke, assigning contingencies like drill calls.
-
-"If road contact starts early, Raven leads route control and keeps civilians off our wake. If we lose light inside, Elena calls immediate fallback to the warded room. If we confirm high-tier manifestation before midnight, Cassius decides whether we disengage and preserve resources or force an early attempt." Lyra's gaze hardened. "No one freelances heroics."
+"All right," she said after a moment. "No more speeches. Tomorrow we run our assignments. Then we meet back in this room—without Theron—compare what we found, and decide what we disclose to Brenn and to him before we set out."
 
 Elena inclined her head. "Agreed."
 
-Cassius gathered two pages into a stack, then ruined the order immediately by adding a third sideways. "I can shorten it. Probably."
+Cassius gathered two pages into a stack, then ruined the order immediately by adding a third sideways. "Tomorrow, if I start spiraling in front of Brenn, throw chalk at me."
 
-"A miracle," Raven said.
+Raven snorted. "Happily."
 
-He pointed a charcoal finger at her. "I am being useful."
+He pointed a charcoal finger at her. "Not at my face. I need this face for credibility."
 
-"For the first time today, you're being understandable."
+"You need a leash, mage."
 
-"Cruelty from the window corner. Unexpected."
+"Put it on the expense list."
 
-"Lie better, mage."
+Elena smiled despite herself. Lyra barked out a short laugh, surprised by it, then shook her head.
 
-The laugh that went around the room then was tired and small and far too human for a town like Gravedawn.
-
-It left behind something quieter than cheer and sturdier than doubt.
-
-Raven rose to check the latch properly this time. Cassius kept talking from the floor, now trimming his ideas into sentences with fewer branches. Elena tied the last ward strip and set it beside her satchel instead of in it, where it could be reached quickly. Lyra leaned back in the chair, eyes on the shutter, listening to all three of them as though recalculating a battlefield she'd misread at first glance.
-
-No one said they trusted one another.
-
-No one lied about that either.
-
-But when the candle burned lower and the room settled around them, their voices had begun to take turns instead of fighting for space, which was near enough to discipline for one night.
+Outside the door, Theron stood in the dim hall, listening to the softened voices through old wood and plaster. He said nothing. After a moment, a thin smile touched his mouth, and he moved on down the corridor without a sound.
