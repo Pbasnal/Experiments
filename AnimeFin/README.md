@@ -99,3 +99,9 @@ Persistent data:
 - Jellyfin cache: `./data/jellyfin-cache`
 
 Logs: `./scripts/setup-jellyfin.sh logs` (or `logs-flask` / `logs-jellyfin`).
+
+
+## Docker-Compose command
+```
+docker compose   --project-directory .   -f scripts/jellyfin-docker-compose.yml   up -d --force-recreate
+```

@@ -22,7 +22,7 @@ def health() -> tuple[dict, int]:
 def search_shows():
     anime_source, _, _ = _services()
     query = (request.args.get("q") or "").strip()
-    mode = (request.args.get("mode") or "sub").strip().lower()
+    mode = (request.args.get("mode") or "dub").strip().lower()
     if not query:
         return jsonify({"error": "Missing required query parameter: q"}), 400
     if mode not in {"sub", "dub"}:
@@ -33,7 +33,7 @@ def search_shows():
 @api_bp.get("/shows/<show_id>/episodes")
 def show_episodes(show_id: str):
     anime_source, _, _ = _services()
-    mode = (request.args.get("mode") or "sub").strip().lower()
+    mode = (request.args.get("mode") or "dub").strip().lower()
     if mode not in {"sub", "dub"}:
         return jsonify({"error": "mode must be sub or dub"}), 400
     return jsonify({"show_id": show_id, "mode": mode, "episodes": anime_source.list_episodes(show_id, mode)})
@@ -45,7 +45,7 @@ def create_downloads():
     body = request.get_json(force=True)
     show_id = (body.get("show_id") or "").strip()
     show_title = (body.get("show_title") or "").strip()
-    mode = (body.get("mode") or "sub").strip().lower()
+    mode = (body.get("mode") or "dub").strip().lower()
     quality = (body.get("quality") or "best").strip().lower()
     source_url = (body.get("source_url") or "").strip()
     source_type = (body.get("source_type") or "").strip().lower()

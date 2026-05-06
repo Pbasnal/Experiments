@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: PictureTales Comic API
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /v1/health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /v1/series:
+    get:
+      summary: List series
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [popular, latest]
+            default: popular
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: List of series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesListResponse"
+
+  /v1/search:
+    get:
+      summary: Search series
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+            default: ""
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Search result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesListResponse"
+
+  /v1/series/{seriesId}:
+    get:
+      summary: Get series detail
+      parameters:
+        - in: path
+          name: seriesId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Series detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDetailDto"
+        "400":
+          description: Invalid series id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/series/{seriesId}/chapters:
+    get:
+      summary: List chapters for series
+      parameters:
+        - in: path
+          name: seriesId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chapter list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChapterListResponse"
+        "400":
+          description: Invalid series id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/series/{seriesId}/chapters/{chapterId}/pages:
+    get:
+      summary: List page references for chapter
+      parameters:
+        - in: path
+          name: seriesId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: chapterId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Page list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageListResponse"
+        "400":
+          description: Invalid path params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Unknown series/chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/content/series/{seriesId}/cover:
+    get:
+      summary: Stream cover image
+      parameters:
+        - in: path
+          name: seriesId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Image bytes
+          content:
+            image/jpeg: {}
+            image/png: {}
+            image/webp: {}
+            image/gif: {}
+        "404":
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v1/content/series/{seriesId}/chapters/{chapterId}/images/{pageIndex}:
+    get:
+      summary: Stream page image
+      parameters:
+        - in: path
+          name: seriesId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: chapterId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Image bytes
+          content:
+            image/jpeg: {}
+            image/png: {}
+            image/webp: {}
+            image/gif: {}
+        "404":
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status: { type: string }
+        repositoryKind: { type: string }
+        apiVersion: { type: string }
+      required: [status, repositoryKind, apiVersion]
+
+    ErrorResponse:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+      required: [code, message]
+
+    SeriesSummaryDto:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        descriptionSnippet: { type: string }
+      required: [id, title, descriptionSnippet]
+
+    SeriesListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesSummaryDto"
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        pageSize: { type: integer }
+      required: [items, total, page, pageSize]
+
+    SeriesDetailDto:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        status: { type: string }
+        coverRelativePath:
+          type: string
+          nullable: true
+      required: [id, title, description, status]
+
+    ChapterDto:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        sortIndex: { type: integer }
+      required: [id, title, sortIndex]
+
+    ChapterListResponse:
+      type: object
+      properties:
+        seriesId: { type: string }
+        chapters:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChapterDto"
+      required: [seriesId, chapters]
+
+    PageRefDto:
+      type: object
+      properties:
+        index: { type: integer }
+        url: { type: string }
+      required: [index, url]
+
+    PageListResponse:
+      type: object
+      properties:
+        seriesId: { type: string }
+        chapterId: { type: string }
+        pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PageRefDto"
+      required: [seriesId, chapterId, pages]

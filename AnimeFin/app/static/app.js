@@ -62,7 +62,7 @@ async function initSearchPage() {
       const data = await getJson(
         `/api/shows/${encodeURIComponent(showId)}/episodes?mode=${encodeURIComponent(modeEl.value)}`
       );
-      episodesEl.value = data.episodes.slice(0, 5).join(",");
+      episodesEl.value = data.episodes.join(",");
       outputEl.textContent = `Loaded ${data.episodes.length} episodes`;
     } catch (error) {
       outputEl.textContent = error.message;
