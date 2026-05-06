@@ -25,7 +25,7 @@ services:
     container_name: rough-jellyfin
     restart: unless-stopped
     ports:
-      - "8096:8096"
+      - "8080:8096"
     volumes:
       - ./data/jellyfin-config:/config
       - ./data/jellyfin-cache:/cache

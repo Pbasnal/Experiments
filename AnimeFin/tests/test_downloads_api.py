@@ -6,9 +6,11 @@ from app.main import create_app
 
 class _FakeAnimeSource:
     def search_shows(self, query, mode):  # noqa: ARG002
+        self.last_search_mode = mode
         return [{"id": "show-1", "title": "Frieren", "episode_count": 10}]
 
     def list_episodes(self, show_id, mode):  # noqa: ARG002
+        self.last_episodes_mode = mode
         return ["1", "2", "3"]
 
 
@@ -79,6 +81,30 @@ def test_search_and_episode_routes(tmp_path):
     episodes_res = client.get("/api/shows/show-1/episodes?mode=sub")
     assert episodes_res.status_code == 200
     assert episodes_res.get_json()["episodes"] == ["1", "2", "3"]
+
+
+def test_routes_default_mode_to_dub(tmp_path):
+    app = _build_test_app(tmp_path)
+    client = app.test_client()
+
+    search_res = client.get("/api/search?q=frieren")
+    assert search_res.status_code == 200
+    assert app.extensions["anime_source"].last_search_mode == "dub"
+
+    episodes_res = client.get("/api/shows/show-1/episodes")
+    assert episodes_res.status_code == 200
+    assert app.extensions["anime_source"].last_episodes_mode == "dub"
+
+    create_res = client.post(
+        "/api/downloads",
+        json={
+            "show_id": "show-1",
+            "show_title": "Frieren",
+            "episodes": ["1", "2"],
+            "quality": "best",
+        },
+    )
+    assert create_res.status_code == 202
 
 
 def test_download_create_and_cancel_routes(tmp_path):
