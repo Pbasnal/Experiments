@@ -1,0 +1,3 @@
+[submodule "AnimeFin/ani-cli"]
+	path = AnimeFin/ani-cli
+	url = https://github.com/pystardust/ani-cli.git

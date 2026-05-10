@@ -119,7 +119,11 @@ class DownloadService:
         show_dir = self.downloads_root / self._safe_show_name(job["show_title"])
         show_dir.mkdir(parents=True, exist_ok=True)
 
+        source_url = str(job.get("source_url") or "").strip()
         env = {**os.environ, "ANI_CLI_DOWNLOAD_DIR": str(show_dir)}
+        if not source_url and not env.get("TERM"):
+            env["TERM"] = "dumb"
+
         command, executor = self._resolve_command_and_executor(job, show_dir)
         self.jobs_store.append_event(job_id, "info", f"Executing: {' '.join(command)}")
 
