@@ -22,9 +22,14 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY app /opt/rough/app
 COPY app.py /opt/rough/app.py
-COPY ani-cli /opt/rough/ani-cli
 
-RUN chmod +x /opt/rough/ani-cli/ani-cli
+# Fetch ani-cli at build time. A git submodule checkout is often empty in the build
+# context (only a gitlink), and .dockerignore excludes .git — so COPY ani-cli breaks.
+# Pin with: docker build --build-arg ANI_CLI_REF=v4.13.0 ...
+ARG ANI_CLI_REF=master
+RUN mkdir -p /opt/rough/ani-cli \
+  && curl -fsSL "https://raw.githubusercontent.com/pystardust/ani-cli/${ANI_CLI_REF}/ani-cli" -o /opt/rough/ani-cli/ani-cli \
+  && chmod +x /opt/rough/ani-cli/ani-cli
 
 EXPOSE 5001
 
