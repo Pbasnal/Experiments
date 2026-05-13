@@ -109,3 +109,7 @@ Logs: `./scripts/setup-jellyfin.sh logs` (or `logs-flask` / `logs-jellyfin`).
 ```
 docker compose   --project-directory .   -f scripts/jellyfin-docker-compose.yml   up -d --force-recreate
 ```
+
+## Get latest for submodules
+
+`git submodule update --recursive --remote`
