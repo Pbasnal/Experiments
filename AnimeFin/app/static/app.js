@@ -11,7 +11,49 @@ async function getJson(url, options = {}) {
   return data;
 }
 
+/** AnimePahe base URL UI — runs before search UI so Save still works if other controls are missing. */
+async function initAnimepaheSettings() {
+  const animepaheBaseEl = byId("animepahe-base-url");
+  const animepaheSaveBtn = byId("animepahe-save-base");
+  const animepahePathEl = byId("animepahe-config-path");
+  const animepaheOutEl = byId("animepahe-settings-output");
+  if (!animepaheBaseEl || !animepaheSaveBtn) return;
+
+  async function loadAnimepaheSettings() {
+    try {
+      const s = await getJson("/api/settings/animepahe");
+      animepaheBaseEl.value = s.base_url || "";
+      if (animepahePathEl) {
+        animepahePathEl.textContent = s.config_path
+          ? `Config file: ${s.config_path} (under the hidden .config folder inside your ANIMEPAHE_DL_HOME directory)`
+          : "";
+      }
+      if (animepaheOutEl) animepaheOutEl.textContent = "";
+    } catch (error) {
+      if (animepaheOutEl) animepaheOutEl.textContent = error.message;
+    }
+  }
+
+  animepaheSaveBtn.addEventListener("click", async () => {
+    if (animepaheOutEl) animepaheOutEl.textContent = "";
+    try {
+      await getJson("/api/settings/animepahe", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base_url: animepaheBaseEl.value.trim() }),
+      });
+      if (animepaheOutEl) animepaheOutEl.textContent = "Saved.";
+      await loadAnimepaheSettings();
+    } catch (error) {
+      if (animepaheOutEl) animepaheOutEl.textContent = error.message;
+    }
+  });
+  await loadAnimepaheSettings();
+}
+
 async function initSearchPage() {
+  await initAnimepaheSettings();
+
   const queryEl = byId("query");
   if (!queryEl) return;
 
@@ -107,40 +149,6 @@ async function initSearchPage() {
       outputEl.textContent = error.message;
     }
   });
-
-  const animepaheBaseEl = byId("animepahe-base-url");
-  const animepaheSaveBtn = byId("animepahe-save-base");
-  const animepahePathEl = byId("animepahe-config-path");
-  const animepaheOutEl = byId("animepahe-settings-output");
-  if (animepaheBaseEl && animepaheSaveBtn) {
-    async function loadAnimepaheSettings() {
-      try {
-        const s = await getJson("/api/settings/animepahe");
-        animepaheBaseEl.value = s.base_url || "";
-        if (animepahePathEl) {
-          animepahePathEl.textContent = s.config_path ? `Config file: ${s.config_path}` : "";
-        }
-        if (animepaheOutEl) animepaheOutEl.textContent = "";
-      } catch (error) {
-        if (animepaheOutEl) animepaheOutEl.textContent = error.message;
-      }
-    }
-    animepaheSaveBtn.addEventListener("click", async () => {
-      if (animepaheOutEl) animepaheOutEl.textContent = "";
-      try {
-        await getJson("/api/settings/animepahe", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ base_url: animepaheBaseEl.value.trim() }),
-        });
-        if (animepaheOutEl) animepaheOutEl.textContent = "Saved.";
-        await loadAnimepaheSettings();
-      } catch (error) {
-        if (animepaheOutEl) animepaheOutEl.textContent = error.message;
-      }
-    });
-    await loadAnimepaheSettings();
-  }
 }
 
 async function initDownloadsPage() {
