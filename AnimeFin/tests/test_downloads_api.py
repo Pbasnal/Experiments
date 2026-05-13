@@ -55,6 +55,7 @@ def _build_test_app(tmp_path):
         downloads_dir=tmp_path / "downloads",
         database_path=tmp_path / "jobs.sqlite3",
         ani_cli_path=tmp_path / "ani-cli",
+        animepahe_dl_exe=None,
         allanime_api="https://example.test",
         allanime_referer="https://example.test",
         user_agent="test-agent",
@@ -105,6 +106,21 @@ def test_routes_default_mode_to_dub(tmp_path):
         },
     )
     assert create_res.status_code == 202
+
+
+def test_download_rejects_invalid_downloader(tmp_path):
+    app = _build_test_app(tmp_path)
+    client = app.test_client()
+    res = client.post(
+        "/api/downloads",
+        json={
+            "show_id": "show-1",
+            "show_title": "Frieren",
+            "episodes": ["1"],
+            "downloader": "nope",
+        },
+    )
+    assert res.status_code == 400
 
 
 def test_download_create_and_cancel_routes(tmp_path):

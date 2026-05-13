@@ -21,7 +21,10 @@ No streaming playback features are implemented.
 
 - Python 3.9+
 - Local `ani-cli` script at `./ani-cli/ani-cli` (default path)
+- Optional AnimePahe jobs (`downloader: animepahe_dl`): `pip install animepahe-dl` on your machine (PyQt6 wheels are fine locally).
 - For direct source-url downloads (optional): `yt-dlp`, `ffmpeg`, `aria2c`
+
+Docker installs **animepahe-dl without PyQt6** and replaces `anime_downloader/__init__.py` with `docker/patches/anime_downloader_init_headless.py` so the CLI can import the package without PyQt6 (see `docker/Dockerfile.flask`). Rebuild after changing the animepahe-dl pin or patch file.
 
 ## Setup
 
@@ -29,6 +32,7 @@ No streaming playback features are implemented.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+# optional: pip install animepahe-dl
 cp .env.example .env
 ```
 

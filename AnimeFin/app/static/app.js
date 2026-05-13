@@ -15,6 +15,8 @@ async function initSearchPage() {
   const queryEl = byId("query");
   if (!queryEl) return;
 
+  const downloaderEl = byId("downloader");
+  const downloaderHintEl = byId("downloader-hint");
   const modeEl = byId("mode");
   const searchBtn = byId("search-btn");
   const resultsEl = byId("search-results");
@@ -25,6 +27,13 @@ async function initSearchPage() {
   const qualityEl = byId("quality");
   const enqueueBtn = byId("enqueue-btn");
   const outputEl = byId("action-output");
+
+  function syncDownloaderHint() {
+    if (!downloaderEl || !downloaderHintEl) return;
+    downloaderHintEl.hidden = downloaderEl.value === "ani_cli";
+  }
+  downloaderEl.addEventListener("change", syncDownloaderHint);
+  syncDownloaderHint();
 
   searchBtn.addEventListener("click", async () => {
     const query = queryEl.value.trim();
@@ -90,6 +99,7 @@ async function initSearchPage() {
           episodes,
           mode: modeEl.value,
           quality: qualityEl.value.trim() || "best",
+          downloader: downloaderEl.value,
         }),
       });
       outputEl.textContent = `Queued jobs:\n${data.job_ids.join("\n")}`;
@@ -114,10 +124,12 @@ async function initDownloadsPage() {
     data.jobs.forEach((job) => {
       const tr = document.createElement("tr");
       const progress = typeof job.progress_pct === "number" ? `${job.progress_pct.toFixed(1)}%` : "0%";
+      const dl = job.downloader === "animepahe_dl" ? "animepahe-dl" : "ani-cli";
       tr.innerHTML = `
         <td>${job.id}</td>
         <td>${job.show_title}</td>
         <td>${job.episode}</td>
+        <td>${dl}</td>
         <td>${job.status}</td>
         <td>${progress}</td>
         <td></td>

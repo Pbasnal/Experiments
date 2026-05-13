@@ -47,6 +47,7 @@ def create_downloads():
     show_title = (body.get("show_title") or "").strip()
     mode = (body.get("mode") or "dub").strip().lower()
     quality = (body.get("quality") or "best").strip().lower()
+    downloader = (body.get("downloader") or "ani_cli").strip().lower()
     source_url = (body.get("source_url") or "").strip()
     source_type = (body.get("source_type") or "").strip().lower()
     referer = (body.get("referer") or "").strip()
@@ -56,6 +57,8 @@ def create_downloads():
         return jsonify({"error": "show_id and show_title are required"}), 400
     if mode not in {"sub", "dub"}:
         return jsonify({"error": "mode must be sub or dub"}), 400
+    if downloader not in {"ani_cli", "animepahe_dl"}:
+        return jsonify({"error": "downloader must be ani_cli or animepahe_dl"}), 400
     if not isinstance(episodes, list) or not episodes:
         return jsonify({"error": "episodes must be a non-empty array"}), 400
 
@@ -68,6 +71,7 @@ def create_downloads():
             episodes=[str(ep) for ep in episodes],
             mode=mode,
             quality=quality,
+            downloader=downloader,
             source_url=source_url,
             source_type=source_type,
             referer=referer,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,12 +12,25 @@ class AppConfig:
     downloads_dir: Path
     database_path: Path
     ani_cli_path: Path
+    animepahe_dl_exe: Path | None
     allanime_api: str
     allanime_referer: str
     user_agent: str
     host: str
     port: int
     debug: bool
+
+
+def _resolve_animepahe_dl_exe() -> Path | None:
+    raw = (os.getenv("ANIMEPAHE_DL") or "").strip()
+    if raw:
+        candidate = Path(raw).expanduser()
+        if candidate.is_file():
+            return candidate.resolve()
+        found = shutil.which(raw)
+        return Path(found).resolve() if found else None
+    found = shutil.which("animepahe-dl")
+    return Path(found).resolve() if found else None
 
 
 def load_config() -> AppConfig:
@@ -33,6 +47,7 @@ def load_config() -> AppConfig:
         downloads_dir=downloads_dir,
         database_path=database_path,
         ani_cli_path=ani_cli_path,
+        animepahe_dl_exe=_resolve_animepahe_dl_exe(),
         allanime_api=os.getenv("ALLANIME_API", "https://api.allanime.day/api"),
         allanime_referer=os.getenv("ALLANIME_REFERER", "https://allmanga.to"),
         user_agent=os.getenv(

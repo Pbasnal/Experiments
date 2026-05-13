@@ -21,6 +21,7 @@ class NewJob:
     mode: str
     quality: str
     output_path: str
+    downloader: str = "ani_cli"
     source_url: str = ""
     source_type: str = ""
     referer: str = ""
@@ -60,6 +61,7 @@ class JobsStore:
                     source_url TEXT NOT NULL DEFAULT '',
                     source_type TEXT NOT NULL DEFAULT '',
                     referer TEXT NOT NULL DEFAULT '',
+                    downloader TEXT NOT NULL DEFAULT 'ani_cli',
                     error_message TEXT NOT NULL DEFAULT '',
                     created_at TEXT NOT NULL,
                     started_at TEXT,
@@ -75,6 +77,8 @@ class JobsStore:
                 conn.execute("ALTER TABLE jobs ADD COLUMN source_type TEXT NOT NULL DEFAULT ''")
             if "referer" not in names:
                 conn.execute("ALTER TABLE jobs ADD COLUMN referer TEXT NOT NULL DEFAULT ''")
+            if "downloader" not in names:
+                conn.execute("ALTER TABLE jobs ADD COLUMN downloader TEXT NOT NULL DEFAULT 'ani_cli'")
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS download_events (
@@ -99,8 +103,8 @@ class JobsStore:
                     INSERT INTO jobs (
                         id, show_id, show_title, episode, mode, quality, status,
                         progress_pct, bytes_downloaded, bytes_total, output_path,
-                        source_url, source_type, referer, error_message, created_at, started_at, finished_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, 'queued', 0, 0, 0, ?, ?, ?, ?, '', ?, NULL, NULL)
+                        source_url, source_type, referer, downloader, error_message, created_at, started_at, finished_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, 'queued', 0, 0, 0, ?, ?, ?, ?, ?, '', ?, NULL, NULL)
                     """,
                     (
                         job_id,
@@ -113,6 +117,7 @@ class JobsStore:
                         job.source_url,
                         job.source_type,
                         job.referer,
+                        job.downloader,
                         now,
                     ),
                 )

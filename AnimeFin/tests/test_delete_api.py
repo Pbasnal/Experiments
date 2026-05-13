@@ -11,6 +11,7 @@ def _build_test_app(tmp_path):
         downloads_dir=tmp_path / "downloads",
         database_path=tmp_path / "jobs.sqlite3",
         ani_cli_path=tmp_path / "ani-cli",
+        animepahe_dl_exe=None,
         allanime_api="https://example.test",
         allanime_referer="https://example.test",
         user_agent="test-agent",

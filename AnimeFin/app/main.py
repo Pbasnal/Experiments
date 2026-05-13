@@ -24,7 +24,12 @@ def create_app(config: AppConfig | None = None) -> Flask:
     jobs_store = JobsStore(cfg.database_path)
     anime_source = AnimeSourceService(cfg.allanime_api, cfg.allanime_referer, cfg.user_agent)
     media_store = MediaStore(cfg.downloads_dir)
-    downloads = DownloadService(jobs_store, cfg.downloads_dir, cfg.ani_cli_path)
+    downloads = DownloadService(
+        jobs_store,
+        cfg.downloads_dir,
+        cfg.ani_cli_path,
+        cfg.animepahe_dl_exe,
+    )
     downloads.start()
 
     app.extensions["jobs_store"] = jobs_store

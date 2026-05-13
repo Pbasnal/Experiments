@@ -16,6 +16,17 @@
     <section class="card">
       <h2>Search Shows</h2>
       <div class="row">
+        <label for="downloader">Downloader</label>
+        <select id="downloader" aria-label="Downloader">
+          <option value="ani_cli" selected>ani-cli (AllAnime)</option>
+          <option value="animepahe_dl">animepahe-dl (AnimePahe)</option>
+        </select>
+      </div>
+      <p id="downloader-hint" class="hint">
+        Search and episode list use AllAnime. Choose <strong>animepahe-dl</strong> only if you enqueue with a title
+        that matches AnimePahe (episode numbers may differ from the list below).
+      </p>
+      <div class="row">
         <input id="query" type="text" placeholder="Search title" />
         <select id="mode">
           <option value="dub" selected>dub</option>
@@ -31,7 +42,7 @@
       <h2>Episode Selection</h2>
       <div class="row">
         <input id="show-id" type="text" placeholder="Show id (auto-filled)" readonly />
-        <input id="show-title" type="text" placeholder="Show title (auto-filled)" readonly />
+        <input id="show-title" type="text" placeholder="Show title (edit for AnimePahe if needed)" />
         <button id="load-episodes-btn">Load Episodes</button>
       </div>
       <p class="hint">Enter episodes as comma-separated values (example: <code>1,2,3</code>).</p>

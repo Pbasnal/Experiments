@@ -3,6 +3,7 @@ FROM python:3.12-slim-bookworm
 WORKDIR /opt/rough
 
 # Runtime tools for ani-cli and download executors (yt-dlp / ffmpeg / aria2).
+# nodejs: required by animepahe-dl CLI (check_dependencies looks for `node` on PATH).
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -13,12 +14,20 @@ RUN apt-get update \
     sed \
     openssl \
     aria2 \
+    nodejs \
+  && (command -v node >/dev/null || ln -sf /usr/bin/nodejs /usr/local/bin/node) \
   && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /opt/rough/requirements.txt
+COPY requirements-docker.txt /opt/rough/requirements-docker.txt
+COPY docker/patches/anime_downloader_init_headless.py /opt/rough/docker/patches/anime_downloader_init_headless.py
+# animepahe-dl is installed with --no-deps so pip does not pull PyQt6 (no GUI in container;
+# PyQt6 often lacks wheels on linux/arm64 and would require Qt/qmake to build).
+# Overwrite site-packages __init__.py: upstream imports .gui eagerly; vendored copy wraps it in try/except.
 RUN pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir -r /opt/rough/requirements.txt \
-  && pip install --no-cache-dir yt-dlp
+  && pip install --no-cache-dir -r /opt/rough/requirements-docker.txt \
+  && pip install --no-cache-dir --no-deps "animepahe-dl==5.10.0" \
+  && cp /opt/rough/docker/patches/anime_downloader_init_headless.py \
+    "$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/anime_downloader/__init__.py"
 
 COPY app /opt/rough/app
 COPY app.py /opt/rough/app.py

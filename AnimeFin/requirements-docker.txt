@@ -1,0 +1,17 @@
+# Image runtime only (Flask app + headless downloaders).
+# animepahe-dl declares PyQt6, but its CLI path does not import the GUI; PyQt6
+# often has no wheel on linux/arm64 and then tries to compile against qmake.
+# Install runtime deps explicitly, then the package with --no-deps (see Dockerfile).
+flask>=3.0.0
+yt-dlp>=2024.1.0
+beautifulsoup4>=4.14.3
+pyfzf>=0.3.0
+pycryptodome>=3.19.0
+tqdm>=4.66.0
+urllib3>=2.6.1
+platformdirs>=4.0.0
+loguru>=0.7.0
+plyer>=2.1.0
+questionary>=2.0.0
+rich>=13.0.0
+typer>=0.9.0

@@ -1,2 +1,5 @@
 flask>=3.0.0
 pytest>=8.0.0
+yt-dlp>=2024.1.0
+# Optional (AnimePahe tool / local ANIMEPAHE_DL): pip install animepahe-dl
+# Docker installs animepahe-dl without PyQt6 — see requirements-docker.txt + Dockerfile.
