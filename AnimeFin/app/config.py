@@ -13,6 +13,8 @@ class AppConfig:
     database_path: Path
     ani_cli_path: Path
     animepahe_dl_exe: Path | None
+    """HOME for animepahe-dl subprocess; config at ~/.config/animepahe-dl/config.json under it."""
+    animepahe_runtime_home: Path
     allanime_api: str
     allanime_referer: str
     user_agent: str
@@ -42,12 +44,18 @@ def load_config() -> AppConfig:
     downloads_dir.mkdir(parents=True, exist_ok=True)
     database_path.parent.mkdir(parents=True, exist_ok=True)
 
+    animepahe_runtime_home = Path(
+        os.getenv("ANIMEPAHE_DL_HOME", database_path.parent / "animepahe-runtime")
+    ).expanduser().resolve()
+    animepahe_runtime_home.mkdir(parents=True, exist_ok=True)
+
     return AppConfig(
         base_dir=base_dir,
         downloads_dir=downloads_dir,
         database_path=database_path,
         ani_cli_path=ani_cli_path,
         animepahe_dl_exe=_resolve_animepahe_dl_exe(),
+        animepahe_runtime_home=animepahe_runtime_home,
         allanime_api=os.getenv("ALLANIME_API", "https://api.allanime.day/api"),
         allanime_referer=os.getenv("ALLANIME_REFERER", "https://allmanga.to"),
         user_agent=os.getenv(

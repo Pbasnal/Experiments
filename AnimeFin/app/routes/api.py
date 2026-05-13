@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from flask import Blueprint, current_app, jsonify, request
 
+from app.services.animepahe_config import read_animepahe_settings, write_animepahe_base_url
+
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -11,6 +13,24 @@ def _services():
     downloads = current_app.extensions["downloads"]
     media = current_app.extensions["media"]
     return anime_source, downloads, media
+
+
+@api_bp.get("/settings/animepahe")
+def get_animepahe_settings():
+    cfg = current_app.config["APP_CONFIG"]
+    return jsonify(read_animepahe_settings(cfg.animepahe_runtime_home))
+
+
+@api_bp.put("/settings/animepahe")
+def put_animepahe_settings():
+    cfg = current_app.config["APP_CONFIG"]
+    body = request.get_json(force=True) or {}
+    base_url = (body.get("base_url") or "").strip()
+    try:
+        result = write_animepahe_base_url(cfg.animepahe_runtime_home, base_url)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify(result)
 
 
 @api_bp.get("/health")

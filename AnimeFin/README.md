@@ -58,10 +58,13 @@ Then open:
     - `episodes` (required array)
     - `mode` (`sub` or `dub`)
     - `quality` (default `best`)
+    - `downloader` (`ani_cli` or `animepahe_dl`; default `ani_cli`)
     - optional direct-source fields:
       - `source_url`
       - `source_type` (`m3u8_ffmpeg` or `mp4_aria2`; defaults to yt-dlp flow for direct url)
       - `referer`
+- `GET /api/settings/animepahe` — current AnimePahe `base_url` and `config_path` (for animepahe-dl)
+- `PUT /api/settings/animepahe` — body `{ "base_url": "https://..." }` (http/https only)
 - `GET /api/downloads`
 - `GET /api/downloads/<job_id>`
 - `DELETE /api/downloads/<job_id>` (cancel queued/running job)
@@ -99,6 +102,7 @@ In Jellyfin, add a library with folder **`/media/downloads`**.
 
 Persistent data:
 - Flask SQLite and app data: `./data/app-data`
+- AnimePahe-dl domain config: under `./data/app-data/animepahe-runtime/` when using `ANIMEPAHE_DL_HOME=/data/animepahe-runtime` (see compose file); editable from the home page.
 - Jellyfin config: `./data/jellyfin-config`
 - Jellyfin cache: `./data/jellyfin-cache`
 
@@ -111,5 +115,4 @@ docker compose   --project-directory .   -f scripts/jellyfin-docker-compose.yml 
 ```
 
 ## Get latest for submodules
-
 `git submodule update --recursive --remote`

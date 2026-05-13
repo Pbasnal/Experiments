@@ -11,16 +11,25 @@ class MediaStore:
 
     def list_media(self) -> list[dict[str, str]]:
         items: list[dict[str, str]] = []
-        for path in sorted(self.downloads_root.glob("**/*"), key=lambda p: str(p).lower()):
-            if path.is_dir():
+        root = self.downloads_root
+        try:
+            candidates = sorted(root.rglob("*"), key=lambda p: str(p).lower())
+        except OSError:
+            return items
+        for path in candidates:
+            try:
+                if not path.is_file():
+                    continue
+                resolved = path.resolve()
+                rel = resolved.relative_to(root)
+            except (ValueError, OSError, RuntimeError):
                 continue
-            rel = path.relative_to(self.downloads_root)
             media_id = rel.as_posix()
             items.append(
                 {
                     "media_id": media_id,
                     "show": rel.parts[0] if rel.parts else "unknown",
-                    "path": str(path),
+                    "path": str(resolved),
                 }
             )
         return items

@@ -107,6 +107,40 @@ async function initSearchPage() {
       outputEl.textContent = error.message;
     }
   });
+
+  const animepaheBaseEl = byId("animepahe-base-url");
+  const animepaheSaveBtn = byId("animepahe-save-base");
+  const animepahePathEl = byId("animepahe-config-path");
+  const animepaheOutEl = byId("animepahe-settings-output");
+  if (animepaheBaseEl && animepaheSaveBtn) {
+    async function loadAnimepaheSettings() {
+      try {
+        const s = await getJson("/api/settings/animepahe");
+        animepaheBaseEl.value = s.base_url || "";
+        if (animepahePathEl) {
+          animepahePathEl.textContent = s.config_path ? `Config file: ${s.config_path}` : "";
+        }
+        if (animepaheOutEl) animepaheOutEl.textContent = "";
+      } catch (error) {
+        if (animepaheOutEl) animepaheOutEl.textContent = error.message;
+      }
+    }
+    animepaheSaveBtn.addEventListener("click", async () => {
+      if (animepaheOutEl) animepaheOutEl.textContent = "";
+      try {
+        await getJson("/api/settings/animepahe", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ base_url: animepaheBaseEl.value.trim() }),
+        });
+        if (animepaheOutEl) animepaheOutEl.textContent = "Saved.";
+        await loadAnimepaheSettings();
+      } catch (error) {
+        if (animepaheOutEl) animepaheOutEl.textContent = error.message;
+      }
+    });
+    await loadAnimepaheSettings();
+  }
 }
 
 async function initDownloadsPage() {
@@ -119,9 +153,10 @@ async function initDownloadsPage() {
   const jobEvents = byId("job-events");
 
   async function refreshJobs() {
-    const data = await getJson("/api/downloads");
-    jobsBody.innerHTML = "";
-    data.jobs.forEach((job) => {
+    try {
+      const data = await getJson("/api/downloads");
+      jobsBody.innerHTML = "";
+      (data.jobs || []).forEach((job) => {
       const tr = document.createElement("tr");
       const progress = typeof job.progress_pct === "number" ? `${job.progress_pct.toFixed(1)}%` : "0%";
       const dl = job.downloader === "animepahe_dl" ? "animepahe-dl" : "ani-cli";
@@ -158,35 +193,49 @@ async function initDownloadsPage() {
 
       jobsBody.appendChild(tr);
     });
+    } catch (error) {
+      jobsBody.innerHTML = "";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="7">${error.message}</td>`;
+      jobsBody.appendChild(tr);
+    }
   }
 
   async function refreshMedia() {
-    const data = await getJson("/api/media");
-    mediaList.innerHTML = "";
-    if (!data.items.length) {
-      mediaList.innerHTML = "<li>No downloaded files yet.</li>";
-      return;
-    }
-    data.items.forEach((item) => {
-      const li = document.createElement("li");
-      const button = document.createElement("button");
-      button.textContent = "Delete";
-      button.addEventListener("click", async () => {
-        if (!window.confirm(`Delete ${item.media_id}?`)) return;
-        await getJson(`/api/media/${encodeURIComponent(item.media_id)}`, { method: "DELETE" });
-        await refreshMedia();
+    try {
+      const data = await getJson("/api/media");
+      mediaList.innerHTML = "";
+      if (!data.items.length) {
+        mediaList.innerHTML = "<li>No downloaded files yet.</li>";
+        return;
+      }
+      data.items.forEach((item) => {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.textContent = "Delete";
+        button.addEventListener("click", async () => {
+          if (!window.confirm(`Delete ${item.media_id}?`)) return;
+          await getJson(`/api/media/${encodeURIComponent(item.media_id)}`, { method: "DELETE" });
+          await refreshMedia();
+        });
+        li.innerHTML = `<code>${item.media_id}</code> `;
+        li.appendChild(button);
+        mediaList.appendChild(li);
       });
-      li.innerHTML = `<code>${item.media_id}</code> `;
-      li.appendChild(button);
+    } catch (error) {
+      mediaList.innerHTML = "";
+      const li = document.createElement("li");
+      li.textContent = `Could not load media list: ${error.message}`;
       mediaList.appendChild(li);
-    });
+    }
   }
 
   refreshJobsBtn.addEventListener("click", refreshJobs);
   refreshMediaBtn.addEventListener("click", refreshMedia);
-  await refreshJobs();
   await refreshMedia();
+  await refreshJobs();
   setInterval(refreshJobs, 2000);
+  setInterval(refreshMedia, 5000);
 }
 
 initSearchPage();

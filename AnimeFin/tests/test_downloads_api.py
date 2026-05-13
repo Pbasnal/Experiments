@@ -56,6 +56,7 @@ def _build_test_app(tmp_path):
         database_path=tmp_path / "jobs.sqlite3",
         ani_cli_path=tmp_path / "ani-cli",
         animepahe_dl_exe=None,
+        animepahe_runtime_home=tmp_path / "animepahe-home",
         allanime_api="https://example.test",
         allanime_referer="https://example.test",
         user_agent="test-agent",
@@ -106,6 +107,31 @@ def test_routes_default_mode_to_dub(tmp_path):
         },
     )
     assert create_res.status_code == 202
+
+
+def test_animepahe_settings_get_put(tmp_path):
+    app = _build_test_app(tmp_path)
+    client = app.test_client()
+    get_res = client.get("/api/settings/animepahe")
+    assert get_res.status_code == 200
+    body = get_res.get_json()
+    assert "base_url" in body
+    assert "config_path" in body
+    assert Path(body["config_path"]).name == "config.json"
+
+    put_res = client.put("/api/settings/animepahe", json={"base_url": "https://animepahe.example"})
+    assert put_res.status_code == 200
+    assert put_res.get_json()["base_url"] == "https://animepahe.example"
+
+    get2 = client.get("/api/settings/animepahe")
+    assert get2.get_json()["base_url"] == "https://animepahe.example"
+
+
+def test_animepahe_settings_put_validation(tmp_path):
+    app = _build_test_app(tmp_path)
+    client = app.test_client()
+    bad = client.put("/api/settings/animepahe", json={"base_url": "ftp://x"})
+    assert bad.status_code == 400
 
 
 def test_download_rejects_invalid_downloader(tmp_path):

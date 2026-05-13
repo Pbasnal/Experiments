@@ -40,11 +40,13 @@ class DownloadService:
         downloads_root: Path,
         ani_cli_path: Path,
         animepahe_dl_exe: Path | None,
+        animepahe_runtime_home: Path,
     ) -> None:
         self.jobs_store = jobs_store
         self.downloads_root = downloads_root
         self.ani_cli_path = ani_cli_path
         self.animepahe_dl_exe = animepahe_dl_exe
+        self.animepahe_runtime_home = animepahe_runtime_home.resolve()
         self._queue: queue.Queue[str] = queue.Queue()
         self._cancelled: set[str] = set()
         self._lock = threading.Lock()
@@ -153,6 +155,7 @@ class DownloadService:
         env = {**os.environ, "ANI_CLI_DOWNLOAD_DIR": str(show_dir)}
         if downloader == "animepahe_dl":
             env["DOWNLOAD_DIR"] = str(show_dir)
+            env["HOME"] = str(self.animepahe_runtime_home)
         if not source_url and not env.get("TERM"):
             env["TERM"] = "dumb"
 

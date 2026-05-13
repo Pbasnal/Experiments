@@ -13,6 +13,21 @@
     <h1>Flask Anime Downloader</h1>
     <p class="hint">Downloads root: <code>{{ downloads_dir }}</code></p>
 
+    <section class="card" id="animepahe-settings-card">
+      <h2>AnimePahe domain (animepahe-dl)</h2>
+      <p class="hint">
+        Base URL used when downloader is <strong>animepahe-dl</strong>. Written to the server config file below;
+        persists across restarts if <code>ANIMEPAHE_DL_HOME</code> points at a mounted volume (see README).
+      </p>
+      <div class="row">
+        <label for="animepahe-base-url">Base URL</label>
+        <input id="animepahe-base-url" type="url" placeholder="https://animepahe.com" />
+        <button id="animepahe-save-base" type="button">Save</button>
+      </div>
+      <p id="animepahe-config-path" class="hint"></p>
+      <pre id="animepahe-settings-output"></pre>
+    </section>
+
     <section class="card">
       <h2>Search Shows</h2>
       <div class="row">

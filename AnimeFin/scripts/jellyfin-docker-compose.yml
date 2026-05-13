@@ -19,7 +19,11 @@ services:
       - DOWNLOADS_DIR=/media/downloads
       - DATABASE_PATH=/data/jobs.sqlite3
       - ANI_CLI_PATH=/opt/rough/ani-cli/ani-cli
-      # animepahe-dl is on PATH when installed via requirements.txt; override with absolute path if needed
+      # animepahe-dl: synthetic HOME so config.json lives on the /data volume (persists restarts)
+      - ANIMEPAHE_DL_HOME=/data/animepahe-runtime
+      # optional: default base_url only when config.json is first created
+      # - ANIMEPAHE_BASE_URL=https://animepahe.com
+      # animepahe-dl is on PATH; override with absolute path if needed
       # - ANIMEPAHE_DL=/usr/local/bin/animepahe-dl
 
   jellyfin:

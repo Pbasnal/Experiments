@@ -6,6 +6,7 @@ from app.config import AppConfig, load_config
 from app.routes.api import api_bp
 from app.routes.ui import ui_bp
 from app.services.anime_source import AnimeSourceService
+from app.services.animepahe_config import ensure_default_animepahe_config
 from app.services.downloads import DownloadService
 from app.storage.jobs import JobsStore
 from app.storage.media import MediaStore
@@ -13,6 +14,7 @@ from app.storage.media import MediaStore
 
 def create_app(config: AppConfig | None = None) -> Flask:
     cfg = config or load_config()
+    ensure_default_animepahe_config(cfg.animepahe_runtime_home)
     app = Flask(
         __name__,
         template_folder=str(cfg.base_dir / "app" / "templates"),
@@ -29,6 +31,7 @@ def create_app(config: AppConfig | None = None) -> Flask:
         cfg.downloads_dir,
         cfg.ani_cli_path,
         cfg.animepahe_dl_exe,
+        cfg.animepahe_runtime_home,
     )
     downloads.start()
 
