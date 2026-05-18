@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Screen Time Guardian</string>
+    <string name="accessibility_service_description">Monitors current app and opens lock screen when time limit is exceeded.</string>
+</resources>
