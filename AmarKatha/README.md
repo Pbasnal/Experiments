@@ -2,34 +2,34 @@
 
 A Flask-based web application for Indian comic creators and readers, built to test if Indian comic creators and readers want a platform that prioritizes storytelling quality, creator-first tools, and consistent discovery.
 
-## 🎯 MVP Goal
+## Project status
+
+**This README is for setup and orientation.** For an accurate feature-by-feature status (what works, what is broken, what is planned), see:
+
+- **[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)** — source of truth (updated May 2026)
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — structure and stack
+- **[docs/README.md](docs/README.md)** — index of all documentation
+
+**Short version:** early prototype (~40% of MVP). Creator dashboard and data models are largely in place; the **reader path** (chapter viewing, search UI, follow/rate/comment) and several **templates** are still missing. Do not assume features listed below are fully working until confirmed in the status doc.
+
+## MVP goal
 
 "To test if Indian comic creators and readers want a platform that prioritizes storytelling quality, creator-first tools, and consistent discovery."
 
-## ✅ Core MVP Features Implemented
+See [docs/product/mvp-goal.md](docs/product/mvp-goal.md) for the full must-have vs deferred list.
 
-### 1. Reader App – Discovery & Reading
-- **🖼️ Home feed** (Trending + New + Editor Picks) - Let readers discover good content quickly
-- **📚 Comic viewer** (vertical scroll) - Mobile-first reading experience
-- **🔍 Search + Genre Filters** - Explore by themes like "Shonen", "Romance", "Drama"
-- **➕ Follow/Subscribe to comics** - Builds user–series relationship
+## Implementation snapshot (high level)
 
-### 2. Creator Dashboard – Upload & Schedule
-- **🖋️ Upload chapter** (image upload) - Basic creator publishing capability
-- **📆 Set chapter schedule** (e.g., weekly) - Validates habit-forming behavior
-- **👤 Simple creator profile page** - Creates brand space for each artist
+| Area | Status |
+|------|--------|
+| Auth (register, login, become creator, optional Google OAuth) | Mostly working |
+| Creator dashboard, series, comic CRUD | Mostly working |
+| Chapter upload routes | Routes exist; some templates missing |
+| Reader home / detail / search / chapter reader | Incomplete or broken |
+| Follow, rate, comment, view analytics | Models only; routes not wired |
+| Admin moderation UI | Routes exist; most templates missing |
 
-### 3. Community & Feedback
-- **💬 Comment system** (per chapter) - Enables reader–creator interaction
-- **⭐️ Simple rating** (1–5 stars) - Collect quality signals for ranking
-
-### 4. Discovery Boost Controls
-- **🎖️ "Editor's Picks" slot** - Manual control to promote high-quality titles
-- **📈 Trending algorithm** (based on read + dwell time) - Gives momentum to good content
-
-### 5. Basic Admin Tools
-- **⚠️ Content moderation** (basic report & remove) - Keeps platform clean
-- **🧠 Data dashboard** (simple metrics) - Tracks reads, subscriptions, ratings, drop-off
+Details: [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 ## 🛠️ Technology Stack
 
@@ -41,174 +41,45 @@ A Flask-based web application for Indian comic creators and readers, built to te
 - **Containerization**: Docker & Docker Compose
 - **Caching**: Redis (optional)
 
-## 🐳 Docker Setup (Recommended)
+## Docker (recommended for local testing)
 
-### Prerequisites
-- Docker Desktop for macOS
-- Git
+One file: **`docker-compose.yml`** — PostgreSQL, Flask app, Redis.
 
-### Quick Start with Docker
+Full guide: **[docs/docker.md](docs/docker.md)**
 
-1. **Clone and setup**
-   ```bash
-   git clone <repository-url>
-   cd AmarKatha
-   ```
+### Quick start
 
-2. **Run the setup script**
-   ```bash
-   ./setup.sh
-   ```
-
-3. **Access the application**
-   - HTTP (redirects to HTTPS): http://localhost:5000
-   - HTTPS: https://localhost:5002
-   - Creator dashboard: https://localhost:5002/creator/dashboard
-   - Admin panel: https://localhost:5002/admin/dashboard
-
-**Note**: You'll see a browser warning about the self-signed certificate. This is normal for development. Click "Advanced" and "Proceed to localhost".
-
-### 🔐 HTTPS Setup (Recommended for OAuth)
-
-For Google OAuth and other features that require HTTPS:
-
-1. **Generate SSL certificates**
-   ```bash
-   ./generate_ssl_cert.sh
-   ```
-
-2. **Start with HTTPS**
-   ```bash
-   ./scripts/start.sh start-https
-   ```
-
-3. **Access the application**
-   - HTTP (redirects to HTTPS): http://localhost:5000
-   - HTTPS: https://localhost:5002
-   - Creator dashboard: https://localhost:5002/creator/dashboard
-   - Admin panel: https://localhost:5002/admin/dashboard
-
-4. **Update Google OAuth settings**
-   - Add `https://localhost:5002` to Authorized JavaScript origins
-   - Add `https://localhost:5002/google/authorized` to Authorized redirect URIs
-
-**Note**: You'll see a browser warning about the self-signed certificate. This is normal for development. Click "Advanced" and "Proceed to localhost".
-
-### Docker Scripts
-
-#### Main Setup Script
 ```bash
-# Full setup with admin user creation
+git clone <repository-url>
+cd AmarKatha
 ./setup.sh
-
-# Setup without admin user creation
-./setup.sh --skip-admin
-
-# Production setup
-./setup.sh --prod
-
-# Show help
-./setup.sh --help
 ```
 
-#### Quick Management Script
+Open **http://localhost:5000** (creator dashboard: `/creator/dashboard`).
+
+### Common commands
+
 ```bash
-# Start the application (HTTPS by default)
-./scripts/start.sh start
-
-# Start with HTTP only
-./scripts/start.sh start-http
-
-# Start with HTTPS explicitly
-./scripts/start.sh start-https
-
-# Stop the application
+./scripts/start.sh start      # docker compose up -d
 ./scripts/start.sh stop
-
-# Restart the application
-./scripts/start.sh restart
-
-# Restart with HTTPS
-./scripts/start.sh restart-https
-
-# View logs
 ./scripts/start.sh logs
-
-# View HTTPS logs
-./scripts/start.sh logs-https
-
-# Check status
-./scripts/start.sh status
-
-# Check HTTPS status
-./scripts/start.sh status-https
-
-# Rebuild containers
-./scripts/start.sh build
-
-# Rebuild with HTTPS
-./scripts/start.sh build-https
-
-# Check SSL certificates
-./scripts/start.sh ssl-check
-
-# Clean everything
-./scripts/start.sh clean
+./scripts/dev.sh help         # db shell, migrations, backup, etc.
 ```
 
-#### Development Script
+Or directly:
+
 ```bash
-# Open Flask shell
-./scripts/dev.sh shell
-
-# Open database shell
-./scripts/dev.sh db-shell
-
-# Initialize database
-./scripts/dev.sh init-db
-
-# Create admin user
-./scripts/dev.sh create-admin
-
-# View web logs
-./scripts/dev.sh logs-web
-
-# View database logs
-./scripts/dev.sh logs-db
-
-# Create database backup
-./scripts/dev.sh backup
-
-# Restore database
-./scripts/dev.sh restore backup_file.sql
-
-# Show all commands
-./scripts/dev.sh help
+docker compose up --build -d
+docker compose exec web flask init-db
+docker compose down
 ```
 
-### Manual Docker Commands
-
-If you prefer to run Docker commands manually:
+### Without the setup script
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# Build and start
-docker-compose up --build -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-
-# Access database
-docker-compose exec postgres psql -U amarkatha_user -d amarkatha
-
-# Run Flask commands
-docker-compose exec web flask init-db
-docker-compose exec web flask create-admin
+cp env.example .env
+docker compose up --build -d
+docker compose exec web flask init-db
 ```
 
 ## 📁 Project Structure
@@ -226,17 +97,16 @@ AmarKatha/
 │   ├── static/
 │   │   └── uploads/         # Uploaded images
 │   └── templates/           # HTML templates
+├── docs/                    # All project documentation
 ├── scripts/
-│   ├── start.sh             # Quick start/stop script
-│   └── dev.sh               # Development tasks script
-├── docker-compose.yml       # Main Docker Compose config
-├── docker-compose.override.yml  # Development overrides
-├── docker-compose.prod.yml  # Production overrides
-├── Dockerfile               # Flask app container
-├── setup.sh                 # Main setup script
-├── requirements.txt         # Python dependencies
-├── run.py                   # Application entry point
-└── README.md               # This file
+│   ├── start.sh             # Docker start/stop
+│   └── dev.sh               # Dev tasks (shell, DB, migrate)
+├── docker-compose.yml       # Local dev stack (only compose file)
+├── Dockerfile
+├── setup.sh                 # First-time Docker setup
+├── requirements.txt
+├── run.py
+└── README.md
 ```
 
 ## 🚀 Traditional Setup (Without Docker)
@@ -336,33 +206,34 @@ For Google OAuth and other features that require HTTPS:
 - **Scheduling**: Chapters can be scheduled for future publication
 - **Editor Picks**: Manual curation system for quality content
 
-## 🎨 Key Routes
+## Key routes
 
-### Reader Routes (`/`)
-- `GET /` - Home feed with trending, new, and editor picks
-- `GET /search` - Search comics with genre filters
-- `GET /comic/<id>` - Comic detail page
-- `GET /comic/<id>/chapter/<id>` - Chapter viewer
-- `POST /comic/<id>/follow` - Follow/unfollow comic
-- `POST /comic/<id>/rate` - Rate comic (1-5 stars)
-- `POST /chapter/<id>/rate` - Rate chapter (1-5 stars)
-- `POST /chapter/<id>/comment` - Add comment to chapter
+Routes marked *planned* are documented targets but not implemented in `app/routes/` yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
-### Creator Routes (`/creator`)
-- `GET /creator/dashboard` - Creator overview and stats
-- `GET /creator/comic/new` - Create new comic
-- `GET /creator/comic/<id>/edit` - Edit comic details
-- `GET /creator/comic/<id>/chapter/new` - Upload new chapter
-- `GET /creator/comic/<id>/chapter/<id>/edit` - Edit chapter and upload pages
-- `GET /creator/profile` - Edit creator profile
-- `GET /creator/schedule` - Manage chapter schedule
+### Reader routes (`/`)
+- `GET /` - Home (trending / new / editor picks logic present; template wiring incomplete)
+- `GET /search` - Search (route present; template missing)
+- `GET /comic/<id>` - Comic detail (route present; template missing)
+- `GET /comic/<id>/chapter/<id>` - Chapter viewer *(planned)*
+- `POST /comic/<id>/follow` - Follow/unfollow *(planned)*
+- `POST /comic/<id>/rate` - Rate comic *(planned)*
+- `POST /chapter/<id>/rate` - Rate chapter *(planned)*
+- `POST /chapter/<id>/comment` - Comment *(planned)*
 
-### Admin Routes (`/admin`)
-- `GET /admin/dashboard` - Admin overview and metrics
-- `GET /admin/comics` - Manage all comics
-- `GET /admin/comments` - Moderate comments
-- `GET /admin/users` - Manage users
-- `GET /admin/analytics` - Detailed analytics dashboard
+### Creator routes (`/creator`) — largely implemented
+- `GET /creator/dashboard` - Overview and stats
+- `GET /creator/comic/new` - Create comic
+- `GET /creator/comic/<id>/edit` - Edit comic
+- `GET /creator/comic/<id>/chapter/new` - New chapter (template missing)
+- `GET /creator/comic/<id>/chapter/<id>/edit` - Edit chapter / upload pages (template missing)
+- `GET /creator/profile` - Profile (template missing)
+- `GET /creator/schedule` - Schedule (template missing)
+- Series routes: `/creator/series/new`, `/creator/series/<id>`, etc.
+
+### Admin routes (`/admin`) — backend present; most templates missing
+- `GET /admin/dashboard`, `/admin/comics`, `/admin/comments`, `/admin/analytics`
+- `GET /admin/users` - Works (template exists)
+- Access: currently any `is_artist` user (no separate admin flag)
 
 ## 🧪 Validation Metrics
 
@@ -403,16 +274,8 @@ python run.py
 ```
 
 ### Production
-```bash
-# Using Docker
-./setup.sh --prod
 
-# Traditional
-1. Set `FLASK_ENV=production`
-2. Use a production WSGI server (Gunicorn, uWSGI)
-3. Configure a production database (PostgreSQL recommended)
-4. Set up proper file storage (AWS S3, Google Cloud Storage)
-```
+Use a managed PostgreSQL instance, Gunicorn (or similar) behind TLS, and object storage for uploads. The included `docker-compose.yml` is for **local development only** — see [docs/docker.md](docs/docker.md).
 
 ## 📈 Analytics & Insights
 

@@ -44,8 +44,8 @@ check_docker() {
         exit 1
     fi
     
-    if ! command_exists docker-compose; then
-        print_error "Docker Compose is not installed. Please install Docker Compose first."
+    if ! docker compose version >/dev/null 2>&1 && ! command_exists docker-compose; then
+        print_error "Docker Compose is not available. Install Docker Desktop (includes Compose v2)."
         exit 1
     fi
     
@@ -55,7 +55,16 @@ check_docker() {
         exit 1
     fi
     
-    print_success "Docker and Docker Compose are ready!"
+    print_success "Docker is ready!"
+}
+
+# Prefer "docker compose" (v2), fall back to docker-compose
+dc() {
+    if docker compose version >/dev/null 2>&1; then
+        docker compose "$@"
+    else
+        docker-compose "$@"
+    fi
 }
 
 # Function to create .env file
@@ -111,28 +120,12 @@ create_directories() {
     print_success "Directories created!"
 }
 
-# Function to generate SSL certificates
-generate_ssl_certificates() {
-    print_status "Checking SSL certificates..."
-    
-    if [ ! -f "ssl/localhost.crt" ] || [ ! -f "ssl/localhost.key" ]; then
-        print_status "Generating SSL certificates..."
-        ./generate_ssl_cert.sh
-        print_success "SSL certificates generated!"
-    else
-        print_success "SSL certificates already exist!"
-    fi
-}
-
 # Function to build and start containers
 start_containers() {
     print_status "Building and starting Docker containers..."
     
-    # Stop any existing containers
-    docker-compose down 2>/dev/null || true
-    
-    # Build and start containers
-    docker-compose up --build -d
+    dc down 2>/dev/null || true
+    dc up --build -d
     
     print_success "Containers started successfully!"
 }
@@ -145,7 +138,7 @@ wait_for_services() {
     print_status "Waiting for PostgreSQL..."
     timeout=60
     counter=0
-    while ! docker-compose exec -T postgres pg_isready -U amarkatha_user -d amarkatha >/dev/null 2>&1; do
+    while ! dc exec -T postgres pg_isready -U amarkatha_user -d amarkatha >/dev/null 2>&1; do
         sleep 2
         counter=$((counter + 2))
         if [ $counter -ge $timeout ]; then
@@ -155,11 +148,10 @@ wait_for_services() {
     done
     print_success "PostgreSQL is ready!"
     
-    # Wait for Flask app (check both HTTP and HTTPS)
     print_status "Waiting for Flask application..."
-    timeout=60
+    timeout=90
     counter=0
-    while ! curl -f http://localhost:5000/health >/dev/null 2>&1 && ! curl -k -f https://localhost:5002/health >/dev/null 2>&1; do
+    while ! curl -f http://localhost:5000/health >/dev/null 2>&1; do
         sleep 2
         counter=$((counter + 2))
         if [ $counter -ge $timeout ]; then
@@ -175,7 +167,7 @@ initialize_database() {
     print_status "Initializing database..."
     
     # Initialize database tables
-    docker-compose exec -T web flask init-db
+    dc exec -T web flask init-db
     
     print_success "Database initialized!"
 }
@@ -193,43 +185,38 @@ create_admin_user() {
     echo ""
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        docker-compose exec -T web flask create-admin
+        dc exec -T web flask create-admin
         print_success "Admin user created!"
     else
         print_warning "Skipping admin user creation. You can create one later with:"
-        print_warning "docker-compose exec web flask create-admin"
+        print_warning "docker compose exec web flask create-admin"
     fi
 }
 
 # Function to show status
 show_status() {
     print_status "Checking container status..."
-    docker-compose ps
+    dc ps
     
     echo ""
     print_success "AmarKatha is now running!"
     echo ""
-    echo -e "${GREEN}Access URLs:${NC}"
-    echo -e "  HTTP (redirects to HTTPS): ${BLUE}http://localhost:5000${NC}"
-    echo -e "  HTTPS: ${BLUE}https://localhost:5002${NC}"
-    echo -e "  Creator Dashboard: ${BLUE}https://localhost:5002/creator/dashboard${NC}"
-    echo -e "  Admin Panel: ${BLUE}https://localhost:5002/admin/dashboard${NC}"
+    echo -e "${GREEN}Access:${NC}"
+    echo -e "  App: ${BLUE}http://localhost:5000${NC}"
+    echo -e "  Creator dashboard: ${BLUE}http://localhost:5000/creator/dashboard${NC}"
+    echo -e "  Docs: ${BLUE}docs/docker.md${NC}"
     echo ""
-    print_warning "Note: You'll see a browser warning about the self-signed certificate."
-    print_warning "This is normal for development. Click 'Advanced' and 'Proceed to localhost'."
-    echo ""
-    echo -e "${GREEN}Useful Commands:${NC}"
-    echo -e "  View logs: ${BLUE}docker-compose logs -f${NC}"
-    echo -e "  Stop services: ${BLUE}docker-compose down${NC}"
-    echo -e "  Restart services: ${BLUE}docker-compose restart${NC}"
-    echo -e "  Access database: ${BLUE}docker-compose exec postgres psql -U amarkatha_user -d amarkatha${NC}"
+    echo -e "${GREEN}Useful commands:${NC}"
+    echo -e "  Logs: ${BLUE}docker compose logs -f web${NC}"
+    echo -e "  Stop: ${BLUE}docker compose down${NC}"
+    echo -e "  DB shell: ${BLUE}docker compose exec postgres psql -U amarkatha_user -d amarkatha${NC}"
     echo ""
 }
 
 # Function to clean up on error
 cleanup() {
     print_error "Setup failed. Cleaning up..."
-    docker-compose down 2>/dev/null || true
+    dc down 2>/dev/null || true
     exit 1
 }
 
@@ -246,7 +233,6 @@ main() {
     check_docker
     setup_environment
     create_directories
-    generate_ssl_certificates
     start_containers
     wait_for_services
     initialize_database
@@ -264,21 +250,14 @@ case "${1:-}" in
         echo "Options:"
         echo "  --help, -h     Show this help message"
         echo "  --skip-admin   Skip admin user creation"
-        echo "  --prod         Use production configuration"
         echo ""
         echo "Examples:"
         echo "  $0              # Full setup with admin user creation"
         echo "  $0 --skip-admin # Setup without admin user creation"
-        echo "  $0 --prod       # Production setup"
         exit 0
         ;;
     --skip-admin)
         SKIP_ADMIN=true
-        main
-        ;;
-    --prod)
-        print_status "Using production configuration..."
-        export COMPOSE_FILE="docker-compose.yml:docker-compose.prod.yml"
         main
         ;;
     "")

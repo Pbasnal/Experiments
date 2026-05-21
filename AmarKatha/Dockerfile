@@ -5,7 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=run.py
-ENV FLASK_ENV=production
+ENV FLASK_ENV=development
 
 # Set work directory
 WORKDIR /app
@@ -26,31 +26,20 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy project (.dockerignore excludes docs noise, .env, etc.)
 COPY . .
 
-# Copy Google credentials if they exist (will be ignored if not present)
-COPY google_credentials.json* ./
-COPY credentials.json* ./
-COPY client_secret.json* ./
-
-# Copy SSL certificates if they exist
-COPY ssl/ ./ssl/
-
-# Create uploads directory
-RUN mkdir -p app/static/uploads
+# Optional dirs for OAuth / HTTPS outside Docker (not required for compose HTTP)
+RUN mkdir -p app/static/uploads ssl
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Expose ports for both HTTP and HTTPS
-EXPOSE 5000 5002
+EXPOSE 5000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
-# Run the application with both HTTP and HTTPS
-CMD ["python", "start_server.py"] 
+CMD ["python", "run.py", "--host", "0.0.0.0", "--port", "5000"] 

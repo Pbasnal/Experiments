@@ -85,7 +85,7 @@ def main():
         print("2. Make sure your Google Cloud Console has these Authorized redirect URIs:")
         print("   - http://localhost:5000/auth/google/authorized")
         print("3. Restart your Docker containers:")
-        print("   docker-compose down && docker-compose up --build -d")
+        print("   docker compose down && docker compose up --build -d")
         return 0
     else:
         print("❌ Google OAuth is not configured!")

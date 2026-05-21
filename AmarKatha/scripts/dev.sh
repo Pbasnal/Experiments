@@ -28,51 +28,59 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+dc() {
+    if docker compose version >/dev/null 2>&1; then
+        docker compose "$@"
+    else
+        docker-compose "$@"
+    fi
+}
+
 case "${1:-help}" in
     shell)
         print_status "Opening Flask shell..."
-        docker-compose exec web flask shell
+        dc exec web flask shell
         ;;
     db-shell)
         print_status "Opening PostgreSQL shell..."
-        docker-compose exec postgres psql -U amarkatha_user -d amarkatha
+        dc exec postgres psql -U amarkatha_user -d amarkatha
         ;;
     init-db)
         print_status "Initializing database..."
-        docker-compose exec web flask init-db
+        dc exec web flask init-db
         print_success "Database initialized!"
         ;;
     create-admin)
         print_status "Creating admin user..."
-        docker-compose exec web flask create-admin
+        dc exec web flask create-admin
         ;;
     migrate)
         print_status "Running database migrations..."
-        docker-compose exec web flask db upgrade
+        dc exec web flask db upgrade
         ;;
     test)
         print_status "Running tests..."
-        docker-compose exec web python -m pytest
+        dc exec web python -m pytest
         ;;
     lint)
         print_status "Running linting..."
-        docker-compose exec web flake8 .
+        dc exec web flake8 .
         ;;
     format)
         print_status "Formatting code..."
-        docker-compose exec web black .
+        dc exec web black .
         ;;
     logs-web)
         print_status "Showing web container logs..."
-        docker-compose logs -f web
+        dc logs -f web
         ;;
     logs-db)
         print_status "Showing database logs..."
-        docker-compose logs -f postgres
+        dc logs -f postgres
         ;;
     backup)
         print_status "Creating database backup..."
-        docker-compose exec postgres pg_dump -U amarkatha_user amarkatha > backup_$(date +%Y%m%d_%H%M%S).sql
+        dc exec postgres pg_dump -U amarkatha_user amarkatha > backup_$(date +%Y%m%d_%H%M%S).sql
         print_success "Backup created!"
         ;;
     restore)
@@ -81,7 +89,7 @@ case "${1:-help}" in
             exit 1
         fi
         print_status "Restoring database from $2..."
-        docker-compose exec -T postgres psql -U amarkatha_user -d amarkatha < "$2"
+        dc exec -T postgres psql -U amarkatha_user -d amarkatha < "$2"
         print_success "Database restored!"
         ;;
     reset-db)
@@ -90,13 +98,13 @@ case "${1:-help}" in
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_status "Resetting database..."
-            docker-compose exec web flask init-db
+            dc exec web flask init-db
             print_success "Database reset!"
         fi
         ;;
     install-deps)
         print_status "Installing new dependencies..."
-        docker-compose exec web pip install -r requirements.txt
+        dc exec web pip install -r requirements.txt
         print_success "Dependencies installed!"
         ;;
     help)
