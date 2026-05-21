@@ -13,12 +13,23 @@ class Config:
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 
-    # Environment-specific settings
     FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
-    
-    # OAuth settings
-    OAUTH_INSECURE_TRANSPORT = os.environ.get('OAUTH_INSECURE_TRANSPORT', 
-        'true' if FLASK_ENV == 'development' else 'false').lower() == 'true'
+
+    # OAuth — HTTP allowed in dev when OAUTH_INSECURE_TRANSPORT=true
+    OAUTH_INSECURE_TRANSPORT = os.environ.get(
+        'OAUTH_INSECURE_TRANSPORT',
+        'true' if os.environ.get('FLASK_ENV', 'development') == 'development' else 'false',
+    ).lower() == 'true'
+
+    # Google OAuth (env vars override JSON file)
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
+    GOOGLE_OAUTH_CREDENTIALS_FILE = os.environ.get(
+        'GOOGLE_OAUTH_CREDENTIALS_FILE', 'google_credentials.json'
+    )
+
+    # Public base URL for OAuth redirect documentation (no trailing slash)
+    APP_BASE_URL = os.environ.get('APP_BASE_URL', 'http://localhost:5000')
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -28,7 +39,6 @@ class ProductionConfig(Config):
     DEBUG = False
     OAUTH_INSECURE_TRANSPORT = False
 
-# Factory to get the right config
 def get_config():
     env = os.environ.get('FLASK_ENV', 'development')
     if env == 'production':

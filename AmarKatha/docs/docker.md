@@ -53,7 +53,9 @@ Copy `env.example` to `.env`. For Docker, `DATABASE_URL` is set in `docker-compo
 
 ## Google OAuth (optional)
 
-OAuth needs HTTPS in production. For local HTTP testing, use email/password auth, or run the app outside Docker with `python run.py --https` after `./generate_ssl_cert.sh`. See root README “Traditional setup”.
+With `OAUTH_INSECURE_TRANSPORT=true` (default in compose), Google sign-in works over **HTTP** on port 5000.
+
+Setup: [oauth-google.md](./oauth-google.md) — redirect URI must be `http://localhost:5000/google/authorized`.
 
 ## Troubleshooting
 

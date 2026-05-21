@@ -6,6 +6,7 @@
 |----------|-------------|
 | [PROJECT_STATUS.md](./PROJECT_STATUS.md) | **What is built vs planned** — feature matrix and priorities |
 | [docker.md](./docker.md) | **Run locally with Docker** — single `docker-compose.yml` |
+| [oauth-google.md](./oauth-google.md) | **Google sign-in** — credentials and redirect URI |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | App structure, models, blueprints |
 
 ## Product
