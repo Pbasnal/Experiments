@@ -11,25 +11,44 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def index():
     """Home page with trending, new, and editor picks"""
-    # Get trending comics (based on views in last 7 days)
-    trending_comics = Comic.query.join(ViewLog).filter(
-        ViewLog.viewed_at >= datetime.utcnow() - timedelta(days=7)
-    ).group_by(Comic.id).order_by(
-        func.count(ViewLog.id).desc()
-    ).limit(10).all()
-    
-    # Get new comics (created in last 30 days)
-    new_comics = Comic.query.filter(
-        Comic.created_at >= datetime.utcnow() - timedelta(days=30)
-    ).order_by(Comic.created_at.desc()).limit(10).all()
-    
-    # Get editor picks (manually curated)
-    editor_picks = Comic.query.filter_by(is_editor_pick=True).limit(5).all()
-    
-    return render_template('index.html', 
-                         trending_comics=trending_comics,
-                         new_comics=new_comics,
-                         editor_picks=editor_picks)
+    published = Comic.query.filter_by(is_published=True)
+
+    # Trending: most views in the last 7 days (published only)
+    trending_comics = (
+        published.join(ViewLog)
+        .filter(ViewLog.viewed_at >= datetime.utcnow() - timedelta(days=7))
+        .group_by(Comic.id)
+        .order_by(func.count(ViewLog.id).desc())
+        .limit(8)
+        .all()
+    )
+
+    # New releases (published, last 30 days)
+    new_comics = (
+        published.filter(Comic.created_at >= datetime.utcnow() - timedelta(days=30))
+        .order_by(Comic.created_at.desc())
+        .limit(8)
+        .all()
+    )
+
+    # If nothing has views yet, show recent releases in the trending row
+    if not trending_comics:
+        trending_comics = new_comics[:8]
+
+    # Editor picks (published + flagged)
+    editor_picks = (
+        published.filter_by(is_editor_pick=True)
+        .order_by(Comic.updated_at.desc())
+        .limit(6)
+        .all()
+    )
+
+    return render_template(
+        'index.html',
+        trending_comics=trending_comics,
+        new_comics=new_comics,
+        editor_picks=editor_picks,
+    )
 
 @bp.route('/about')
 def about():
@@ -48,7 +67,7 @@ def redirect_to_https():
 def comic_detail(comic_id):
     comic = Comic.query.get_or_404(comic_id)
     chapters = Chapter.query.filter_by(comic_id=comic_id, is_published=True).order_by(Chapter.chapter_number).all()
-    return render_template('comic/detail.html', comic=comic, chapters=chapters)
+    return render_template('comic/view.html', comic=comic, chapters=chapters)
 
 @bp.route('/search')
 def search():

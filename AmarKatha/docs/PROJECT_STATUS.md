@@ -165,7 +165,7 @@ Peer review, print, paid subs, community doodle feed, advanced pacing analytics.
 
 - Default `SECRET_KEY` fallback in `config.py` — must override in production.
 - `.env` may exist locally; use `env.example` as template; do not commit secrets.
-- Upload limit 16MB; files stored on local disk (not S3).
+- Upload limit 500MB per request (configurable via `MAX_CONTENT_LENGTH`); files on local disk.
 - Redis in compose is optional; not required for current code paths.
 
 ---

@@ -200,7 +200,8 @@ def new_comic():
             schedule=schedule,
             content_type=content_type,
             cover_image=cover_image,
-            author_id=current_user.id
+            author_id=current_user.id,
+            is_published=True,
         )
         
         # Set series if provided

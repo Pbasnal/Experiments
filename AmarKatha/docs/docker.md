@@ -50,6 +50,7 @@ Copy `env.example` to `.env`. For Docker, `DATABASE_URL` is set in `docker-compo
 | `POSTGRES_USER` | `amarkatha_user` |
 | `POSTGRES_PASSWORD` | `amarkatha_password` |
 | `WEB_PORT` | `5000` |
+| `MAX_CONTENT_LENGTH` | `524288000` (500MB upload limit) |
 
 ## Google OAuth (optional)
 

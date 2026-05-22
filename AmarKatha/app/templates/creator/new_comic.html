@@ -70,7 +70,7 @@
                 <!-- Form Card -->
                 <div class="card">
                     <div class="card-body">
-                        <form method="POST" enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data" id="comicCreateForm" action="{{ request.path }}" data-max-upload-mb="{{ max_upload_mb }}">
                             <div class="row">
                                 <!-- Left Column - Basic Info -->
                                 <div class="col-lg-8">
@@ -238,13 +238,14 @@
                                     <div class="mb-3" id="imagesInputGroup">
                                         <label class="form-label">Comic Pages (Images)</label>
                                         <input type="file" class="form-control" name="pages" accept="image/*" multiple>
-                                        <div class="form-text">Select one or more images (PNG, JPG, JPEG, GIF).</div>
+                                        <div class="form-text">Select one or more images (PNG, JPG, JPEG, GIF). Up to {{ max_upload_mb }}MB total per upload.</div>
                                     </div>
 
                                     <!-- PDF upload -->
                                     <div class="mb-3" id="pdfInputGroup" style="display:none;">
                                         <label class="form-label">Comic as PDF</label>
                                         <input type="file" class="form-control" name="pdf_file" accept="application/pdf">
+                                        <div class="form-text">PDF up to {{ max_upload_mb }}MB.</div>
                                     </div>
                                 </div>
 
@@ -260,7 +261,7 @@
                                             <div class="upload-placeholder">
                                                 <i class="fas fa-cloud-upload-alt"></i>
                                                 <p>Upload Comic Cover</p>
-                                                <small>PNG, JPG, JPEG, GIF up to 5MB</small>
+                                                <small>PNG, JPG, JPEG, GIF (large files OK)</small>
                                             </div>
                                         </div>
                                         <input type="file" 
@@ -301,7 +302,7 @@
                                             <i class="fas fa-times"></i>
                                             Cancel
                                         </a>
-                                        <button type="submit" class="btn btn-primary btn-lg">
+                                        <button type="submit" class="btn btn-primary btn-lg" id="comicSubmitBtn">
                                             <i class="fas fa-plus-circle"></i>
                                             Create Comic
                                         </button>
@@ -315,6 +316,21 @@
         </div>
     </div>
 </div>
+</div>
+
+<!-- Upload progress overlay -->
+<div id="uploadProgressOverlay" class="upload-progress-overlay" hidden aria-hidden="true" role="dialog" aria-labelledby="uploadProgressTitle" aria-modal="true">
+    <div class="upload-progress-card">
+        <div class="upload-progress-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <h2 id="uploadProgressTitle" class="upload-progress-title">Uploading your files</h2>
+        <p id="uploadProgressMessage" class="upload-progress-message">Please keep this tab open while your comic is being uploaded.</p>
+        <div class="progress upload-progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="uploadProgressBarWrap">
+            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+        </div>
+        <p id="uploadProgressPercent" class="upload-progress-percent">0%</p>
+    </div>
 </div>
 
 <script>
@@ -393,6 +409,132 @@ const preselectedSeries = document.getElementById('series_id').value;
 if (preselectedSeries) {
     fetchSeriesDefaults(preselectedSeries);
 }
+
+// AJAX form submit with upload progress
+(function () {
+    const form = document.getElementById('comicCreateForm');
+    if (!form) return;
+
+    const overlay = document.getElementById('uploadProgressOverlay');
+    const messageEl = document.getElementById('uploadProgressMessage');
+    const titleEl = document.getElementById('uploadProgressTitle');
+    const bar = document.getElementById('uploadProgressBar');
+    const barWrap = document.getElementById('uploadProgressBarWrap');
+    const percentEl = document.getElementById('uploadProgressPercent');
+    const submitBtn = document.getElementById('comicSubmitBtn');
+    const cancelLink = form.querySelector('a[href*="dashboard"]');
+
+    function setProgress(percent, title, message) {
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        if (percent === null) {
+            bar.style.width = '100%';
+            bar.classList.add('progress-bar-animated', 'progress-bar-striped');
+            percentEl.textContent = '';
+            barWrap.setAttribute('aria-valuenow', '0');
+            return;
+        }
+        const clamped = Math.min(100, Math.max(0, percent));
+        bar.style.width = clamped + '%';
+        barWrap.setAttribute('aria-valuenow', String(clamped));
+        percentEl.textContent = clamped + '%';
+    }
+
+    function showOverlay() {
+        overlay.hidden = false;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('upload-in-progress');
+        if (submitBtn) submitBtn.disabled = true;
+        if (cancelLink) cancelLink.classList.add('pe-none', 'opacity-50');
+        setProgress(0, 'Uploading your files', 'Your files are being uploaded. Please keep this tab open.');
+    }
+
+    function hideOverlay() {
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('upload-in-progress');
+        if (submitBtn) submitBtn.disabled = false;
+        if (cancelLink) cancelLink.classList.remove('pe-none', 'opacity-50');
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        showOverlay();
+
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
+        let uploadFinished = false;
+
+        xhr.upload.addEventListener('progress', function (ev) {
+            if (ev.lengthComputable && ev.total > 0) {
+                const pct = Math.round((ev.loaded / ev.total) * 100);
+                if (pct >= 100) {
+                    uploadFinished = true;
+                    setProgress(100, 'Upload complete', 'Saving your comic on the server. This may take a moment for large files.');
+                } else {
+                    setProgress(
+                        pct,
+                        'Uploading your files',
+                        'Your files are being uploaded (' + formatBytes(ev.loaded) + ' of ' + formatBytes(ev.total) + '). Please keep this tab open.'
+                    );
+                }
+            } else {
+                setProgress(null, 'Uploading your files', 'Your files are being uploaded. Please keep this tab open.');
+            }
+        });
+
+        xhr.upload.addEventListener('load', function () {
+            if (!uploadFinished) {
+                uploadFinished = true;
+                setProgress(100, 'Upload complete', 'Saving your comic on the server. This may take a moment for large files.');
+            }
+        });
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status === 413) {
+                hideOverlay();
+                const maxMb = form.dataset.maxUploadMb || '{{ max_upload_mb }}';
+                alert('Upload too large. This server allows up to ' + maxMb + ' MB total per submit (all files combined). Try fewer pages per batch or a smaller file.');
+                return;
+            }
+            if (xhr.status >= 400) {
+                hideOverlay();
+                alert('Something went wrong while saving your comic. Please try again.');
+                return;
+            }
+
+            setProgress(100, 'Done', 'Redirecting…');
+            const target = xhr.responseURL || form.action;
+
+            if (target === window.location.href) {
+                document.open();
+                document.write(xhr.responseText);
+                document.close();
+            } else {
+                window.location.href = target;
+            }
+        });
+
+        xhr.addEventListener('error', function () {
+            hideOverlay();
+            alert('Network error during upload. Check your connection and try again.');
+        });
+
+        xhr.addEventListener('abort', function () {
+            hideOverlay();
+        });
+
+        xhr.open('POST', form.action || window.location.pathname);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(formData);
+    });
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+})();
 
 // Mobile menu functionality is now handled by the unified mobile menu in base.html
 </script>

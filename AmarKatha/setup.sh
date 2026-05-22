@@ -87,7 +87,7 @@ FLASK_DEBUG=1
 DATABASE_URL=postgresql://amarkatha_user:amarkatha_password@postgres:5432/amarkatha
 
 # File Upload Configuration
-MAX_CONTENT_LENGTH=16777216
+MAX_CONTENT_LENGTH=104857600
 UPLOAD_FOLDER=app/static/uploads
 
 # PostgreSQL Docker Configuration

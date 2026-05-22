@@ -34,7 +34,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-amarkatha_user}:${POSTGRES_PASSWORD:-amarkatha_password}@postgres:5432/${POSTGRES_DB:-amarkatha}
       SECRET_KEY: ${SECRET_KEY:-change-me-in-env}
       UPLOAD_FOLDER: /app/app/static/uploads
-      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH:-16777216}
+      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH:-104857600}
       OAUTH_INSECURE_TRANSPORT: ${OAUTH_INSECURE_TRANSPORT:-true}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:5000}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}

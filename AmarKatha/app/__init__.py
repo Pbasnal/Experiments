@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, flash, redirect, request, url_for
+from werkzeug.exceptions import RequestEntityTooLarge
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -20,6 +21,10 @@ def create_app(config_class=None):
 
     app.config.from_object(config_class)
 
+    # Docker / shell env overrides (bytes); keeps upload limit in sync with compose .env
+    if os.environ.get('MAX_CONTENT_LENGTH'):
+        app.config['MAX_CONTENT_LENGTH'] = int(os.environ['MAX_CONTENT_LENGTH'])
+
     if app.config['OAUTH_INSECURE_TRANSPORT']:
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     else:
@@ -39,11 +44,25 @@ def create_app(config_class=None):
 
     @app.context_processor
     def inject_auth_helpers():
+        max_mb = app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)
         return {
             'google_oauth_enabled': 'google' in app.blueprints,
+            'max_upload_mb': max_mb,
         }
 
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_upload_too_large(_error):
+        max_mb = app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)
+        flash(
+            f'Upload too large. This server allows up to {max_mb} MB per upload '
+            f'(all files in the form combined). Try fewer pages per batch or compress images.',
+            'error',
+        )
+        return redirect(request.referrer or url_for('creator.dashboard')), 413
+
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    limit_mb = app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)
+    print(f'Upload limit: {limit_mb} MB per request (MAX_CONTENT_LENGTH)')
 
     return app
 

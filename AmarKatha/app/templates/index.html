@@ -140,9 +140,9 @@
             </div>
         </div>
         
-        {% if comics %}
+        {% if trending_comics %}
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                {% for comic in comics[:8] %}
+                {% for comic in trending_comics %}
                 <div class="col">
                     <div class="card comic-card h-100">
                         {% if comic.cover_image %}
@@ -154,7 +154,7 @@
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ comic.title }}</h5>
-                            <p class="card-text text-muted small">{{ comic.description[:100] }}{% if comic.description|length > 100 %}...{% endif %}</p>
+                            <p class="card-text text-muted small">{% if comic.description %}{{ comic.description[:100] }}{% if comic.description|length > 100 %}...{% endif %}{% else %}No description yet.{% endif %}</p>
                             
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="rating-stars">
@@ -167,7 +167,7 @@
                                     {% endfor %}
                                     <small class="text-muted ms-1">({{ comic.rating_count }})</small>
                                 </div>
-                                <span class="badge bg-primary">{{ comic.genre }}</span>
+                                {% if comic.genre %}<span class="badge bg-primary">{{ comic.genre }}</span>{% endif %}
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center">
@@ -202,8 +202,46 @@
     </div>
 </section>
 
+<!-- New Releases -->
+{% if new_comics %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="h3 mb-3">
+                    <i class="fas fa-sparkles text-primary me-2"></i>New Releases
+                </h2>
+                <p class="text-muted">Fresh comics from Indian creators</p>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for comic in new_comics %}
+            <div class="col">
+                <div class="card comic-card h-100">
+                    {% if comic.cover_image %}
+                        <img src="{{ url_for('static', filename=comic.cover_image) }}" class="card-img-top comic-cover" alt="{{ comic.title }}">
+                    {% else %}
+                        <div class="card-img-top comic-cover bg-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ comic.title }}</h5>
+                        <p class="card-text text-muted small">{% if comic.description %}{{ comic.description[:100] }}{% if comic.description|length > 100 %}...{% endif %}{% else %}No description yet.{% endif %}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">by {{ comic.author.username }}</small>
+                            <a href="{{ url_for('main.comic_detail', comic_id=comic.id) }}" class="btn btn-sm btn-primary">Read Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Editor's Picks -->
-{% set editor_picks = comics|selectattr('is_editor_pick')|list %}
 {% if editor_picks %}
 <section class="py-5">
     <div class="container">
@@ -229,7 +267,7 @@
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ comic.title }}</h5>
-                        <p class="card-text text-muted small">{{ comic.description[:100] }}{% if comic.description|length > 100 %}...{% endif %}</p>
+                        <p class="card-text text-muted small">{% if comic.description %}{{ comic.description[:100] }}{% if comic.description|length > 100 %}...{% endif %}{% else %}No description yet.{% endif %}</p>
                         
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="rating-stars">

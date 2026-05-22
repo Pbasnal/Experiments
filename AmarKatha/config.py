@@ -11,7 +11,10 @@ class Config:
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    # Total size per HTTP request (all files in one form). Default 100MB.
+    _default_upload_limit = 100 * 1024 * 1024
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', _default_upload_limit))
+    MAX_UPLOAD_FILE_SIZE = int(os.environ.get('MAX_UPLOAD_FILE_SIZE', MAX_CONTENT_LENGTH))
 
     FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
 
