@@ -1,12 +1,29 @@
 # Creator Dashboard Requirements
 
+## Document hierarchy
+
+| Document | Scope |
+|----------|--------|
+| [mvp-goal.md](../product/mvp-goal.md) | **Authoritative for launch scope:** V0 validation vs V1 platform |
+| [publishing-tool-hl-prd.md](../product/publishing-tool-hl-prd.md) | **Authoritative for publishing:** pages, scheduling; V0 subset in §3–§9 |
+| [india-market-analysis-feedback.md](../product/india-market-analysis-feedback.md) | Market rationale for lean scope |
+| **This document** | **Post-V0 vision:** upload formats, library, analytics — do not build for validation launch |
+
+When this doc conflicts with **mvp-goal.md** or **publishing-tool-hl-prd.md** on launch scope, those win. Requirements below marked **(V1+)** are aspirational until V0 kill criteria pass.
+
 ## 🎯 Overview
 
-The Creator Dashboard is the central hub for artists to manage their content, upload new material, track performance, and engage with their audience. It should provide an intuitive, powerful interface that empowers creators to focus on their art while providing comprehensive tools for content management and analytics.
+The Creator Dashboard is the central hub for artists to manage content, upload material, track performance, and engage with their audience.
+
+**V0 (validation launch):** Creator Home (minimal), Series Detail, Chapter Editor (images only), schedule + skip/hiatus, share link. No content library grid, no pacing analytics, no PDF batch upload, no unified multi-format hub.
+
+**V1+:** Full dashboard as described in sections below.
 
 ## 📋 Core Requirements
 
-### 1. Content Upload Hub
+### 1. Content Upload Hub (V1+)
+
+> **V0:** Image pages only via Chapter Editor. Defer PDF, batch 100, and unified upload hub.
 **Goal**: Provide a unified interface for uploading various types of content
 
 #### 1.1 Multi-Format Upload Support
@@ -39,13 +56,13 @@ Upload → Preview → Organize → Publish/Schedule
   - Genre/Tags
   - Target Audience
   - Content Rating
-  - Publication Schedule
+  - Publication Schedule (see [publishing-tool-hl-prd.md](../product/publishing-tool-hl-prd.md) §5.3 for cadence, skip, hiatus)
 
 #### 2.2 Series Organization
 - **Hierarchical Structure**: Series → Chapters/Episodes → Pages
 - **Flexible Naming**: Support for chapter numbers, episode titles, etc.
 - **Status Management**: Ongoing, Completed, Hiatus, Cancelled
-- **Scheduling**: Set publication frequency and dates
+- **Scheduling**: Set publication frequency and dates — full behavior in [publishing-tool-hl-prd.md](../product/publishing-tool-hl-prd.md)
 
 #### 2.3 Series Dashboard
 - **Overview**: Total chapters, total views, average rating
@@ -74,7 +91,9 @@ Upload → Preview → Organize → Publish/Schedule
 - **Archive**: Hide from public view
 - **Delete**: Permanent removal (with confirmation)
 
-### 4. Analytics & Insights
+### 4. Analytics & Insights (V1+)
+
+> **V0:** Chapter view counts and creator retention only. Defer pacing graphs, hot spots, drop-off heat maps.
 **Goal**: Provide detailed performance data for informed decision-making
 
 #### 4.1 Individual Content Analytics
@@ -178,10 +197,14 @@ Dashboard
 ### 7. Advanced Features
 
 #### 7.1 Content Scheduling
+
+> **Superseded for product definition** by [publishing-tool-hl-prd.md](../product/publishing-tool-hl-prd.md) (§4.3, §5.3–5.4, §6). Items below remain as a checklist; implement per HL-PRD flows.
+
 - **Publish Later**: Schedule content for future publication
 - **Series Scheduling**: Set regular publication schedules
 - **Bulk Scheduling**: Schedule multiple chapters at once
 - **Calendar View**: Visual calendar for scheduled content
+- **Skip / Hiatus**: Skip cycles or pause series without breaking the queue (HL-PRD §5.3)
 
 #### 7.2 Collaboration Tools
 - **Co-Creators**: Add other users as collaborators
@@ -307,11 +330,11 @@ Comparative Analysis: Chapter-to-chapter performance
 ## 🚀 Implementation Phases
 
 ### Phase 1: Core Dashboard (MVP)
-- Basic dashboard layout
-- Content upload (images and PDFs)
-- Simple series creation
-- Basic content management
-- Essential analytics
+- Basic dashboard layout — **V0: minimal Creator Home only**
+- Content upload (images only) — **V0**
+- Simple series creation — **V0**
+- Basic content management — **V0: series detail, no library grid**
+- Essential analytics — **V0: view counts only**
 
 ### Phase 2: Enhanced Analytics
 - Detailed performance metrics
@@ -321,7 +344,7 @@ Comparative Analysis: Chapter-to-chapter performance
 
 ### Phase 3: Advanced Features
 - Collaboration tools
-- Advanced scheduling
+- Advanced scheduling (per [publishing-tool-hl-prd.md](../product/publishing-tool-hl-prd.md) — skip/hiatus, auto-queue, publish queue)
 - Monetization integration
 - Advanced content organization
 

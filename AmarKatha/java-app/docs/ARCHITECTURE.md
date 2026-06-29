@@ -2,6 +2,8 @@
 
 Flask monolith for an Indian comics platform: readers discover and read content; creators publish via a dashboard; admins curate and moderate.
 
+**Product specs:** [mvp-goal.md](./product/mvp-goal.md) (V0 validation) · [publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md) · [india-market-analysis-feedback.md](./product/india-market-analysis-feedback.md)
+
 ## Stack
 
 | Layer | Technology |
@@ -93,4 +95,4 @@ Uploads land in `app/static/uploads/` (max 16MB per `config.py`).
 - **DB init**: `flask init-db` or migrations via `./scripts/dev.sh migrate`
 - **Docker**: `./setup.sh` or `docker compose up -d` — see [docker.md](./docker.md)
 
-For feature completeness and known gaps, see [PROJECT_STATUS.md](./PROJECT_STATUS.md).
+For feature completeness and known gaps, see [PROJECT_STATUS.md](./PROJECT_STATUS.md). Publishing UX and scheduling behavior are specified in [product/publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md).

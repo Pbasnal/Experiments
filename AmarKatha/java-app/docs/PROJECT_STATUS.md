@@ -7,7 +7,7 @@
 
 ## Executive summary
 
-AmarKatha is a Flask web app aimed at validating whether Indian comic creators and readers want a quality-first platform (see [product/mvp-goal.md](./product/mvp-goal.md)). The codebase has:
+AmarKatha is a Flask web app aimed at validating whether Indian comic creators and readers want a quality-first platform (see [product/mvp-goal.md](./product/mvp-goal.md) — **V0 lean validation launch**). The codebase has:
 
 - A **complete data model** for the planned MVP (users, comics, chapters, pages, ratings, comments, follows, view logs, series).
 - **Working infrastructure** (Docker, migrations, auth basics, creator dashboard UI, series management).
@@ -43,7 +43,7 @@ Validation still requires: publish → discover → read → engage → measure.
 | **Creator** | Create / edit comic | ✅ Done | Templates present |
 | **Creator** | Series create / edit / detail | ✅ Done | Includes basic series analytics |
 | **Creator** | New chapter + upload pages | ⚠️ Partial | Routes in `creator.py`; **`new_chapter.html`, `chapter_edit.html` missing** |
-| **Creator** | Chapter schedule | ⚠️ Partial | DB + route; **`schedule.html` missing** |
+| **Creator** | Chapter schedule | ⚠️ Partial | DB + route; **`schedule.html` missing** — target UX in [publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md) |
 | **Creator** | Creator profile | ⚠️ Partial | Route; **`profile.html` missing** |
 | **Creator** | Unified multi-format upload | ❌ Planned | Sprint 3 in [planning/dashboard-execution-plan.md](./planning/dashboard-execution-plan.md) |
 | **Creator** | Per-comic analytics UI | ❌ Planned | Helpers partially exist; no `comic_analytics` route/template |
@@ -112,7 +112,7 @@ From [planning/dashboard-execution-plan.md](./planning/dashboard-execution-plan.
 | 5 | Basic per-comic analytics | ❌ Not started |
 | 6–8 | Advanced analytics, polish, integrations | ❌ Not started |
 
-Detailed requirements in [planning/creator-dashboard-requirements.md](./planning/creator-dashboard-requirements.md) are **aspirational** (hot spots, pacing graphs, monetization, etc.) — not current scope.
+Detailed requirements in [planning/creator-dashboard-requirements.md](./planning/creator-dashboard-requirements.md) are **mostly V1+** (analytics, library, upload depth) — not V0. **V0 scope** is in [product/mvp-goal.md](./product/mvp-goal.md) and [product/publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md).
 
 ---
 
@@ -122,7 +122,9 @@ Detailed requirements in [planning/creator-dashboard-requirements.md](./planning
 |----------|------|-----------------------------|
 | **`docs/PROJECT_STATUS.md`** (this file) | Status source of truth | ✅ Yes |
 | `README.md` | Setup + feature list | ⚠️ Overstates MVP completion — being corrected |
-| [product/mvp-goal.md](./product/mvp-goal.md) | Product north star | ✅ Accurate goals |
+| [product/mvp-goal.md](./product/mvp-goal.md) | Product north star; **V0 vs V1 scope** | ✅ Accurate goals |
+| [product/publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md) | Publishing V0 subset + V1 vision | ✅ Product spec (not yet implemented) |
+| [product/india-market-analysis-feedback.md](./product/india-market-analysis-feedback.md) | Market review; lean launch rationale | ✅ Reference |
 | [planning/dashboard-execution-plan.md](./planning/dashboard-execution-plan.md) | Sprint tasks | ✅ Good for creator work; Sprints 3+ open |
 | [planning/](./planning/) (creator dashboard docs) | Design / sample code | ❌ Plans only — not live code |
 | [design/image-generation-prompts.md](./design/image-generation-prompts.md) | Marketing assets | N/A for code status |
@@ -132,32 +134,35 @@ Detailed requirements in [planning/creator-dashboard-requirements.md](./planning
 
 ## Recommended priorities
 
-Ordered to reach a **credible MVP demo** (creator publishes → reader reads → basic engagement):
+**Aligned to [product/mvp-goal.md](./product/mvp-goal.md) V0** — validate scheduling + share-link reading before building marketplace features (follow, comments, trending).
 
-### P0 — Unblock core loop (1–2 weeks)
+Ordered to reach a **credible V0 demo** (invite creator publishes → share link → reader returns after skip):
+
+### P0 — V0 validation loop
 
 1. Add `main.chapter_view` + chapter reader template (vertical scroll, `ChapterPage` images).
-2. Fix `main.index` ↔ `index.html` (pass `comics` or update template for three feeds).
-3. Add `comic/detail.html` (chapter list, link to reader).
-4. Add missing creator templates: `new_chapter.html`, `chapter_edit.html`.
-5. Log `ViewLog` on chapter read (minimal: comic_id, chapter_id, optional user_id).
+2. Series share page with schedule strip + hiatus banner.
+3. Add missing creator templates: `new_chapter.html`, `chapter_edit.html`.
+4. Skip next slot + hiatus on series (per [publishing-tool-hl-prd.md](./product/publishing-tool-hl-prd.md) V0).
+5. Log chapter views + reader return-after-skip events (minimal analytics).
 
-### P1 — MVP validation features
+### P1 — V0 catalog + polish
 
-6. POST routes: follow comic, rate comic/chapter, comment on chapter.
-7. Add `search.html`.
-8. Admin templates + separate `is_admin` (or env-based admin allowlist).
-9. Add placeholder or generated hero images under `app/static/images/`.
+6. Fix `main.index` ↔ `index.html` — **Editor's Picks + chronological only** (no trending).
+7. Add `comic/detail.html` (chapter list, share link).
+8. Seed catalog content (≥10 series / 30 chapters) before public home marketing.
+9. Add placeholder hero images under `app/static/images/`.
 
-### P2 — Creator polish (per execution plan)
+### P2 — V1 (only if V0 kill criteria pass)
 
-10. Sprint 3 unified upload OR simplify to “images only” for MVP.
-11. Per-comic analytics page (basic counts from DB).
-12. Tests for auth, publish flow, and one read path.
+10. Follow comic, rate, comment routes.
+11. Search + trending once volume threshold met.
+12. Auto-publish queue, PDF upload, creator analytics UI.
+13. Tests for auth, publish flow, and read path.
 
 ### Deferred (per [product/mvp-goal.md](./product/mvp-goal.md))
 
-Peer review, print, paid subs, community doodle feed, advanced pacing analytics.
+V0: follow, comments, ratings, search, trending, auto-publish, open signup. V1+: peer review, print, full paid subs, community doodle feed, advanced pacing analytics.
 
 ---
 

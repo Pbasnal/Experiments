@@ -16,7 +16,7 @@ A Flask-based web application for Indian comic creators and readers, built to te
 
 "To test if Indian comic creators and readers want a platform that prioritizes storytelling quality, creator-first tools, and consistent discovery."
 
-See [docs/product/mvp-goal.md](docs/product/mvp-goal.md) for the full must-have vs deferred list.
+See [docs/product/mvp-goal.md](docs/product/mvp-goal.md) for **V0 validation launch** scope (lean; share-link first). Publishing: [publishing-tool-hl-prd.md](docs/product/publishing-tool-hl-prd.md). Market context: [india-market-analysis-feedback.md](docs/product/india-market-analysis-feedback.md).
 
 ## Implementation snapshot (high level)
 

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' · AmarKatha'">AmarKatha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --text: #111827;
+            --muted: #6b7280;
+            --bg: #fafafa;
+            --card: #ffffff;
+            --border: #e5e7eb;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+        .logo {
+            font-family: 'Literata', Georgia, serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        main {
+            max-width: 42rem;
+            margin: 4rem auto;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-family: 'Literata', Georgia, serif;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        p { color: var(--muted); line-height: 1.6; margin-bottom: 2rem; }
+        .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-block;
+            padding: 0.65rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <div class="nav-links">
+        <a href="/">Reader</a>
+        <a href="/creator">Creator</a>
+        <a href="/admin">Admin</a>
+    </div>
+</nav>
+<main>
+    <span class="badge">UI Preview · Coming in V0</span>
+    <h1 th:text="${title}">Title</h1>
+    <p th:text="${description}">Description</p>
+    <div class="actions">
+        <a href="/" class="btn btn-primary">← Back to homepage</a>
+        <a href="/creator/series" class="btn btn-secondary" th:if="${title == 'Creator Portal'}">My Series</a>
+    </div>
+</main>
+</body>
+</html>
