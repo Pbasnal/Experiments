@@ -8,7 +8,6 @@ interface LayoutProps {
 const navItems = [
   { label: 'Home', href: '/', external: false },
   { label: 'Creator', href: '/creator', external: true },
-  { label: 'Admin', href: '/admin', external: true },
 ];
 
 export default function Layout({ children }: LayoutProps) {
@@ -39,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
               ),
             )}
           </nav>
-          <a href="/oauth2/authorization/google" className="btn-signin">
+          <a href="/creator/login" className="btn-signin">
             Sign in
           </a>
         </div>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up · AmarKatha</title>
+    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <div class="nav-links">
+        <a href="/">Reader</a>
+    </div>
+</nav>
+<main>
+    <div class="card">
+        <h1>Sign up</h1>
+
+        <div class="alert alert-error" th:if="${errorCode == 'invite_required'}">
+            Enter an invite code to continue.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'invite_not_found'}">
+            Invite code not found.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'invite_used'}">
+            This invite has already been used.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'invite_expired'}">
+            This invite has expired.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'invite_blank'}">
+            Enter an invite code.
+        </div>
+
+        <form th:action="@{/creator/signup}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="invite">Invite code</label>
+            <input id="invite" name="invite" type="text" autocomplete="off"
+                   placeholder="Invite code" th:value="${invite}">
+            <button type="submit" class="btn btn-google">Continue with Google</button>
+        </form>
+
+        <span class="footer-link">Already have an account? <a href="/creator/login">Sign in</a></span>
+    </div>
+</main>
+</body>
+</html>

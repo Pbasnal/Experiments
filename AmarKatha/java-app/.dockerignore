@@ -1,0 +1,15 @@
+.git
+.idea
+.vscode
+*.iml
+*.log
+.env
+target
+reader/node_modules
+reader/dist
+src/main/resources/static
+docs
+**/.DS_Store
+**/agent-transcripts
+**/*.md
+!README.md

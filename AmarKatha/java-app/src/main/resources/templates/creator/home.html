@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Portal · AmarKatha</title>
+    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
+    <style>
+        main { max-width: 42rem; text-align: center; }
+        .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+        .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); width: auto; padding: 0.65rem 1.25rem; }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <div class="nav-links">
+        <a href="/creator/series">My Series</a>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" style="background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;font-size:0.9rem;font-weight:500;">Sign out</button>
+        </form>
+    </div>
+</nav>
+<main>
+    <div class="card">
+        <h1>Welcome, <span th:text="${user.displayName}">Creator</span></h1>
+        <p class="subtitle">Upload chapters, set your schedule, and share links with readers.</p>
+        <div class="actions">
+            <a href="/creator/series" class="btn btn-primary" style="width: auto; padding: 0.65rem 1.25rem;">My Series</a>
+            <a href="/" class="btn btn-secondary">View reader site</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in · AmarKatha</title>
+    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <div class="nav-links">
+        <a href="/">Reader</a>
+    </div>
+</nav>
+<main>
+    <div class="card">
+        <h1>Sign in</h1>
+
+        <div class="alert alert-error" th:if="${errorCode == 'account_not_found'}">
+            No account found. <a href="/creator/signup">Sign up</a>
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'admin_denied'}">
+            Not authorized.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'oauth_failed'}">
+            Google sign-in failed. Please try again.
+        </div>
+
+        <a class="btn btn-google" th:href="@{/oauth2/authorization/google}">
+            Continue with Google
+        </a>
+
+        <span class="footer-link">New here? <a href="/creator/signup">Sign up</a></span>
+    </div>
+</main>
+</body>
+</html>

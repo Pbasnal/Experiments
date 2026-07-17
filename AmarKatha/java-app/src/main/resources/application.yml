@@ -3,9 +3,45 @@ spring:
     name: amarkatha
   thymeleaf:
     cache: false
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:amarkatha}
+    username: ${POSTGRES_USER:amarkatha}
+    password: ${POSTGRES_PASSWORD:amarkatha}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope: openid, profile, email
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
 
 server:
   port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+
+amarkatha:
+  contact-email: ${AMARKATHA_CONTACT_EMAIL:hello@amarkatha.in}
+  admin:
+    bootstrap-emails: ${ADMIN_BOOTSTRAP_EMAILS:}
 
 management:
   endpoints:

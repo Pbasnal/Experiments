@@ -5,7 +5,7 @@
 | Document | Description |
 |----------|-------------|
 | [PROJECT_STATUS.md](./PROJECT_STATUS.md) | **What is built vs planned** — feature matrix and priorities |
-| [docker.md](./docker.md) | **Run locally with Docker** — single `docker-compose.yml` |
+| [docker.md](./docker.md) | **Run locally with Docker** — Postgres + Spring Boot + React SPA |
 | [oauth-google.md](./oauth-google.md) | **Google sign-in** — credentials and redirect URI |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Flask prototype structure (legacy) |
 

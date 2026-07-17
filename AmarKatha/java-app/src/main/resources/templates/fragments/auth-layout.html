@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' · AmarKatha'">AmarKatha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <style th:fragment="styles">
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --text: #111827;
+            --muted: #6b7280;
+            --bg: #fafafa;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --error-bg: #fef2f2;
+            --error-text: #b91c1c;
+            --success-bg: #ecfdf5;
+            --success-text: #047857;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+        .logo {
+            font-family: 'Literata', Georgia, serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        main {
+            max-width: 28rem;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        h1 {
+            font-family: 'Literata', Georgia, serif;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle { color: var(--muted); line-height: 1.5; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        input[type="text"]:focus {
+            outline: 2px solid rgba(79, 70, 229, 0.35);
+            border-color: var(--primary);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-google {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+            font-family: inherit;
+        }
+        .btn-google:hover { border-color: var(--primary); color: var(--primary); }
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .alert-error { background: var(--error-bg); color: var(--error-text); }
+        .alert-success { background: var(--success-bg); color: var(--success-text); }
+        .footer-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.25rem;
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+        .footer-link a { color: var(--primary); }
+    </style>
+</head>
+<body th:fragment="body">
+</body>
+</html>

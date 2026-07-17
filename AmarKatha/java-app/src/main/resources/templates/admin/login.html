@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign In · AmarKatha</title>
+    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+</nav>
+<main>
+    <div class="card">
+        <h1>Admin sign in</h1>
+        <p class="subtitle">Founder / ops access only. Use a bootstrap-approved Google account.</p>
+
+        <div class="alert alert-error" th:if="${errorCode == 'admin_denied'}">
+            This Google account is not authorized for admin access.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'oauth_failed'}">
+            Google sign-in failed. Please try again.
+        </div>
+
+        <a class="btn btn-google" th:href="@{/oauth2/authorization/google}">
+            Continue with Google
+        </a>
+    </div>
+</main>
+</body>
+</html>

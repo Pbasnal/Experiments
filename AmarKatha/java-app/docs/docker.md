@@ -1,89 +1,78 @@
-# Docker — local development
+# Docker — local development (Java V0)
 
-One Compose file runs the full stack for local testing: **PostgreSQL**, **Flask web app**, and **Redis** (reserved for future caching).
+One Compose file runs the full stack: **PostgreSQL** + **Spring Boot app** (serves the React reader SPA).
 
 ## Quick start
 
 ```bash
-# First time (creates .env, starts containers, init DB, optional admin user)
-./setup.sh
-
-# Or manually
 cp env.example .env
+# Optional: set GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / ADMIN_BOOTSTRAP_EMAILS
+
+./scripts/dev.sh up
+# or
 docker compose up --build -d
-docker compose exec web flask init-db
-docker compose exec web flask create-admin   # interactive
 ```
 
-**App URL:** http://localhost:5000  
-**Health check:** http://localhost:5000/health
+**App URL:** http://localhost:8080  
+**Health check:** http://localhost:8080/actuator/health
 
 ## Everyday commands
 
 | Task | Command |
 |------|---------|
-| Start | `docker compose up -d` or `./scripts/start.sh start` |
-| Stop | `docker compose down` or `./scripts/start.sh stop` |
-| Logs | `docker compose logs -f web` |
-| Rebuild | `docker compose up --build -d` |
-| DB shell | `docker compose exec postgres psql -U amarkatha_user -d amarkatha` |
-| Flask shell | `docker compose exec web flask shell` |
-| Migrations | `docker compose exec web flask db upgrade` |
-
-See also `./scripts/dev.sh help` for backup, lint, and other helpers.
+| Start (build + run) | `./scripts/dev.sh up` or `docker compose up --build -d` |
+| Stop | `./scripts/dev.sh down` or `docker compose down` |
+| Logs | `./scripts/dev.sh logs` or `docker compose logs -f app` |
+| Postgres only | `./scripts/dev.sh db` |
+| Host-native app | `./scripts/dev.sh run` |
 
 ## Services
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| `web` | 5000 | Flask app (live code mount from project root) |
+| `app` | 8080 | Spring Boot + bundled React reader |
 | `postgres` | 5432 | Primary database |
-| `redis` | 6379 | Optional; not required by app code today |
+
+The React frontend is built inside the Docker image (multi-stage) and served as static assets by Spring Boot — same origin, no separate nginx container in V0.
 
 ## Environment
 
-Copy `env.example` to `.env`. For Docker, `DATABASE_URL` is set in `docker-compose.yml` to use the `postgres` hostname. Defaults:
+Copy `env.example` to `.env`. Inside Compose, `POSTGRES_HOST` is forced to `postgres` for the app container.
 
-| Variable | Default |
-|----------|---------|
-| `POSTGRES_DB` | `amarkatha` |
-| `POSTGRES_USER` | `amarkatha_user` |
-| `POSTGRES_PASSWORD` | `amarkatha_password` |
-| `WEB_PORT` | `5000` |
-| `MAX_CONTENT_LENGTH` | `524288000` (500MB upload limit) |
-
-## Google OAuth (optional)
-
-With `OAUTH_INSECURE_TRANSPORT=true` (default in compose), Google sign-in works over **HTTP** on port 5000.
-
-Setup: [oauth-google.md](./oauth-google.md) — redirect URI must be `http://localhost:5000/google/authorized`.
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `SERVER_PORT` | `8080` | Host port mapped to app |
+| `POSTGRES_*` | `amarkatha` | DB name/user/password |
+| `GOOGLE_CLIENT_ID` | placeholder | Required for real OAuth |
+| `GOOGLE_CLIENT_SECRET` | placeholder | Required for real OAuth |
+| `ADMIN_BOOTSTRAP_EMAILS` | empty | Comma-separated admin emails |
 
 ## Troubleshooting
 
-**Port 5432 or 5000 in use**
+**Port 5432 or 8080 in use**
 
 ```bash
 lsof -i :5432
-lsof -i :5000
+lsof -i :8080
 ```
 
-Change `POSTGRES_PORT` or `WEB_PORT` in `.env` if needed.
+Change `POSTGRES_PORT` or `SERVER_PORT` in `.env`.
+
+**App unhealthy / OAuth errors**
+
+```bash
+docker compose logs -f app
+```
+
+Set real Google credentials in `.env` and recreate: `docker compose up -d --force-recreate app`.
 
 **Reset database (deletes all data)**
 
 ```bash
 docker compose down -v
-docker compose up -d
-docker compose exec web flask init-db
-```
-
-**Web container unhealthy**
-
-```bash
-docker compose logs web
-docker compose exec web curl -f http://localhost:5000/health
+./scripts/dev.sh up
 ```
 
 ## Production
 
-This repository ships a **local-dev-only** Compose setup. For production, use a managed database, secrets management, and a WSGI server (e.g. Gunicorn) behind a reverse proxy with TLS — not the dev `command: python run.py` override.
+This Compose setup is for **local/dev**. Production adds Nginx TLS, managed Postgres, secrets management, and Azure Blob — see `docs/engineering/infrastructure.md`.

@@ -122,9 +122,8 @@ public class HomeApiController {
                 new PlatformRouteDto("Creator home", "/creator", "Creator", "preview", "Next slot, drafts, quick upload"),
                 new PlatformRouteDto("Series management", "/creator/series", "Creator", "planned", "CRUD, schedule, skip/hiatus"),
                 new PlatformRouteDto("Chapter editor", "/creator/series/{id}/chapters/{id}/edit", "Creator", "planned", "Multi-image upload & publish"),
-                new PlatformRouteDto("Creator signup", "/creator/onboard", "Creator", "planned", "Google OAuth + invite token"),
-                new PlatformRouteDto("Admin dashboard", "/admin", "Admin", "preview", "Invites, stipends, reports"),
-                new PlatformRouteDto("Sign in", "/oauth2/authorization/google", "Auth", "planned", "Google OAuth for creators"),
+                new PlatformRouteDto("Sign up / Sign in", "/creator/signup", "Auth", "preview", "Google OAuth; bootstrap admins skip invite"),
+                new PlatformRouteDto("Creator login", "/creator/login", "Auth", "preview", "Returning creators and admins"),
                 new PlatformRouteDto("Legal / grievance", "/legal/grievance", "Ops", "planned", "IT Rules compliance pages")
         );
     }
