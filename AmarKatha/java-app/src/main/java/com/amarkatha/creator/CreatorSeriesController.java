@@ -118,9 +118,14 @@ public class CreatorSeriesController {
         model.addAttribute("scheduleStrip", strip);
         model.addAttribute("promptCadence", seriesScheduleService.shouldPromptCadence(id, principal.getId()));
         model.addAttribute("nextExpectedLabel", formatNextExpected(series));
-        model.addAttribute("minPeriodDays", ScheduleCalendar.MIN_PERIOD_DAYS);
-        model.addAttribute("maxPeriodDays", ScheduleCalendar.MAX_PERIOD_DAYS);
         model.addAttribute("defaultReleaseHour", ScheduleCalendar.DEFAULT_RELEASE_HOUR_IST);
+        String[] hourLabels = new String[24];
+        for (int h = 0; h < 24; h++) {
+            int displayHour = h % 12 == 0 ? 12 : h % 12;
+            String amPm = h < 12 ? "AM" : "PM";
+            hourLabels[h] = String.format("%d:00 %s", displayHour, amPm);
+        }
+        model.addAttribute("hourLabels", hourLabels);
         model.addAttribute("dayNames", new String[]{
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
         });

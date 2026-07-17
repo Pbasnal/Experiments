@@ -120,9 +120,9 @@
                 <select id="releaseHourIst" name="releaseHourIst" required>
                     <option th:each="h : ${#numbers.sequence(0, 23)}"
                             th:value="${h}"
-                            th:text="${h < 10 ? '0' + h + ':00' : h + ':00'}"
+                            th:text="${hourLabels[h]}"
                             th:selected="${series.releaseHourIst != null ? series.releaseHourIst == h : h == defaultReleaseHour}">
-                        18:00
+                        6:00 PM
                     </option>
                 </select>
             </div>
