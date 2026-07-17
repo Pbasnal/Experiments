@@ -69,16 +69,26 @@ public class ReaderCatalogService {
     public SeriesDetailDto seriesBySlug(String slug) {
         Series series = seriesRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound("Series not found"));
-        List<Chapter> chapters = listedPublishedChapters(series.getId()).stream()
+        List<Chapter> listed = listedPublishedChapters(series.getId());
+        List<Chapter> intact = listed.stream()
                 .filter(c -> mediaIntegrityService.isChapterMediaIntact(c.getId()))
                 .toList();
-        if (chapters.isEmpty()) {
+        if (intact.isEmpty()) {
+            long publishedCount = chapterRepository.countBySeriesIdAndState(
+                    series.getId(),
+                    ChapterState.PUBLISHED
+            );
+            if (publishedCount > 0) {
+                throw unavailable(
+                        "This series is temporarily unavailable while we restore chapter media."
+                );
+            }
             throw notFound("Series not found");
         }
         String creatorName = loadCreatorNames(List.of(series.getCreatorId()))
                 .getOrDefault(series.getCreatorId(), "Creator");
         ScheduleStripDto schedule = toScheduleDto(series);
-        List<ChapterSummaryDto> summaries = chapters.stream()
+        List<ChapterSummaryDto> summaries = intact.stream()
                 .map(c -> new ChapterSummaryDto(
                         c.getSlug(),
                         c.getTitle(),
@@ -94,6 +104,7 @@ public class ReaderCatalogService {
                 series.getGenres() == null ? List.of() : series.getGenres(),
                 series.getContentLanguage(),
                 ReaderPresentation.coverGradient(series.getSlug()),
+                ReaderPresentation.coverUrl(series.getCoverStorageKey(), series.getVersion()),
                 schedule.scheduleLabel(),
                 schedule,
                 series.getStatus().name(),
@@ -113,9 +124,23 @@ public class ReaderCatalogService {
                         chapterSlug,
                         ChapterState.PUBLISHED
                 )
-                .orElseThrow(() -> notFound("Chapter not found"));
-        if (!mediaIntegrityService.isChapterMediaIntact(chapter.getId())) {
+                .orElse(null);
+        if (chapter == null) {
+            if (chapterRepository.findBySeriesIdAndSlugAndState(
+                    series.getId(),
+                    chapterSlug,
+                    ChapterState.PUBLISHED
+            ).isPresent()) {
+                throw unavailable(
+                        "This chapter is temporarily unavailable while we restore its pages."
+                );
+            }
             throw notFound("Chapter not found");
+        }
+        if (!mediaIntegrityService.isChapterMediaIntact(chapter.getId())) {
+            throw unavailable(
+                    "This chapter is temporarily unavailable while we restore its pages."
+            );
         }
         List<ChapterPage> pages = chapterPageRepository.findByChapterIdOrderBySortOrderAsc(chapter.getId());
         List<ChapterPageDto> pageDtos = pages.stream()
@@ -152,6 +177,7 @@ public class ReaderCatalogService {
                 series.getGenres() == null ? List.of() : series.getGenres(),
                 series.getContentLanguage(),
                 ReaderPresentation.coverGradient(series.getSlug()),
+                ReaderPresentation.coverUrl(series.getCoverStorageKey(), series.getVersion()),
                 schedule.scheduleLabel(),
                 schedule,
                 series.getStatus().name(),
@@ -208,5 +234,9 @@ public class ReaderCatalogService {
 
     private static ResponseStatusException notFound(String message) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+    }
+
+    private static ResponseStatusException unavailable(String message) {
+        return new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, message);
     }
 }

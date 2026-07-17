@@ -10,7 +10,14 @@ public interface MediaStore {
 
     UploadResult putOriginal(String key, InputStream data, String contentType);
 
+    UploadResult putDerivative(String key, InputStream data, String contentType);
+
     Path resolvePath(String key);
 
     boolean exists(String key);
+
+    void delete(String key);
+
+    /** Deletes all files under a storage prefix (directory). */
+    void deletePrefix(String prefix);
 }

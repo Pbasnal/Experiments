@@ -17,6 +17,7 @@ export interface SeriesCard {
   genres: string[];
   contentLanguage: string;
   coverGradient: string;
+  coverUrl?: string | null;
   scheduleLabel: string;
   schedule?: ScheduleStrip;
   status: 'ONGOING' | 'HIATUS' | 'COMPLETED';

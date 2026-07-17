@@ -22,6 +22,12 @@ public interface ChapterRepository extends JpaRepository<Chapter, UUID> {
 
     Optional<Chapter> findBySeriesIdAndId(UUID seriesId, UUID id);
 
+    Optional<Chapter> findBySeriesIdAndSlugAndState(
+            UUID seriesId,
+            String slug,
+            ChapterState state
+    );
+
     List<Chapter> findBySeriesIdAndStateAndListedAtIsNotNullOrderByChapterNumberAsc(
             UUID seriesId,
             ChapterState state

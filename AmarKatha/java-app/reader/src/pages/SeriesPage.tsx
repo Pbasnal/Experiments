@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { fetchSeries } from '../api/home';
+import { fetchSeries, trackSeriesView } from '../api/home';
 import type { SeriesDetail } from '../types';
 
 export default function SeriesPage() {
@@ -20,6 +20,7 @@ export default function SeriesPage() {
         if (!cancelled) {
           setSeries(data);
           setError(null);
+          void trackSeriesView(seriesSlug);
         }
       })
       .catch((e: Error) => {
@@ -56,40 +57,51 @@ export default function SeriesPage() {
     );
   }
 
+  const scheduleLine = series.schedule?.nextExpectedAt
+    ? `${formatLocalDate(series.schedule.nextExpectedAt)}${
+        series.schedule.periodDays != null ? ` · every ${series.schedule.periodDays} days` : ''
+      }`
+    : (series.schedule?.scheduleLabel ?? series.scheduleLabel);
+
   return (
     <div className="series-page">
       <Link to="/" className="back-link">
         ← All series
       </Link>
-      <div className="series-hero" style={{ background: series.coverGradient }}>
+      <header
+        className={`series-hero${series.coverUrl ? ' has-cover' : ''}`}
+        style={series.coverUrl ? undefined : { background: series.coverGradient }}
+      >
+        {series.coverUrl && (
+          <img
+            className="series-hero-image"
+            src={series.coverUrl}
+            alt=""
+            decoding="async"
+          />
+        )}
+        <div className="series-hero-fade" aria-hidden="true" />
         <div className="series-hero-content">
-          <h1>{series.title}</h1>
+          <h1 className="series-hero-title">{series.title}</h1>
           <p className="series-creator">by {series.creatorName}</p>
+          <div className="series-hero-schedule">
+            <strong>{series.schedule?.headline ?? 'Schedule'}</strong>
+            <p>{scheduleLine}</p>
+            {series.schedule?.skipMessage && (
+              <p className="hiatus-note">
+                <em>{series.schedule.skipMessage}</em>
+              </p>
+            )}
+            {(series.schedule?.status ?? series.status) === 'HIATUS' && (
+              <p className="hiatus-note">This series is on hiatus. Check back when the creator resumes.</p>
+            )}
+          </div>
+          {series.description && (
+            <p className="series-hero-desc">{series.description}</p>
+          )}
         </div>
-      </div>
+      </header>
       <div className="series-content">
-        <aside className="schedule-strip">
-          <strong>{series.schedule?.headline ?? 'Schedule'}</strong>
-          {series.schedule?.nextExpectedAt ? (
-            <p>
-              {formatLocalDate(series.schedule.nextExpectedAt)}
-              {series.schedule.periodDays != null && (
-                <span className="muted"> · every {series.schedule.periodDays} days</span>
-              )}
-            </p>
-          ) : (
-            <p>{series.schedule?.scheduleLabel ?? series.scheduleLabel}</p>
-          )}
-          {series.schedule?.skipMessage && (
-            <p className="hiatus-note">
-              <em>{series.schedule.skipMessage}</em>
-            </p>
-          )}
-          {(series.schedule?.status ?? series.status) === 'HIATUS' && (
-            <p className="hiatus-note">This series is on hiatus. Check back when the creator resumes.</p>
-          )}
-        </aside>
-        {series.description && <p className="series-synopsis">{series.description}</p>}
         {series.genres.length > 0 && (
           <div className="series-tags">
             {series.genres.map((g) => (

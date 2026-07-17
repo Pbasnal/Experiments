@@ -17,6 +17,8 @@ import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -35,6 +37,7 @@ public class ChapterService {
     private final SeriesScheduleService seriesScheduleService;
     private final MediaStore mediaStore;
     private final ChapterMediaIntegrityService mediaIntegrityService;
+    private final WebpConversionService webpConversionService;
     private final int maxPagesPerChapter;
     private final long maxPageBytes;
 
@@ -45,6 +48,7 @@ public class ChapterService {
             SeriesScheduleService seriesScheduleService,
             MediaStore mediaStore,
             ChapterMediaIntegrityService mediaIntegrityService,
+            WebpConversionService webpConversionService,
             @Value("${amarkatha.media.max-pages-per-chapter:40}") int maxPagesPerChapter,
             @Value("${amarkatha.media.max-page-bytes:16777216}") long maxPageBytes
     ) {
@@ -54,6 +58,7 @@ public class ChapterService {
         this.seriesScheduleService = seriesScheduleService;
         this.mediaStore = mediaStore;
         this.mediaIntegrityService = mediaIntegrityService;
+        this.webpConversionService = webpConversionService;
         this.maxPagesPerChapter = maxPagesPerChapter;
         this.maxPageBytes = maxPageBytes;
     }
@@ -135,7 +140,7 @@ public class ChapterService {
                 ImageMeta meta = readImageMeta(bytes);
                 MediaStore.UploadResult uploaded = mediaStore.putOriginal(
                         key,
-                        new java.io.ByteArrayInputStream(bytes),
+                        new ByteArrayInputStream(bytes),
                         file.getContentType()
                 );
                 ChapterPage page = ChapterPage.create(
@@ -146,7 +151,8 @@ public class ChapterService {
                         meta.width(),
                         meta.height()
                 );
-                chapterPageRepository.save(page);
+                ChapterPage saved = chapterPageRepository.save(page);
+                scheduleWebp(saved.getId());
             } catch (IOException | UncheckedIOException ex) {
                 throw new ChapterException(
                         "Failed to store page (check media folder permissions): "
@@ -178,6 +184,19 @@ public class ChapterService {
 
     public long getMaxPageBytes() {
         return maxPageBytes;
+    }
+
+    private void scheduleWebp(UUID pageId) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    webpConversionService.convertPageAsync(pageId);
+                }
+            });
+        } else {
+            webpConversionService.convertPageAsync(pageId);
+        }
     }
 
     private double nextChapterNumber(UUID seriesId) {

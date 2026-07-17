@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.amarkatha.media.MediaStore;
 import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.shared.domain.SeriesStatus;
 import java.util.Optional;
@@ -22,12 +23,21 @@ class SeriesServiceTest {
 
     @Mock
     private SeriesRepository seriesRepository;
+    @Mock
+    private MediaStore mediaStore;
+    @Mock
+    private WebpConversionService webpConversionService;
 
     private SeriesService seriesService;
 
     @BeforeEach
     void setUp() {
-        seriesService = new SeriesService(seriesRepository);
+        seriesService = new SeriesService(
+                seriesRepository,
+                mediaStore,
+                webpConversionService,
+                16 * 1024 * 1024
+        );
     }
 
     @Test

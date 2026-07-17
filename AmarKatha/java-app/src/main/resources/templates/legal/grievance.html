@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievance · AmarKatha</title>
+    <th:block th:replace="~{fragments/legal-layout :: styles}"></th:block>
+</head>
+<body>
+<th:block th:replace="~{fragments/legal-layout :: header(active='grievance')}"></th:block>
+<main class="legal-main">
+    <h1>Grievance officer</h1>
+    <p class="legal-meta">IT Rules 2021 · V0 interim designation</p>
+
+    <section>
+        <h2>Designated officer</h2>
+        <p>
+            <strong th:text="${grievanceOfficerName}">Founder (interim)</strong><br>
+            Email:
+            <a th:href="'mailto:' + ${contactEmail}" th:text="${contactEmail}">hello@amarkatha.in</a>
+        </p>
+        <p>
+            We aim to <strong>acknowledge reports within 24 hours</strong> and resolve or remove infringing /
+            illegal content within 24 hours of a valid report during the V0 validation period.
+        </p>
+    </section>
+    <section>
+        <h2>How to report</h2>
+        <ol>
+            <li>Email the officer with the series or chapter URL, reason, and your contact email.</li>
+            <li>Include “Report” in the subject line (example: <em>Report — series-slug</em>).</li>
+            <li>We will confirm receipt and follow up when action is taken.</li>
+        </ol>
+        <p>
+            Quick mailto:
+            <a th:href="'mailto:' + ${contactEmail} + '?subject=Report%20content'">
+                Report content
+            </a>
+        </p>
+    </section>
+    <section>
+        <h2>Reasons we act on</h2>
+        <ul>
+            <li>Copyright infringement</li>
+            <li>Hateful or illegal content</li>
+            <li>Spam / scam</li>
+            <li>Other legal concerns</li>
+        </ul>
+    </section>
+</main>
+<th:block th:replace="~{fragments/legal-layout :: footer}"></th:block>
+</body>
+</html>

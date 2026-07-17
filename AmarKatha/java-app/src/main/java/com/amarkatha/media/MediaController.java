@@ -32,9 +32,25 @@ public class MediaController {
         }
         Path file = mediaStore.resolvePath(key);
         String contentType = Files.probeContentType(file);
+        if (contentType == null || contentType.isBlank()) {
+            if (key.toLowerCase().endsWith(".webp")) {
+                contentType = "image/webp";
+            } else if (key.toLowerCase().endsWith(".png")) {
+                contentType = "image/png";
+            } else if (key.toLowerCase().endsWith(".jpg") || key.toLowerCase().endsWith(".jpeg")) {
+                contentType = "image/jpeg";
+            } else {
+                contentType = "application/octet-stream";
+            }
+        }
+        // Covers are re-uploaded in place (original.jpg); don't pin them immutable.
+        boolean coverAsset = key.contains("/cover/");
+        String cacheControl = coverAsset
+                ? "public, max-age=60, must-revalidate"
+                : "public, max-age=31536000, immutable";
         return ResponseEntity.ok()
-                .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
-                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                .header(HttpHeaders.CACHE_CONTROL, cacheControl)
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(new FileSystemResource(file));
     }
 }

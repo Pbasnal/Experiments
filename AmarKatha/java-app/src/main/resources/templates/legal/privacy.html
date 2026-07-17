@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy · AmarKatha</title>
+    <th:block th:replace="~{fragments/legal-layout :: styles}"></th:block>
+</head>
+<body>
+<th:block th:replace="~{fragments/legal-layout :: header(active='privacy')}"></th:block>
+<main class="legal-main">
+    <h1>Privacy Policy</h1>
+    <p class="legal-meta">Last updated: 17 July 2026 · V0 validation launch</p>
+
+    <section>
+        <h2>What we collect</h2>
+        <ul>
+            <li><strong>Creators / admins:</strong> Google account email, display name, and session cookies to keep you signed in.</li>
+            <li><strong>Readers:</strong> an anonymous <code>reader_id</code> cookie (random UUID, HttpOnly, 1 year) used only for product analytics — no account link in V0.</li>
+            <li><strong>Usage events:</strong> series/chapter view events (series id, optional chapter id, referrer class, time). No advertising IDs.</li>
+            <li><strong>Uploads:</strong> comic images and series covers you choose to publish.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>How we use data</h2>
+        <p>
+            Operate the service, show schedule/share experiences, measure whether readers return after skips,
+            and respond to abuse reports. We do not sell personal data.
+        </p>
+    </section>
+    <section>
+        <h2>Cookies</h2>
+        <p>
+            Session cookie for signed-in users; <code>reader_id</code> for anonymous analytics. Essential for
+            the product; no third-party ad cookies in V0.
+        </p>
+    </section>
+    <section>
+        <h2>Contact</h2>
+        <p>
+            Privacy questions:
+            <a th:href="'mailto:' + ${contactEmail}" th:text="${contactEmail}">hello@amarkatha.in</a>
+        </p>
+    </section>
+</main>
+<th:block th:replace="~{fragments/legal-layout :: footer}"></th:block>
+</body>
+</html>

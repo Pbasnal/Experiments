@@ -53,7 +53,7 @@ public class ReaderApiController {
                 new PlatformRouteDto("Chapter editor", "/creator/series/{id}/chapters/{id}/edit", "Creator", "preview", "Multi-image upload & publish now"),
                 new PlatformRouteDto("Sign up / Sign in", "/creator/signup", "Auth", "preview", "Google OAuth; bootstrap admins skip invite"),
                 new PlatformRouteDto("Creator login", "/creator/login", "Auth", "preview", "Returning creators and admins"),
-                new PlatformRouteDto("Legal / grievance", "/legal/grievance", "Ops", "planned", "IT Rules compliance pages")
+                new PlatformRouteDto("Legal / grievance", "/legal/grievance", "Ops", "live", "Terms, privacy, grievance officer")
         );
     }
 }

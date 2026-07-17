@@ -1,6 +1,7 @@
 package com.amarkatha.creator;
 
 import com.amarkatha.identity.security.AmarKathaPrincipal;
+import com.amarkatha.publishing.ChapterException;
 import com.amarkatha.publishing.ChapterService;
 import com.amarkatha.publishing.OngoingSeriesCapExceededException;
 import com.amarkatha.publishing.ScheduleServiceException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -129,7 +131,45 @@ public class CreatorSeriesController {
         model.addAttribute("dayNames", new String[]{
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
         });
+        if (series.getCoverStorageKey() != null && !series.getCoverStorageKey().isBlank()) {
+            // Bust browser cache: re-uploads often reuse .../cover/original.jpg
+            model.addAttribute(
+                    "coverUrl",
+                    "/media/" + series.getCoverStorageKey() + "?v=" + series.getVersion()
+            );
+        }
         return "creator/series-detail";
+    }
+
+    @PostMapping("/{id}/cover")
+    public String uploadCover(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam("cover") MultipartFile cover,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesService.uploadCover(id, principal.getId(), cover);
+            redirectAttributes.addFlashAttribute("success", "Cover uploaded. Optimizing for readers…");
+        } catch (ChapterException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/cover/remove")
+    public String removeCover(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesService.removeCover(id, principal.getId());
+            redirectAttributes.addFlashAttribute("success", "Cover removed.");
+        } catch (SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
     }
 
     @PostMapping("/{id}/schedule")

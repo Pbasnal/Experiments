@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="styles">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f5f1;
+            --card: #fff;
+            --text: #1c1917;
+            --muted: #78716c;
+            --border: #e7e5e4;
+            --primary: #0f766e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: "DM Sans", system-ui, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.6;
+        }
+        .legal-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background: var(--card);
+        }
+        .legal-nav a { color: var(--muted); text-decoration: none; margin-left: 1rem; font-size: 0.9rem; }
+        .legal-nav a.active, .legal-nav a:hover { color: var(--primary); }
+        .legal-nav .logo { font-family: Literata, Georgia, serif; font-weight: 600; color: var(--text); margin-left: 0; }
+        .legal-main { max-width: 40rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+        .legal-main h1 { font-family: Literata, Georgia, serif; font-size: 2rem; margin: 0 0 0.35rem; }
+        .legal-meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+        .legal-main h2 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; }
+        .legal-main section p, .legal-main li { color: #44403c; }
+        .legal-footer {
+            text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+        .legal-footer a { color: var(--primary); }
+    </style>
+    </th:block>
+</head>
+<body>
+<header th:fragment="header(active)" class="legal-nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <nav>
+        <a href="/legal/terms" th:classappend="${active == 'terms'} ? ' active'">Terms</a>
+        <a href="/legal/privacy" th:classappend="${active == 'privacy'} ? ' active'">Privacy</a>
+        <a href="/legal/grievance" th:classappend="${active == 'grievance'} ? ' active'">Grievance</a>
+    </nav>
+</header>
+<footer th:fragment="footer" class="legal-footer">
+    <a href="/">← Back to AmarKatha</a>
+</footer>
+</body>
+</html>

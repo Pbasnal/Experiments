@@ -17,7 +17,18 @@ export default function SeriesCardView({ series }: SeriesCardProps) {
   return (
     <article className="series-card">
       <Link to={`/read/s/${series.slug}`} className="series-card-link">
-        <div className="series-cover" style={{ background: series.coverGradient }}>
+        <div
+          className="series-cover"
+          style={
+            series.coverUrl
+              ? {
+                  backgroundImage: `url(${series.coverUrl})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+              : { background: series.coverGradient }
+          }
+        >
           <span className="series-lang">{series.contentLanguage.toUpperCase()}</span>
           {series.status === 'HIATUS' && <span className="series-badge hiatus">Hiatus</span>}
           {series.status === 'COMPLETED' && <span className="series-badge completed">Complete</span>}

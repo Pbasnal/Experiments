@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { fetchChapter } from '../api/home';
+import { fetchChapter, trackChapterView } from '../api/home';
 import type { ChapterReader } from '../types';
 
 export default function ChapterReaderPage() {
@@ -23,6 +23,7 @@ export default function ChapterReaderPage() {
         if (!cancelled) {
           setChapter(data);
           setError(null);
+          void trackChapterView(seriesSlug, chapterSlug);
         }
       })
       .catch((e: Error) => {

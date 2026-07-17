@@ -9,7 +9,8 @@ public class SpaForwardController {
     @GetMapping(value = {
             "/",
             "/read",
-            "/read/**"
+            "/read/profile",
+            "/profile"
     })
     public String forwardReaderSpa() {
         return "forward:/index.html";

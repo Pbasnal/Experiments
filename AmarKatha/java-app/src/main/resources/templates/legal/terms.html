@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service · AmarKatha</title>
+    <th:block th:replace="~{fragments/legal-layout :: styles}"></th:block>
+</head>
+<body>
+<th:block th:replace="~{fragments/legal-layout :: header(active='terms')}"></th:block>
+<main class="legal-main">
+    <h1>Terms of Service</h1>
+    <p class="legal-meta">Last updated: 17 July 2026 · V0 validation launch</p>
+
+    <section>
+        <h2>1. Who we are</h2>
+        <p>
+            AmarKatha (“we”, “us”) is an invite-only comics publishing platform for Indian indie creators
+            and their readers. These terms cover use of amarkatha.in and related services during the V0
+            validation period.
+        </p>
+    </section>
+    <section>
+        <h2>2. Accounts</h2>
+        <p>
+            Creators sign in with Google under an invite. You must keep your account secure and provide
+            accurate profile information. We may suspend accounts that violate these terms or applicable law.
+        </p>
+    </section>
+    <section>
+        <h2>3. Content ownership</h2>
+        <p>
+            Creators retain ownership of comics they upload. By publishing, you grant AmarKatha a
+            non-exclusive license to host, display, and distribute that content for operating the platform
+            (including share links and previews). You confirm you have the rights to publish the material
+            and that it does not infringe others’ rights.
+        </p>
+    </section>
+    <section>
+        <h2>4. Acceptable use</h2>
+        <p>
+            Do not upload illegal, hateful, or infringing content; attempt to break security; scrape the
+            service at scale; or misrepresent schedule/skip information to readers.
+        </p>
+    </section>
+    <section>
+        <h2>5. Takedowns</h2>
+        <p>
+            We may unlist or remove content after a report. See
+            <a href="/legal/grievance">Grievance</a> for how to contact us. V0 target: acknowledge within 24 hours.
+        </p>
+    </section>
+    <section>
+        <h2>6. Contact</h2>
+        <p>
+            Questions:
+            <a th:href="'mailto:' + ${contactEmail}" th:text="${contactEmail}">hello@amarkatha.in</a>
+        </p>
+    </section>
+</main>
+<th:block th:replace="~{fragments/legal-layout :: footer}"></th:block>
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.amarkatha.creator;
 import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.publishing.ChapterException;
 import com.amarkatha.publishing.ChapterService;
+import com.amarkatha.publishing.ScheduleServiceException;
 import com.amarkatha.publishing.SeriesAccessException;
 import com.amarkatha.publishing.SeriesService;
 import com.amarkatha.publishing.domain.Chapter;
@@ -119,7 +120,7 @@ public class CreatorChapterController {
             chapterService.publishNow(seriesId, chapterId, principal.getId(), ack);
             redirectAttributes.addFlashAttribute("success", "Chapter published.");
             return "redirect:/creator/series/" + seriesId;
-        } catch (SeriesAccessException | ChapterException ex) {
+        } catch (SeriesAccessException | ChapterException | ScheduleServiceException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
             return "redirect:/creator/series/" + seriesId + "/chapters/" + chapterId + "/edit";
         }

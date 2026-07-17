@@ -42,6 +42,31 @@
             <span th:text="${series.description}">…</span>
         </p>
 
+        <div style="margin:1rem 0;">
+            <p class="detail-row" style="margin-bottom:0.5rem;"><strong>Cover</strong></p>
+            <div th:if="${coverUrl != null}" style="margin-bottom:0.75rem;">
+                <img th:src="${coverUrl}" alt="Series cover"
+                     style="max-width:12rem; max-height:16rem; object-fit:cover; border-radius:0.5rem; border:1px solid var(--border);">
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+                <form class="js-busy-form" th:action="@{/creator/series/{id}/cover(id=${series.id})}" method="post" enctype="multipart/form-data"
+                      style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="file" name="cover" accept="image/png,image/jpeg,image/webp,image/jpg" required>
+                    <button type="submit" class="btn btn-secondary" data-busy-label="Uploading cover…">Upload cover</button>
+                </form>
+                <form th:if="${coverUrl != null}"
+                      class="js-busy-form"
+                      th:action="@{/creator/series/{id}/cover/remove(id=${series.id})}"
+                      method="post"
+                      onsubmit="return confirm('Remove this cover image?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-secondary" data-busy-label="Removing…">Remove cover</button>
+                </form>
+            </div>
+            <p class="meta" style="margin-top:0.35rem;">PNG/JPG/WebP, max 16 MB. Used on the series hub and WhatsApp previews.</p>
+        </div>
+
         <div class="share-box">
             Reader link:
             <a id="share-link"
@@ -221,5 +246,6 @@ document.querySelectorAll('.js-copy-share').forEach(function (el) {
   });
 });
 </script>
+<script th:replace="~{fragments/creator-layout :: busyForms}"></script>
 </body>
 </html>

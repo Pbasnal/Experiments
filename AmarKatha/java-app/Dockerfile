@@ -20,7 +20,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl webp \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system amarkatha \
     && useradd --system --gid amarkatha --home-dir /app --shell /usr/sbin/nologin amarkatha

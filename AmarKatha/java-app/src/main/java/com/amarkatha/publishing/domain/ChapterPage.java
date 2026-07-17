@@ -92,4 +92,9 @@ public class ChapterPage {
     public Long getBytesWebp() {
         return bytesWebp;
     }
+
+    public void applyWebp(String webpStorageKey, Long bytesWebp) {
+        this.webpStorageKey = webpStorageKey;
+        this.bytesWebp = bytesWebp;
+    }
 }

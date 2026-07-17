@@ -6,6 +6,8 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,15 @@ public class FilesystemMediaStore implements MediaStore {
 
     @Override
     public UploadResult putOriginal(String key, InputStream data, String contentType) {
+        return put(key, data);
+    }
+
+    @Override
+    public UploadResult putDerivative(String key, InputStream data, String contentType) {
+        return put(key, data);
+    }
+
+    private UploadResult put(String key, InputStream data) {
         Path target = resolvePath(key);
         try {
             Files.createDirectories(target.getParent());
@@ -47,6 +58,38 @@ public class FilesystemMediaStore implements MediaStore {
     @Override
     public boolean exists(String key) {
         return Files.isRegularFile(resolvePath(key));
+    }
+
+    @Override
+    public void delete(String key) {
+        try {
+            Files.deleteIfExists(resolvePath(key));
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to delete media key=" + key, ex);
+        }
+    }
+
+    @Override
+    public void deletePrefix(String prefix) {
+        String normalized = sanitize(prefix);
+        if (!normalized.endsWith("/")) {
+            normalized = normalized + "/";
+        }
+        Path dir = root.resolve(normalized).normalize();
+        if (!dir.startsWith(root) || !Files.isDirectory(dir)) {
+            return;
+        }
+        try (Stream<Path> walk = Files.walk(dir)) {
+            walk.sorted(Comparator.reverseOrder()).forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException ex) {
+                    throw new UncheckedIOException("Failed to delete " + path, ex);
+                }
+            });
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to delete prefix=" + prefix, ex);
+        }
     }
 
     private static String sanitize(String key) {

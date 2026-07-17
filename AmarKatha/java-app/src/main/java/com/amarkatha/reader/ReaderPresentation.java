@@ -27,4 +27,13 @@ final class ReaderPresentation {
         }
         return "/media/" + storageKey;
     }
+
+    /** Cover URLs include a bust token so re-uploads of the same path are not sticky in the browser. */
+    static String coverUrl(String storageKey, int version) {
+        String base = mediaUrl(storageKey);
+        if (base == null) {
+            return null;
+        }
+        return base + "?v=" + version;
+    }
 }

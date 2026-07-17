@@ -178,6 +178,10 @@ public class Series {
         this.genres = genres != null ? new ArrayList<>(genres) : new ArrayList<>();
     }
 
+    public void setCoverStorageKey(String coverStorageKey) {
+        this.coverStorageKey = coverStorageKey;
+    }
+
     public void setStatus(SeriesStatus status) {
         this.status = status;
     }

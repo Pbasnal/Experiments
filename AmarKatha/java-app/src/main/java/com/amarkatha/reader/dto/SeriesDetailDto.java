@@ -11,6 +11,7 @@ public record SeriesDetailDto(
         List<String> genres,
         String contentLanguage,
         String coverGradient,
+        String coverUrl,
         String scheduleLabel,
         ScheduleStripDto schedule,
         String status,

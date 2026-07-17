@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/read/**",
+                                "/legal/**",
                                 "/media/**",
                                 "/api/reader/**",
                                 "/api/auth/**",

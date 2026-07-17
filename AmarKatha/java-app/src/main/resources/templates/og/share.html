@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${ogTitle}">AmarKatha</title>
+    <meta name="description" th:content="${ogDescription}">
+    <link rel="canonical" th:href="${ogUrl}">
+    <meta property="og:site_name" content="AmarKatha">
+    <meta property="og:title" th:content="${ogTitle}">
+    <meta property="og:description" th:content="${ogDescription}">
+    <meta property="og:url" th:content="${ogUrl}">
+    <meta property="og:type" th:content="${ogType}">
+    <meta property="og:image" th:if="${ogImage != null}" th:content="${ogImage}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" th:content="${ogTitle}">
+    <meta name="twitter:description" th:content="${ogDescription}">
+    <meta name="twitter:image" th:if="${ogImage != null}" th:content="${ogImage}">
+    <meta http-equiv="refresh" th:content="'0;url=' + ${canonicalPath}">
+</head>
+<body>
+<p>
+    <a th:href="${canonicalPath}" th:text="${ogTitle}">Open on AmarKatha</a>
+</p>
+</body>
+</html>

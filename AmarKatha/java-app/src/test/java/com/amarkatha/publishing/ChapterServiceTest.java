@@ -38,6 +38,8 @@ class ChapterServiceTest {
     private MediaStore mediaStore;
     @Mock
     private ChapterMediaIntegrityService mediaIntegrityService;
+    @Mock
+    private WebpConversionService webpConversionService;
 
     private ChapterService chapterService;
     private UUID creatorId;
@@ -52,6 +54,7 @@ class ChapterServiceTest {
                 seriesScheduleService,
                 mediaStore,
                 mediaIntegrityService,
+                webpConversionService,
                 40,
                 16 * 1024 * 1024
         );
