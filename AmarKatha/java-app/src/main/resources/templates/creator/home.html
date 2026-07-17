@@ -18,6 +18,15 @@
     <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
 
+    <div class="alert alert-warn" th:if="${totalDrafts > 0}">
+        You have <strong th:text="${totalDrafts}">0</strong> draft chapter<span th:if="${totalDrafts != 1}">s</span>
+        waiting to publish.
+    </div>
+    <div class="alert alert-warn" th:if="${needsScheduleCount > 0}">
+        <span th:text="${needsScheduleCount}">0</span> series need<span th:if="${needsScheduleCount == 1}">s</span> a release schedule
+        (set after your second published chapter).
+    </div>
+
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
             <div>
@@ -42,6 +51,16 @@
                         <span class="badge" th:text="${s.status}">ONGOING</span>
                         · <span th:text="${s.contentLanguage}">en</span>
                         · /read/s/<span th:text="${s.slug}">slug</span>
+                    </div>
+                    <div class="meta" style="margin-top:0.35rem;">
+                        <span th:text="${s.nextSlotLabel}">Next: —</span>
+                        <span th:if="${s.scheduleSummary != null}"> · <span th:text="${s.scheduleSummary}">Every 7 days</span></span>
+                    </div>
+                    <div class="meta" style="margin-top:0.35rem;" th:if="${s.draftCount > 0 or s.needsSchedulePrompt}">
+                        <span class="badge badge-warn" th:if="${s.draftCount > 0}">
+                            <span th:text="${s.draftCount}">0</span> draft<span th:if="${s.draftCount != 1}">s</span>
+                        </span>
+                        <span class="badge badge-warn" th:if="${s.needsSchedulePrompt}">Set schedule</span>
                     </div>
                 </div>
                 <a class="btn btn-secondary" th:href="@{/creator/series/{id}(id=${s.id})}">Open</a>
