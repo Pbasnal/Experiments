@@ -108,10 +108,39 @@ a {
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .btn-signin:hover {
   background: var(--primary-hover);
+}
+
+.btn-signout {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-signout:hover {
+  background: var(--surface-muted, #f3f4f6);
+  color: var(--text);
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-email {
+  font-size: 0.875rem;
+  color: var(--muted);
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 main {

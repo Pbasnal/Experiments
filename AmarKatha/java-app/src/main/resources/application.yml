@@ -18,6 +18,11 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  session:
+    store-type: jdbc
+    timeout: 12h
+    jdbc:
+      initialize-schema: never
   security:
     oauth2:
       client:

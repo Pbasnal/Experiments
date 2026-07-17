@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { fetchMe, logout, type AuthMeResponse } from '../api/auth';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,6 +13,25 @@ const navItems = [
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const [auth, setAuth] = useState<AuthMeResponse | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchMe().then((me) => {
+      if (!cancelled) {
+        setAuth(me);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleLogout() {
+    await logout();
+    setAuth({ authenticated: false });
+    window.location.href = '/';
+  }
 
   return (
     <div className="app-shell">
@@ -38,9 +58,27 @@ export default function Layout({ children }: LayoutProps) {
               ),
             )}
           </nav>
-          <a href="/creator/login" className="btn-signin">
-            Sign in
-          </a>
+          <div className="auth-actions">
+            {auth?.authenticated ? (
+              <>
+                {auth.role === 'ADMIN' && (
+                  <a href="/admin" className="nav-link">
+                    Admin
+                  </a>
+                )}
+                <span className="auth-email" title={auth.email}>
+                  {auth.displayName || auth.email}
+                </span>
+                <button type="button" className="btn-signin btn-signout" onClick={handleLogout}>
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <a href="/creator/login" className="btn-signin">
+                Sign in
+              </a>
+            )}
+          </div>
         </div>
       </header>
       <main>{children}</main>

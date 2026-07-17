@@ -1,7 +1,9 @@
 package com.amarkatha.admin;
 
 import com.amarkatha.identity.InviteService;
+import com.amarkatha.identity.UserRepository;
 import com.amarkatha.identity.domain.InviteToken;
+import com.amarkatha.identity.domain.User;
 import com.amarkatha.identity.security.AmarKathaPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,16 +22,22 @@ public class AdminInviteController {
 
     private final InviteService inviteService;
     private final AdminDashboardService adminDashboardService;
+    private final UserRepository userRepository;
 
-    public AdminInviteController(InviteService inviteService, AdminDashboardService adminDashboardService) {
+    public AdminInviteController(
+            InviteService inviteService,
+            AdminDashboardService adminDashboardService,
+            UserRepository userRepository
+    ) {
         this.inviteService = inviteService;
         this.adminDashboardService = adminDashboardService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping({"", "/"})
     public String adminHome(Model model, @AuthenticationPrincipal AmarKathaPrincipal principal) {
         model.addAttribute("navActive", "dashboard");
-        model.addAttribute("adminEmail", principal.getUser().getEmail());
+        model.addAttribute("adminEmail", principal.getEmail());
         model.addAttribute("dashboard", adminDashboardService.dashboard());
         return "admin/dashboard";
     }
@@ -41,7 +49,7 @@ public class AdminInviteController {
             @AuthenticationPrincipal AmarKathaPrincipal principal
     ) {
         model.addAttribute("navActive", "invites");
-        model.addAttribute("adminEmail", principal.getUser().getEmail());
+        model.addAttribute("adminEmail", principal.getEmail());
         model.addAttribute("statusFilter", status);
         model.addAttribute("invites", adminDashboardService.listInviteRows(status));
         return "admin/invites";
@@ -53,7 +61,8 @@ public class AdminInviteController {
             @RequestParam(value = "redirect", required = false) String redirect,
             RedirectAttributes redirectAttributes
     ) {
-        InviteToken invite = inviteService.generate(principal.getUser());
+        User admin = userRepository.getReferenceById(principal.getId());
+        InviteToken invite = inviteService.generate(admin);
         redirectAttributes.addFlashAttribute("newToken", invite.getToken());
         if ("dashboard".equals(redirect)) {
             return "redirect:/admin";

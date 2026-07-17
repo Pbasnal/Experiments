@@ -13,13 +13,13 @@ public class CreatorController {
 
     @GetMapping({"", "/"})
     public String creatorHome(@AuthenticationPrincipal AmarKathaPrincipal principal, Model model) {
-        model.addAttribute("user", principal.getUser());
+        model.addAttribute("user", principal);
         return "creator/home";
     }
 
     @GetMapping("/series")
     public String seriesList(@AuthenticationPrincipal AmarKathaPrincipal principal, Model model) {
-        model.addAttribute("user", principal.getUser());
+        model.addAttribute("user", principal);
         model.addAttribute("title", "My Series");
         model.addAttribute("description", "Manage up to 5 ongoing series. Set weekly or biweekly cadence after your second chapter.");
         return "creator/placeholder";

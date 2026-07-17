@@ -1,11 +1,15 @@
 package com.amarkatha.identity.security;
 
+import java.io.Serial;
 import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public class AmarKathaAuthenticationToken extends OAuth2AuthenticationToken {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public AmarKathaAuthenticationToken(AmarKathaPrincipal principal, Map<String, Object> attributes) {
         super(principal, principal.getAuthorities(), "google");

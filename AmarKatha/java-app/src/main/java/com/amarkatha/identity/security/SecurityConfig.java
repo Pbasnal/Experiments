@@ -34,6 +34,7 @@ public class SecurityConfig {
                                 "/",
                                 "/read/**",
                                 "/api/reader/**",
+                                "/api/auth/**",
                                 "/actuator/health",
                                 "/actuator/info",
                                 "/error",
@@ -58,12 +59,12 @@ public class SecurityConfig {
                                 request -> request.getRequestURI().startsWith("/admin"))
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/creator/login"))
                 )
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reader/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reader/**", "/api/auth/**"))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("SESSION", "JSESSIONID")
                 )
                 .addFilterBefore(oauthInviteGateFilter, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
