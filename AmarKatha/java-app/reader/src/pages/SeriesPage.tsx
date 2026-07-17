@@ -1,23 +1,56 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { fetchHome } from '../api/home';
-import type { SeriesCard } from '../types';
+import { fetchSeries } from '../api/home';
+import type { SeriesDetail } from '../types';
 
 export default function SeriesPage() {
   const { seriesSlug } = useParams<{ seriesSlug: string }>();
-  const [series, setSeries] = useState<SeriesCard | null>(null);
+  const [series, setSeries] = useState<SeriesDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHome().then((home) => {
-      const match = home.recentlyUpdated.find((s) => s.slug === seriesSlug);
-      setSeries(match ?? null);
-    });
+    if (!seriesSlug) {
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    fetchSeries(seriesSlug)
+      .then((data) => {
+        if (!cancelled) {
+          setSeries(data);
+          setError(null);
+        }
+      })
+      .catch((e: Error) => {
+        if (!cancelled) {
+          setSeries(null);
+          setError(e.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [seriesSlug]);
 
-  if (!series) {
+  if (loading) {
     return (
       <div className="series-page empty">
         <p>Loading series…</p>
+        <Link to="/">← Back to home</Link>
+      </div>
+    );
+  }
+
+  if (error || !series) {
+    return (
+      <div className="series-page empty">
+        <p>{error ?? 'Series not found'}</p>
         <Link to="/">← Back to home</Link>
       </div>
     );
@@ -30,7 +63,6 @@ export default function SeriesPage() {
       </Link>
       <div className="series-hero" style={{ background: series.coverGradient }}>
         <div className="series-hero-content">
-          <span className="preview-badge">Series hub · Preview</span>
           <h1>{series.title}</h1>
           <p className="series-creator">by {series.creatorName}</p>
         </div>
@@ -43,33 +75,41 @@ export default function SeriesPage() {
             <p className="hiatus-note">This series is on hiatus. Check back when the creator resumes.</p>
           )}
         </aside>
-        <p className="series-synopsis">{series.description}</p>
-        <div className="series-tags">
-          {series.genres.map((g) => (
-            <span key={g} className="genre-tag">
-              {g}
-            </span>
-          ))}
-        </div>
+        {series.description && <p className="series-synopsis">{series.description}</p>}
+        {series.genres.length > 0 && (
+          <div className="series-tags">
+            {series.genres.map((g) => (
+              <span key={g} className="genre-tag">
+                {g}
+              </span>
+            ))}
+          </div>
+        )}
         <section className="chapter-list-preview">
           <h2>Chapters</h2>
-          <p className="muted">
-            Chapter reader coming in Week 3. {series.chapterCount} chapters will appear here when listed.
-          </p>
+          <p className="muted">{series.chapterCount} listed chapter{series.chapterCount === 1 ? '' : 's'}</p>
           <ul>
-            {Array.from({ length: Math.min(series.chapterCount, 5) }, (_, i) => (
-              <li key={i}>
-                <span className="chapter-num">Ch. {i + 1}</span>
-                <span className="chapter-placeholder">Vertical reader — planned</span>
+            {series.chapters.map((chapter) => (
+              <li key={chapter.slug}>
+                <Link to={`/read/s/${series.slug}/c/${chapter.slug}`} className="chapter-link">
+                  <span className="chapter-num">Ch. {formatChapterNumber(chapter.chapterNumber)}</span>
+                  <span className="chapter-title">{chapter.title}</span>
+                </Link>
               </li>
             ))}
           </ul>
         </section>
         <div className="share-box">
-          <label>Share link (V0 primary distribution)</label>
-          <code>{window.location.origin}/read/s/{series.slug}</code>
+          <label>Share link</label>
+          <code>
+            {window.location.origin}/read/s/{series.slug}
+          </code>
         </div>
       </div>
     </div>
   );
+}
+
+function formatChapterNumber(n: number): string {
+  return Number.isInteger(n) ? String(n) : String(n);
 }

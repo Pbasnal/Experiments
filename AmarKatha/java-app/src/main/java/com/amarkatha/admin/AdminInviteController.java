@@ -55,6 +55,15 @@ public class AdminInviteController {
         return "admin/invites";
     }
 
+    @GetMapping("/profile")
+    public String profile(Model model, @AuthenticationPrincipal AmarKathaPrincipal principal) {
+        model.addAttribute("navActive", "profile");
+        model.addAttribute("adminEmail", principal.getEmail());
+        model.addAttribute("displayName", principal.getDisplayName());
+        model.addAttribute("role", principal.getRole().name());
+        return "admin/profile";
+    }
+
     @PostMapping("/invites")
     public String generateInvite(
             @AuthenticationPrincipal AmarKathaPrincipal principal,

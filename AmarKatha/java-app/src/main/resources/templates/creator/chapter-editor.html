@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chapter editor · ' + ${series.title}">Chapter editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
+    <style>
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .page-thumb {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: var(--bg);
+        }
+        .page-thumb img {
+            display: block;
+            width: 100%;
+            height: 9rem;
+            object-fit: cover;
+        }
+        .page-thumb .ord {
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding: 0.35rem 0.5rem;
+        }
+        .checkbox-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin: 1rem 0;
+        }
+        .checkbox-row input { margin-top: 0.2rem; }
+    </style>
+</head>
+<body>
+<nav th:replace="~{fragments/creator-layout :: nav(active='series')}"></nav>
+<main class="creator-main">
+    <p class="meta">
+        <a th:href="@{/creator/series/{id}(id=${series.id})}" th:text="${series.title}">Series</a>
+        · Chapter <span th:text="${chapter.chapterNumber}">1</span>
+        · <span class="badge" th:text="${chapter.state}">DRAFT</span>
+    </p>
+    <h1>Chapter editor</h1>
+    <p class="subtitle">
+        Upload PNG/JPG/WebP pages (max <span th:text="${maxPageMb}">16</span> MB each,
+        up to <span th:text="${maxPages}">40</span> pages).
+    </p>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <div class="card" th:if="${canEdit}">
+        <h2 style="font-size:1.05rem; margin-bottom:0.75rem;">Draft details</h2>
+        <form th:action="@{/creator/series/{sid}/chapters/{cid}/save(sid=${series.id},cid=${chapter.id})}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="title">Title</label>
+            <input id="title" type="text" name="title" required maxlength="500" th:value="${chapter.title}">
+            <button type="submit" class="btn btn-secondary">Save draft</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2 style="font-size:1.05rem; margin-bottom:0.35rem;">Pages</h2>
+        <p class="meta" th:text="${#lists.size(pages)} + ' / ' + ${maxPages} + ' pages'">0 / 40</p>
+
+        <div th:if="${#lists.isEmpty(pages)}" class="empty">No pages yet.</div>
+        <div class="page-grid" th:unless="${#lists.isEmpty(pages)}">
+            <div class="page-thumb" th:each="p : ${pages}">
+                <img th:src="@{|/media/${p.originalStorageKey}|}" alt="Page">
+                <div class="ord" th:text="'#' + ${p.sortOrder}">#1</div>
+            </div>
+        </div>
+
+        <form th:if="${canEdit}" style="margin-top:1.25rem;"
+              th:action="@{/creator/series/{sid}/chapters/{cid}/pages(sid=${series.id},cid=${chapter.id})}"
+              method="post" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="files">Add pages</label>
+            <input id="files" type="file" name="files" accept="image/png,image/jpeg,image/webp" multiple required>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card" th:if="${canEdit}">
+        <h2 style="font-size:1.05rem; margin-bottom:0.75rem;">Publish</h2>
+        <form th:action="@{/creator/series/{sid}/chapters/{cid}/publish(sid=${series.id},cid=${chapter.id})}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label class="checkbox-row">
+                <input type="checkbox" name="copyrightAck" value="true" required>
+                <span>I confirm I own the rights to upload this content, or I have permission from the copyright holder.</span>
+            </label>
+            <button type="submit" class="btn btn-primary"
+                    th:disabled="${#lists.isEmpty(pages)}"
+                    th:classappend="${#lists.isEmpty(pages)} ? ' is-disabled'">Publish now</button>
+        </form>
+        <p class="hint">Scheduling and WebP optimization come later. Publish now lists the chapter immediately.</p>
+    </div>
+
+    <div class="card" th:unless="${canEdit}">
+        <p class="meta">This chapter is published and locked for editing in V0.</p>
+        <a class="btn btn-secondary" th:href="@{/creator/series/{id}(id=${series.id})}">Back to series</a>
+    </div>
+</main>
+</body>
+</html>

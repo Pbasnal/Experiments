@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile · AmarKatha Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/creator-layout :: nav(active='profile')}"></nav>
+<main class="creator-main">
+    <h1>Profile</h1>
+    <p class="subtitle">Your creator account.</p>
+    <div class="card">
+        <p class="detail-row"><strong>Name</strong> <span th:text="${user.displayName}">Creator</span></p>
+        <p class="detail-row"><strong>Email</strong> <span th:text="${user.email}">creator@example.com</span></p>
+        <p class="detail-row"><strong>Role</strong> <span th:text="${user.role}">CREATOR</span></p>
+        <p class="hint">More profile settings coming soon.</p>
+        <div class="actions">
+            <a href="/creator" class="btn btn-primary">Creator home</a>
+            <a href="/" class="btn btn-secondary">Reader site</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -66,9 +66,9 @@ export default function Layout({ children }: LayoutProps) {
                     Admin
                   </a>
                 )}
-                <span className="auth-email" title={auth.email}>
+                <a href="/profile" className="auth-email" title={auth.email}>
                   {auth.displayName || auth.email}
-                </span>
+                </a>
                 <button type="button" className="btn-signin btn-signout" onClick={handleLogout}>
                   Sign out
                 </button>

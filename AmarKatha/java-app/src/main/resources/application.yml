@@ -23,6 +23,10 @@ spring:
     timeout: 12h
     jdbc:
       initialize-schema: never
+  servlet:
+    multipart:
+      max-file-size: 16MB
+      max-request-size: 200MB
   security:
     oauth2:
       client:
@@ -47,6 +51,13 @@ amarkatha:
   contact-email: ${AMARKATHA_CONTACT_EMAIL:hello@amarkatha.in}
   admin:
     bootstrap-emails: ${ADMIN_BOOTSTRAP_EMAILS:}
+  media:
+    root: ${AMARKATHA_MEDIA_ROOT:./data/media}
+    max-pages-per-chapter: 40
+    max-page-bytes: 16777216
+    reconcile-on-startup: ${AMARKATHA_MEDIA_RECONCILE_ON_STARTUP:true}
+    reconcile-schedule-enabled: ${AMARKATHA_MEDIA_RECONCILE_SCHEDULE:true}
+    reconcile-interval-ms: ${AMARKATHA_MEDIA_RECONCILE_INTERVAL_MS:3600000}
 
 management:
   endpoints:

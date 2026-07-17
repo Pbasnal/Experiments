@@ -167,4 +167,8 @@ public class Series {
     public void setStatus(SeriesStatus status) {
         this.status = status;
     }
+
+    public void setLastPublishedAt(Instant lastPublishedAt) {
+        this.lastPublishedAt = lastPublishedAt;
+    }
 }

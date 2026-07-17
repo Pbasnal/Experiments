@@ -222,6 +222,10 @@
            th:classappend="${navActive == 'dashboard'} ? ' active'">Dashboard</a>
         <a th:href="@{/admin/invites}"
            th:classappend="${navActive == 'invites'} ? ' active'">Invites</a>
+        <a th:href="@{/admin/media}"
+           th:classappend="${navActive == 'media'} ? ' active'">Media</a>
+        <a th:href="@{/admin/profile}"
+           th:classappend="${navActive == 'profile'} ? ' active'">Profile</a>
         <span class="admin-email" th:text="${adminEmail}">admin@example.com</span>
         <form th:action="@{/logout}" method="post" style="display:inline">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">

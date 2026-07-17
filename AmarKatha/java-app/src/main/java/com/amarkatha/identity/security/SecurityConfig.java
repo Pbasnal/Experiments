@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/read/**",
+                                "/media/**",
                                 "/api/reader/**",
                                 "/api/auth/**",
                                 "/actuator/health",
@@ -45,6 +46,7 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/login/oauth2/**"
                         ).permitAll()
+                        .requestMatchers("/profile").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/creator/**").hasAnyRole("CREATOR", "ADMIN")
                         .anyRequest().permitAll()

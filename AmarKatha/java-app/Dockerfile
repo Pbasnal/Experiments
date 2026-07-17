@@ -26,12 +26,15 @@ RUN apt-get update \
     && useradd --system --gid amarkatha --home-dir /app --shell /usr/sbin/nologin amarkatha
 
 COPY --from=build /workspace/app.jar /app/app.jar
+COPY docker/entrypoint.sh /entrypoint.sh
 
-USER amarkatha
+RUN mkdir -p /data/media \
+    && chown amarkatha:amarkatha /data/media \
+    && chmod +x /entrypoint.sh
 
 EXPOSE 8080
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=12 \
   CMD curl -fsS http://127.0.0.1:8080/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]

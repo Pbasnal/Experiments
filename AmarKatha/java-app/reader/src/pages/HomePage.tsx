@@ -20,7 +20,7 @@ export default function HomePage() {
     <>
       <section className="hero">
         <div className="hero-inner">
-          <span className="hero-eyebrow">V0 validation launch · UI preview</span>
+          <span className="hero-eyebrow">V0 validation launch</span>
           <h1>Where Indian stories come alive</h1>
           <p className="hero-tagline">
             {data?.tagline ?? 'Publish on your rhythm, share a link, readers know when you\'re back.'}
@@ -65,11 +65,14 @@ export default function HomePage() {
       <section className="catalog" id="catalog">
         <div className="section-header">
           <h2>Recently updated</h2>
-          <p>Chronological feed — mock catalog for UI preview. Editor&apos;s Picks and trending deferred to V1.</p>
+          <p>Chronological feed of series with published chapters. Editor&apos;s Picks and trending deferred to V1.</p>
         </div>
         {loading && <p className="state-message">Loading catalog…</p>}
         {error && <p className="state-message error">{error}</p>}
-        {data && (
+        {data && data.recentlyUpdated.length === 0 && !loading && (
+          <p className="state-message">No published series yet. Creators can publish from the portal.</p>
+        )}
+        {data && data.recentlyUpdated.length > 0 && (
           <div className="series-grid">
             {data.recentlyUpdated.map((series) => (
               <SeriesCardView key={series.slug} series={series} />

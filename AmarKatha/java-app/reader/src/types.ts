@@ -12,6 +12,33 @@ export interface SeriesCard {
   chapterCount: number;
 }
 
+export interface ChapterSummary {
+  slug: string;
+  title: string;
+  chapterNumber: number;
+  listedAt: string | null;
+}
+
+export interface SeriesDetail extends SeriesCard {
+  chapters: ChapterSummary[];
+}
+
+export interface ChapterPage {
+  sortOrder: number;
+  imageUrl: string;
+  width: number | null;
+  height: number | null;
+}
+
+export interface ChapterReader {
+  seriesSlug: string;
+  seriesTitle: string;
+  chapterSlug: string;
+  title: string;
+  chapterNumber: number;
+  pages: ChapterPage[];
+}
+
 export interface PlatformRoute {
   label: string;
   path: string;

@@ -3,33 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Portal · AmarKatha</title>
-    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
-    <style>
-        main { max-width: 42rem; text-align: center; }
-        .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
-        .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); width: auto; padding: 0.65rem 1.25rem; }
-    </style>
+    <title>Creator · AmarKatha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
 </head>
 <body>
-<nav class="nav">
-    <a href="/" class="logo">AmarKatha</a>
-    <div class="nav-links">
-        <a href="/creator/series">My Series</a>
-        <form th:action="@{/logout}" method="post" style="display:inline">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <button type="submit" style="background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;font-size:0.9rem;font-weight:500;">Sign out</button>
-        </form>
-    </div>
-</nav>
-<main>
+<nav th:replace="~{fragments/creator-layout :: nav(active='home')}"></nav>
+<main class="creator-main">
+    <h1>Welcome, <span th:text="${user.displayName}">Creator</span></h1>
+    <p class="subtitle">Upload chapters, set your schedule, and share links with readers.</p>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
     <div class="card">
-        <h1>Welcome, <span th:text="${user.displayName}">Creator</span></h1>
-        <p class="subtitle">Upload chapters, set your schedule, and share links with readers.</p>
-        <div class="actions">
-            <a href="/creator/series" class="btn btn-primary" style="width: auto; padding: 0.65rem 1.25rem;">My Series</a>
-            <a href="/" class="btn btn-secondary">View reader site</a>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
+            <div>
+                <h2 style="font-size:1.1rem; margin:0;">Your series</h2>
+                <p class="meta" style="margin:0.35rem 0 0;">
+                    Ongoing: <span th:text="${ongoingCount}">0</span> /
+                    <span th:text="${maxOngoing}">5</span>
+                </p>
+            </div>
+            <a th:if="${canCreate}" th:href="@{/creator/series/new}" class="btn btn-primary">New series</a>
+            <span th:unless="${canCreate}" class="btn btn-primary is-disabled" title="Ongoing series cap reached">New series</span>
         </div>
+
+        <div th:if="${#lists.isEmpty(seriesList)}" class="empty" style="margin-top:1rem;">
+            No series yet. Create one to start uploading chapters.
+        </div>
+        <div th:unless="${#lists.isEmpty(seriesList)}" style="margin-top:0.75rem;">
+            <div class="series-item" th:each="s : ${seriesList}">
+                <div>
+                    <a class="title" th:href="@{/creator/series/{id}(id=${s.id})}" th:text="${s.title}">Title</a>
+                    <div class="meta" style="margin-top:0.25rem;">
+                        <span class="badge" th:text="${s.status}">ONGOING</span>
+                        · <span th:text="${s.contentLanguage}">en</span>
+                        · /read/s/<span th:text="${s.slug}">slug</span>
+                    </div>
+                </div>
+                <a class="btn btn-secondary" th:href="@{/creator/series/{id}(id=${s.id})}">Open</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/creator/series}" class="btn btn-secondary">All series</a>
+        <a href="/" class="btn btn-secondary">View reader site</a>
     </div>
 </main>
 </body>

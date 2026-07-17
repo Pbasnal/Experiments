@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageHeading} + ' · AmarKatha'">Series · AmarKatha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/creator-layout :: nav(active='series')}"></nav>
+<main class="creator-main">
+    <h1 th:text="${pageHeading}">New series</h1>
+    <p class="subtitle">Title is required. Slug is generated automatically and stays stable for share links.</p>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <form th:action="${formAction}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <label for="title">Title</label>
+            <input id="title" type="text" name="title" required maxlength="500"
+                   th:value="${series != null ? series.title : ''}"
+                   placeholder="e.g. Midnight Metro">
+
+            <label for="description">Description (optional)</label>
+            <textarea id="description" name="description" maxlength="4000"
+                      placeholder="Short blurb for your series page"
+                      th:text="${series != null ? series.description : ''}"></textarea>
+
+            <label for="contentLanguage">Content language</label>
+            <select id="contentLanguage" name="contentLanguage">
+                <option value="en" th:selected="${series == null or series.contentLanguage == 'en'}">English</option>
+                <option value="hi" th:selected="${series != null and series.contentLanguage == 'hi'}">Hindi</option>
+                <option value="ta" th:selected="${series != null and series.contentLanguage == 'ta'}">Tamil</option>
+                <option value="te" th:selected="${series != null and series.contentLanguage == 'te'}">Telugu</option>
+                <option value="bn" th:selected="${series != null and series.contentLanguage == 'bn'}">Bengali</option>
+                <option value="mr" th:selected="${series != null and series.contentLanguage == 'mr'}">Marathi</option>
+                <option value="other" th:selected="${series != null and series.contentLanguage != null and !#strings.contains('en,hi,ta,te,bn,mr', series.contentLanguage)}">Other</option>
+            </select>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary" th:text="${series != null ? 'Save changes' : 'Create series'}">Create series</button>
+                <a th:if="${series != null}" th:href="@{/creator/series/{id}(id=${series.id})}" class="btn btn-secondary">Cancel</a>
+                <a th:unless="${series != null}" th:href="@{/creator/series}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

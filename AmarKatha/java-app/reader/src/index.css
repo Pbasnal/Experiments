@@ -141,6 +141,63 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-decoration: none;
+}
+
+.auth-email:hover {
+  color: var(--primary);
+}
+
+.profile-page {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.profile-page h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+}
+
+.profile-page .subtitle {
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+}
+
+.profile-dl {
+  margin: 0 0 1rem;
+}
+
+.profile-dl > div {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-dl dt {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.profile-dl dd {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+.profile-page .muted {
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 main {
@@ -711,7 +768,7 @@ main {
 .chapter-list-preview li {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0;
   border-top: 1px solid var(--border);
   font-size: 0.9rem;
 }
@@ -719,6 +776,76 @@ main {
 .chapter-list-preview li:first-child {
   border-top: none;
 }
+
+.chapter-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.chapter-link:hover {
+  background: var(--primary-soft, #eef2ff);
+}
+
+.chapter-title {
+  flex: 1;
+  text-align: right;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.chapter-num {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Chapter reader */
+.chapter-reader {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+.chapter-reader.empty {
+  text-align: center;
+  padding: 4rem 1.25rem;
+}
+
+.chapter-reader-header {
+  padding: 0 1.25rem 1rem;
+}
+
+.chapter-reader-header h1 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  margin: 0.5rem 0 0;
+}
+
+.page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #111;
+}
+
+.page-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+
+.chapter-reader-footer {
+  padding: 1.5rem 1.25rem 0;
+  display: flex;
+  justify-content: center;
+}
+
 
 .chapter-num {
   font-weight: 600;

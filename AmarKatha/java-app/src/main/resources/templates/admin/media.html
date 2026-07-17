@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media · AmarKatha Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/admin-layout :: styles}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/admin-layout :: nav}"></nav>
+<main class="admin-main">
+    <h1>Media integrity</h1>
+    <p class="subtitle">Keep chapter pages and media files in sync so readers never see broken images.</p>
+
+    <div class="alert alert-success" th:if="${report != null}">
+        <p>
+            Reconcile finished.
+            Delisted <strong th:text="${report.delisted().size()}">0</strong>,
+            relisted <strong th:text="${report.relisted().size()}">0</strong>
+            (published <span th:text="${report.publishedCount()}">0</span>,
+            intact listed <span th:text="${report.intactListedCount()}">0</span>).
+        </p>
+        <ul th:if="${!#lists.isEmpty(report.delisted())}" style="margin-top:0.5rem;padding-left:1.25rem">
+            <li th:each="broken : ${report.delisted()}">
+                <code th:text="${broken.slug()}">chapter</code>
+                —
+                <span th:text="${#strings.listJoin(broken.missingKeys(), ', ')}">keys</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="label">Broken listed chapters</div>
+            <div class="value" th:text="${brokenListedCount}">0</div>
+            <div class="hint">Listed in catalog but missing files</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Reconcile</h2>
+        <p class="muted" style="margin-bottom:1rem">
+            Delists published chapters whose page files are missing.
+            Relists previously delisted published chapters once all files are present again.
+        </p>
+        <form th:action="@{/admin/media/reconcile}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="btn btn-primary">Run reconcile now</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
