@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invites · AmarKatha Admin</title>
+    <title>Dashboard · AmarKatha Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
@@ -12,17 +12,16 @@
 <body>
 <nav th:replace="~{fragments/admin-layout :: nav}"></nav>
 <main class="admin-main">
-    <h1>Invite tokens</h1>
-    <p class="subtitle">One-time codes for creator signup. Share the signup link after generating.</p>
+    <h1>Admin</h1>
+    <p class="subtitle">Invite creators and monitor cohort basics.</p>
 
     <div class="alert alert-success" th:if="${newToken != null}">
-        <p>New invite created.</p>
+        <p>Invite created.</p>
         <p>
             Signup link:
             <a th:href="@{/creator/signup(invite=${newToken})}"
                th:text="@{/creator/signup(invite=${newToken})}">/creator/signup</a>
         </p>
-        <p>Token: <code th:text="${newToken}">token</code></p>
         <div class="token-actions">
             <button type="button" class="btn-ghost js-copy"
                     th:attr="data-copy=@{/creator/signup(invite=${newToken})}">Copy link</button>
@@ -32,56 +31,70 @@
     </div>
 
     <div class="card">
-        <div class="actions" style="margin-bottom: 1rem;">
+        <h2>Quick actions</h2>
+        <div class="actions">
             <form th:action="@{/admin/invites}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="redirect" value="dashboard">
                 <button type="submit" class="btn btn-primary">Generate invite</button>
             </form>
+            <a th:href="@{/admin/invites}" class="btn btn-secondary">View invites</a>
+            <span class="btn btn-soon" title="Coming in a later phase">Stipends · soon</span>
+            <span class="btn btn-soon" title="Coming in a later phase">Reports · soon</span>
         </div>
+    </div>
 
-        <div class="filters">
-            <a th:href="@{/admin/invites(status=all)}"
-               th:classappend="${statusFilter == 'all'} ? ' active'">All</a>
-            <a th:href="@{/admin/invites(status=available)}"
-               th:classappend="${statusFilter == 'available'} ? ' active'">Available</a>
-            <a th:href="@{/admin/invites(status=used)}"
-               th:classappend="${statusFilter == 'used'} ? ' active'">Used</a>
-            <a th:href="@{/admin/invites(status=expired)}"
-               th:classappend="${statusFilter == 'expired'} ? ' active'">Expired</a>
+    <div class="stats">
+        <div class="stat">
+            <div class="label">Available invites</div>
+            <div class="value" th:text="${dashboard.availableInvites}">0</div>
         </div>
+        <div class="stat">
+            <div class="label">Used (30 days)</div>
+            <div class="value" th:text="${dashboard.usedInvitesLast30Days}">0</div>
+        </div>
+        <div class="stat">
+            <div class="label">Creators</div>
+            <div class="value" th:text="${dashboard.creatorCount}">0</div>
+        </div>
+        <div class="stat">
+            <div class="label">Open reports</div>
+            <div class="value">-</div>
+            <div class="hint">Coming soon</div>
+        </div>
+    </div>
 
-        <p class="empty" th:if="${#lists.isEmpty(invites)}">No invites match this filter.</p>
-        <table th:unless="${#lists.isEmpty(invites)}">
+    <div class="card">
+        <h2>Recent invites</h2>
+        <p class="empty" th:if="${#lists.isEmpty(dashboard.recentInvites)}">No invites yet. Generate one above.</p>
+        <table th:unless="${#lists.isEmpty(dashboard.recentInvites)}">
             <thead>
             <tr>
                 <th>Token</th>
                 <th>Status</th>
-                <th>Created by</th>
                 <th>Expires</th>
                 <th>Created</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="invite : ${invites}">
+            <tr th:each="invite : ${dashboard.recentInvites}">
                 <td>
-                    <code th:text="${invite.token}">token</code>
+                    <code th:text="${#strings.substring(invite.token, 0, 12) + '...'}">token</code>
                     <div class="token-actions" th:if="${invite.status == 'Available'}">
                         <button type="button" class="btn-ghost js-copy"
                                 th:attr="data-copy=@{/creator/signup(invite=${invite.token})}">Copy link</button>
-                        <button type="button" class="btn-ghost js-copy"
-                                th:attr="data-copy=${invite.token}">Copy token</button>
                     </div>
                 </td>
                 <td>
                     <span th:class="${'status status-' + #strings.toLowerCase(invite.status)}"
                           th:text="${invite.status}">Available</span>
                 </td>
-                <td th:text="${invite.createdByEmail}">-</td>
                 <td th:text="${invite.expiresLabel}">-</td>
                 <td th:text="${invite.createdLabel}">-</td>
             </tr>
             </tbody>
         </table>
+        <a th:href="@{/admin/invites}" class="see-all">See all invites</a>
     </div>
 </main>
 <script>

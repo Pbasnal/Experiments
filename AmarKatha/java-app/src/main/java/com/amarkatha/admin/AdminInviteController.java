@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -18,31 +19,45 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AdminInviteController {
 
     private final InviteService inviteService;
+    private final AdminDashboardService adminDashboardService;
 
-    public AdminInviteController(InviteService inviteService) {
+    public AdminInviteController(InviteService inviteService, AdminDashboardService adminDashboardService) {
         this.inviteService = inviteService;
+        this.adminDashboardService = adminDashboardService;
     }
 
     @GetMapping({"", "/"})
-    public String adminHome(Model model) {
-        model.addAttribute("title", "Admin Portal");
-        model.addAttribute("description", "Generate invite tokens, track creator stipends, and handle content reports.");
-        return "admin/placeholder";
+    public String adminHome(Model model, @AuthenticationPrincipal AmarKathaPrincipal principal) {
+        model.addAttribute("navActive", "dashboard");
+        model.addAttribute("adminEmail", principal.getUser().getEmail());
+        model.addAttribute("dashboard", adminDashboardService.dashboard());
+        return "admin/dashboard";
     }
 
     @GetMapping("/invites")
-    public String listInvites(Model model) {
-        model.addAttribute("invites", inviteService.listRecent());
+    public String listInvites(
+            @RequestParam(value = "status", required = false, defaultValue = "all") String status,
+            Model model,
+            @AuthenticationPrincipal AmarKathaPrincipal principal
+    ) {
+        model.addAttribute("navActive", "invites");
+        model.addAttribute("adminEmail", principal.getUser().getEmail());
+        model.addAttribute("statusFilter", status);
+        model.addAttribute("invites", adminDashboardService.listInviteRows(status));
         return "admin/invites";
     }
 
     @PostMapping("/invites")
     public String generateInvite(
             @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam(value = "redirect", required = false) String redirect,
             RedirectAttributes redirectAttributes
     ) {
         InviteToken invite = inviteService.generate(principal.getUser());
         redirectAttributes.addFlashAttribute("newToken", invite.getToken());
+        if ("dashboard".equals(redirect)) {
+            return "redirect:/admin";
+        }
         return "redirect:/admin/invites";
     }
 }

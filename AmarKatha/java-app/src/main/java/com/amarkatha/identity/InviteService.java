@@ -73,6 +73,21 @@ public class InviteService {
         return inviteTokenRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    @Transactional(readOnly = true)
+    public List<InviteToken> listRecentWithCreator() {
+        return inviteTokenRepository.findAllWithCreatedByOrderByCreatedAtDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public long countAvailable() {
+        return inviteTokenRepository.countAvailable(Instant.now());
+    }
+
+    @Transactional(readOnly = true)
+    public long countUsedSince(Instant since) {
+        return inviteTokenRepository.countUsedSince(since);
+    }
+
     private static String normalize(String rawToken) {
         return rawToken == null ? "" : rawToken.trim();
     }
