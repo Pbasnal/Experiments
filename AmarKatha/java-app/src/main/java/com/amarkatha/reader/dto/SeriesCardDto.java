@@ -12,6 +12,7 @@ public record SeriesCardDto(
         String contentLanguage,
         String coverGradient,
         String scheduleLabel,
+        ScheduleStripDto schedule,
         String status,
         Instant lastUpdatedAt,
         int chapterCount

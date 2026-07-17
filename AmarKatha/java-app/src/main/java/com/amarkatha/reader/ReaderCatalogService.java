@@ -4,14 +4,17 @@ import com.amarkatha.publishing.ChapterMediaIntegrityService;
 import com.amarkatha.publishing.ChapterPageRepository;
 import com.amarkatha.publishing.ChapterRepository;
 import com.amarkatha.publishing.SeriesRepository;
+import com.amarkatha.publishing.SeriesScheduleService;
 import com.amarkatha.publishing.domain.Chapter;
 import com.amarkatha.publishing.domain.ChapterPage;
 import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.reader.dto.ChapterPageDto;
 import com.amarkatha.reader.dto.ChapterReaderDto;
 import com.amarkatha.reader.dto.ChapterSummaryDto;
+import com.amarkatha.reader.dto.ScheduleStripDto;
 import com.amarkatha.reader.dto.SeriesCardDto;
 import com.amarkatha.reader.dto.SeriesDetailDto;
+import com.amarkatha.scheduling.ScheduleStripView;
 import com.amarkatha.shared.domain.ChapterState;
 import java.time.Instant;
 import java.util.HashMap;
@@ -31,6 +34,7 @@ public class ReaderCatalogService {
     private final ChapterRepository chapterRepository;
     private final ChapterPageRepository chapterPageRepository;
     private final ChapterMediaIntegrityService mediaIntegrityService;
+    private final SeriesScheduleService seriesScheduleService;
     private final JdbcTemplate jdbcTemplate;
 
     public ReaderCatalogService(
@@ -38,12 +42,14 @@ public class ReaderCatalogService {
             ChapterRepository chapterRepository,
             ChapterPageRepository chapterPageRepository,
             ChapterMediaIntegrityService mediaIntegrityService,
+            SeriesScheduleService seriesScheduleService,
             JdbcTemplate jdbcTemplate
     ) {
         this.seriesRepository = seriesRepository;
         this.chapterRepository = chapterRepository;
         this.chapterPageRepository = chapterPageRepository;
         this.mediaIntegrityService = mediaIntegrityService;
+        this.seriesScheduleService = seriesScheduleService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -71,6 +77,7 @@ public class ReaderCatalogService {
         }
         String creatorName = loadCreatorNames(List.of(series.getCreatorId()))
                 .getOrDefault(series.getCreatorId(), "Creator");
+        ScheduleStripDto schedule = toScheduleDto(series);
         List<ChapterSummaryDto> summaries = chapters.stream()
                 .map(c -> new ChapterSummaryDto(
                         c.getSlug(),
@@ -87,7 +94,8 @@ public class ReaderCatalogService {
                 series.getGenres() == null ? List.of() : series.getGenres(),
                 series.getContentLanguage(),
                 ReaderPresentation.coverGradient(series.getSlug()),
-                ReaderPresentation.scheduleLabel(series),
+                schedule.scheduleLabel(),
+                schedule,
                 series.getStatus().name(),
                 lastUpdated(series),
                 summaries.size(),
@@ -135,6 +143,7 @@ public class ReaderCatalogService {
         int chapterCount = (int) listedPublishedChapters(series.getId()).stream()
                 .filter(c -> mediaIntegrityService.isChapterMediaIntact(c.getId()))
                 .count();
+        ScheduleStripDto schedule = toScheduleDto(series);
         return new SeriesCardDto(
                 series.getSlug(),
                 series.getTitle(),
@@ -143,10 +152,25 @@ public class ReaderCatalogService {
                 series.getGenres() == null ? List.of() : series.getGenres(),
                 series.getContentLanguage(),
                 ReaderPresentation.coverGradient(series.getSlug()),
-                ReaderPresentation.scheduleLabel(series),
+                schedule.scheduleLabel(),
+                schedule,
                 series.getStatus().name(),
                 lastUpdated(series),
                 chapterCount
+        );
+    }
+
+    private ScheduleStripDto toScheduleDto(Series series) {
+        ScheduleStripView view = seriesScheduleService.stripFor(series);
+        return new ScheduleStripDto(
+                view.headline(),
+                view.scheduleLabel(),
+                view.nextExpectedAt(),
+                view.skipMessage(),
+                view.status().name(),
+                view.cadence() == null ? null : view.cadence().name(),
+                view.periodDays(),
+                view.releaseHourIst() == null ? null : view.releaseHourIst().intValue()
         );
     }
 

@@ -32,6 +32,7 @@ public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final ChapterPageRepository chapterPageRepository;
     private final SeriesService seriesService;
+    private final SeriesScheduleService seriesScheduleService;
     private final MediaStore mediaStore;
     private final ChapterMediaIntegrityService mediaIntegrityService;
     private final int maxPagesPerChapter;
@@ -41,6 +42,7 @@ public class ChapterService {
             ChapterRepository chapterRepository,
             ChapterPageRepository chapterPageRepository,
             SeriesService seriesService,
+            SeriesScheduleService seriesScheduleService,
             MediaStore mediaStore,
             ChapterMediaIntegrityService mediaIntegrityService,
             @Value("${amarkatha.media.max-pages-per-chapter:40}") int maxPagesPerChapter,
@@ -49,6 +51,7 @@ public class ChapterService {
         this.chapterRepository = chapterRepository;
         this.chapterPageRepository = chapterPageRepository;
         this.seriesService = seriesService;
+        this.seriesScheduleService = seriesScheduleService;
         this.mediaStore = mediaStore;
         this.mediaIntegrityService = mediaIntegrityService;
         this.maxPagesPerChapter = maxPagesPerChapter;
@@ -165,7 +168,7 @@ public class ChapterService {
         Instant now = Instant.now();
         chapter.publishNow(now, now);
         chapterRepository.save(chapter);
-        seriesService.markLastPublished(seriesId, creatorId, now);
+        seriesScheduleService.onChapterPublished(seriesId, creatorId, now);
         return chapter;
     }
 

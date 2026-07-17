@@ -33,6 +33,8 @@ class ChapterServiceTest {
     @Mock
     private SeriesService seriesService;
     @Mock
+    private SeriesScheduleService seriesScheduleService;
+    @Mock
     private MediaStore mediaStore;
     @Mock
     private ChapterMediaIntegrityService mediaIntegrityService;
@@ -47,6 +49,7 @@ class ChapterServiceTest {
                 chapterRepository,
                 chapterPageRepository,
                 seriesService,
+                seriesScheduleService,
                 mediaStore,
                 mediaIntegrityService,
                 40,
@@ -106,7 +109,7 @@ class ChapterServiceTest {
 
         assertEquals(ChapterState.PUBLISHED, published.getState());
         verify(mediaIntegrityService).requireIntactForPublish(chapter.getId());
-        verify(seriesService).markLastPublished(eq(seriesId), eq(creatorId), any());
+        verify(seriesScheduleService).onChapterPublished(eq(seriesId), eq(creatorId), any());
     }
 
     @Test

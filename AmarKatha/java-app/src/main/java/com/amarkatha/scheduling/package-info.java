@@ -1,4 +1,4 @@
 /**
- * Pure schedule domain and ECS systems (no Spring Web).
+ * Pure schedule domain (period-days calendar math). Persistence lives in publishing.
  */
 package com.amarkatha.scheduling;

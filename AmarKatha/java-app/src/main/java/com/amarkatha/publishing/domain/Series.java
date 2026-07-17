@@ -56,6 +56,12 @@ public class Series {
     @Column(name = "day_of_week")
     private Short dayOfWeek;
 
+    @Column(name = "period_days")
+    private Short periodDays;
+
+    @Column(name = "release_hour_ist")
+    private Short releaseHourIst;
+
     @Column(name = "next_expected_at")
     private Instant nextExpectedAt;
 
@@ -128,6 +134,14 @@ public class Series {
         return dayOfWeek;
     }
 
+    public Short getPeriodDays() {
+        return periodDays;
+    }
+
+    public Short getReleaseHourIst() {
+        return releaseHourIst;
+    }
+
     public Instant getNextExpectedAt() {
         return nextExpectedAt;
     }
@@ -170,5 +184,25 @@ public class Series {
 
     public void setLastPublishedAt(Instant lastPublishedAt) {
         this.lastPublishedAt = lastPublishedAt;
+    }
+
+    public void applySchedule(
+            SeriesStatus status,
+            SeriesCadence cadence,
+            Integer periodDays,
+            Short dayOfWeek,
+            Short releaseHourIst,
+            Instant nextExpectedAt,
+            Instant lastPublishedAt,
+            String skipMessage
+    ) {
+        this.status = status;
+        this.cadence = cadence;
+        this.periodDays = periodDays == null ? null : periodDays.shortValue();
+        this.dayOfWeek = dayOfWeek;
+        this.releaseHourIst = releaseHourIst;
+        this.nextExpectedAt = nextExpectedAt;
+        this.lastPublishedAt = lastPublishedAt;
+        this.skipMessage = skipMessage;
     }
 }

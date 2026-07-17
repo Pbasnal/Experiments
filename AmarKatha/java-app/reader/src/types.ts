@@ -1,3 +1,14 @@
+export interface ScheduleStrip {
+  headline: string;
+  scheduleLabel: string;
+  nextExpectedAt: string | null;
+  skipMessage: string | null;
+  status: 'ONGOING' | 'HIATUS' | 'COMPLETED';
+  cadence: string | null;
+  periodDays: number | null;
+  releaseHourIst?: number | null;
+}
+
 export interface SeriesCard {
   slug: string;
   title: string;
@@ -7,6 +18,7 @@ export interface SeriesCard {
   contentLanguage: string;
   coverGradient: string;
   scheduleLabel: string;
+  schedule?: ScheduleStrip;
   status: 'ONGOING' | 'HIATUS' | 'COMPLETED';
   lastUpdatedAt: string;
   chapterCount: number;

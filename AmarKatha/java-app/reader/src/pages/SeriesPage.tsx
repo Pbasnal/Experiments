@@ -69,9 +69,23 @@ export default function SeriesPage() {
       </div>
       <div className="series-content">
         <aside className="schedule-strip">
-          <strong>Schedule</strong>
-          <p>{series.scheduleLabel}</p>
-          {series.status === 'HIATUS' && (
+          <strong>{series.schedule?.headline ?? 'Schedule'}</strong>
+          {series.schedule?.nextExpectedAt ? (
+            <p>
+              {formatLocalDate(series.schedule.nextExpectedAt)}
+              {series.schedule.periodDays != null && (
+                <span className="muted"> · every {series.schedule.periodDays} days</span>
+              )}
+            </p>
+          ) : (
+            <p>{series.schedule?.scheduleLabel ?? series.scheduleLabel}</p>
+          )}
+          {series.schedule?.skipMessage && (
+            <p className="hiatus-note">
+              <em>{series.schedule.skipMessage}</em>
+            </p>
+          )}
+          {(series.schedule?.status ?? series.status) === 'HIATUS' && (
             <p className="hiatus-note">This series is on hiatus. Check back when the creator resumes.</p>
           )}
         </aside>
@@ -112,4 +126,20 @@ export default function SeriesPage() {
 
 function formatChapterNumber(n: number): string {
   return Number.isInteger(n) ? String(n) : String(n);
+}
+
+/** Format UTC Instant in the viewer's local timezone. */
+function formatLocalDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    hourCycle: 'h12',
+  }).format(date);
 }

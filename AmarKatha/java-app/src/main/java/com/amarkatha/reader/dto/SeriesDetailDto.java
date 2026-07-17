@@ -1,5 +1,6 @@
 package com.amarkatha.reader.dto;
 
+import java.time.Instant;
 import java.util.List;
 
 public record SeriesDetailDto(
@@ -11,8 +12,9 @@ public record SeriesDetailDto(
         String contentLanguage,
         String coverGradient,
         String scheduleLabel,
+        ScheduleStripDto schedule,
         String status,
-        java.time.Instant lastUpdatedAt,
+        Instant lastUpdatedAt,
         int chapterCount,
         List<ChapterSummaryDto> chapters
 ) {

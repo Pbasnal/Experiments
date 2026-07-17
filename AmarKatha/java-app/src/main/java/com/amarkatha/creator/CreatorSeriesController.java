@@ -3,9 +3,16 @@ package com.amarkatha.creator;
 import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.publishing.ChapterService;
 import com.amarkatha.publishing.OngoingSeriesCapExceededException;
+import com.amarkatha.publishing.ScheduleServiceException;
 import com.amarkatha.publishing.SeriesAccessException;
+import com.amarkatha.publishing.SeriesScheduleService;
 import com.amarkatha.publishing.SeriesService;
 import com.amarkatha.publishing.domain.Series;
+import com.amarkatha.scheduling.ScheduleCalendar;
+import com.amarkatha.scheduling.ScheduleStripView;
+import java.time.DateTimeException;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,12 +28,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/creator/series")
 public class CreatorSeriesController {
 
+    private static final DateTimeFormatter NEXT_EXPECTED_FMT =
+            DateTimeFormatter.ofPattern("EEE, d MMM yyyy 'at' h a").withLocale(Locale.ENGLISH);
+
     private final SeriesService seriesService;
     private final ChapterService chapterService;
+    private final SeriesScheduleService seriesScheduleService;
 
-    public CreatorSeriesController(SeriesService seriesService, ChapterService chapterService) {
+    public CreatorSeriesController(
+            SeriesService seriesService,
+            ChapterService chapterService,
+            SeriesScheduleService seriesScheduleService
+    ) {
         this.seriesService = seriesService;
         this.chapterService = chapterService;
+        this.seriesScheduleService = seriesScheduleService;
     }
 
     @GetMapping({"", "/"})
@@ -95,10 +111,117 @@ public class CreatorSeriesController {
             Model model
     ) {
         Series series = seriesService.requireOwned(id, principal.getId());
+        ScheduleStripView strip = seriesScheduleService.stripFor(series);
         model.addAttribute("user", principal);
         model.addAttribute("series", series);
         model.addAttribute("chapters", chapterService.listForSeries(id, principal.getId()));
+        model.addAttribute("scheduleStrip", strip);
+        model.addAttribute("promptCadence", seriesScheduleService.shouldPromptCadence(id, principal.getId()));
+        model.addAttribute("nextExpectedLabel", formatNextExpected(series));
+        model.addAttribute("minPeriodDays", ScheduleCalendar.MIN_PERIOD_DAYS);
+        model.addAttribute("maxPeriodDays", ScheduleCalendar.MAX_PERIOD_DAYS);
+        model.addAttribute("defaultReleaseHour", ScheduleCalendar.DEFAULT_RELEASE_HOUR_IST);
+        model.addAttribute("dayNames", new String[]{
+                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+        });
         return "creator/series-detail";
+    }
+
+    @PostMapping("/{id}/schedule")
+    public String activateSchedule(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam int periodDays,
+            @RequestParam int dayOfWeek,
+            @RequestParam int releaseHourIst,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesScheduleService.activateCadence(
+                    id,
+                    principal.getId(),
+                    periodDays,
+                    dayOfWeek,
+                    releaseHourIst
+            );
+            redirectAttributes.addFlashAttribute("success", "Schedule updated.");
+        } catch (ScheduleServiceException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/schedule/clear")
+    public String clearSchedule(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesScheduleService.clearCadence(id, principal.getId());
+            redirectAttributes.addFlashAttribute("success", "Schedule turned off.");
+        } catch (ScheduleServiceException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/schedule/skip")
+    public String skip(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam(required = false) String skipMessage,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesScheduleService.skip(id, principal.getId(), skipMessage);
+            redirectAttributes.addFlashAttribute("success", "Skipped next slot.");
+        } catch (ScheduleServiceException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/schedule/hiatus")
+    public String hiatus(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesScheduleService.hiatus(id, principal.getId());
+            redirectAttributes.addFlashAttribute("success", "Series is on hiatus.");
+        } catch (ScheduleServiceException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/schedule/resume")
+    public String resume(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            seriesScheduleService.resume(id, principal.getId());
+            redirectAttributes.addFlashAttribute("success", "Series resumed.");
+        } catch (ScheduleServiceException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    private static String formatNextExpected(Series series) {
+        if (series.getNextExpectedAt() == null) {
+            return null;
+        }
+        try {
+            return NEXT_EXPECTED_FMT.format(series.getNextExpectedAt().atZone(ScheduleCalendar.IST))
+                    + " (IST)";
+        } catch (DateTimeException ex) {
+            return series.getNextExpectedAt().toString();
+        }
     }
 
     @GetMapping("/{id}/edit")
