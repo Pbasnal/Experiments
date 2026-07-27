@@ -52,16 +52,9 @@ export interface ChapterReader {
   pages: ChapterPage[];
 }
 
-export interface PlatformRoute {
-  label: string;
-  path: string;
-  area: string;
-  status: 'preview' | 'planned' | 'live';
-  description: string;
-}
-
 export interface HomeResponse {
   tagline: string;
   recentlyUpdated: SeriesCard[];
-  platformRoutes: PlatformRoute[];
+  /** @deprecated Not shown on public landing; may be omitted. */
+  platformRoutes?: unknown[];
 }

@@ -44,6 +44,10 @@ Stop with `./scripts/dev.sh down`. Details: [`docs/docker.md`](docs/docker.md).
 
 Copy `env.example` to `.env` and set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_BOOTSTRAP_EMAILS` for auth.
 
+Google OAuth redirect (local): `http://localhost:8080/login/oauth2/code/google` — see [`docs/oauth-google.md`](docs/oauth-google.md).
+
+Public HTTPS + shareable links: [`docs/deploy-https.md`](docs/deploy-https.md).
+
 ### Creator / admin auth flow
 
 1. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_BOOTSTRAP_EMAILS` in `.env`

@@ -46,6 +46,16 @@ Copy `env.example` to `.env`. Inside Compose, `POSTGRES_HOST` is forced to `post
 | `GOOGLE_CLIENT_ID` | placeholder | Required for real OAuth |
 | `GOOGLE_CLIENT_SECRET` | placeholder | Required for real OAuth |
 | `ADMIN_BOOTSTRAP_EMAILS` | empty | Comma-separated admin emails |
+| `AMARKATHA_PUBLIC_BASE_URL` | empty | Public `https://…` origin for OG; required with HTTPS overlay |
+
+## HTTPS (public / pilot)
+
+```bash
+# after placing TLS certs in docker/nginx/certs/ and setting AMARKATHA_PUBLIC_BASE_URL
+docker compose -f docker-compose.yml -f docker-compose.https.yml up --build -d
+```
+
+Details: [`deploy-https.md`](deploy-https.md), OAuth: [`oauth-google.md`](oauth-google.md).
 
 ## Troubleshooting
 

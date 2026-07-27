@@ -128,7 +128,7 @@ export default function SeriesPage() {
         <div className="share-box">
           <label>Share link</label>
           <code>
-            {window.location.origin}/read/s/{series.slug}
+            {window.location.origin}/read/s/{series.slug}?ref=share
           </code>
         </div>
       </div>

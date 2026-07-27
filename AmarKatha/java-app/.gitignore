@@ -5,6 +5,7 @@ target/
 .DS_Store
 .env
 data/
+docker/nginx/certs/*.pem
 reader/node_modules/
 reader/dist/
 *.log

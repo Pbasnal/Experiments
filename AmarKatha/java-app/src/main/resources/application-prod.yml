@@ -1,0 +1,14 @@
+# Activate with SPRING_PROFILES_ACTIVE=prod behind HTTPS reverse proxy.
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: lax
+        http-only: true
+
+amarkatha:
+  # Required for stable OG / share URLs (WhatsApp, invites). No trailing slash.
+  # Example: https://amarkatha.example.com
+  public-base-url: ${AMARKATHA_PUBLIC_BASE_URL}

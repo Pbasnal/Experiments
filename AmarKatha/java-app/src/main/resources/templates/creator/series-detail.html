@@ -70,10 +70,11 @@
         <div class="share-box">
             Reader link:
             <a id="share-link"
-               th:href="@{/read/s/{slug}(slug=${series.slug})}"
-               th:text="@{/read/s/{slug}(slug=${series.slug})}">/read/s/…</a>
+               th:href="@{/read/s/{slug}(slug=${series.slug},ref=share)}"
+               th:text="@{/read/s/{slug}(slug=${series.slug},ref=share)}">/read/s/…</a>
             <div class="schedule-actions" style="margin-top:0.5rem">
-                <button type="button" class="btn btn-secondary js-copy-share" data-copy-path th:attr="data-path=@{/read/s/{slug}(slug=${series.slug})}">
+                <button type="button" class="btn btn-secondary js-copy-share"
+                        th:attr="data-path=@{/read/s/{slug}(slug=${series.slug},ref=share)}">
                     Copy share link
                 </button>
             </div>

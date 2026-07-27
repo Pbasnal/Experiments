@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { fetchHome } from '../api/home';
 import type { HomeResponse } from '../types';
 import SeriesCardView from '../components/SeriesCard';
-import PlatformMap from '../components/PlatformMap';
 
 export default function HomePage() {
   const [data, setData] = useState<HomeResponse | null>(null);
@@ -16,72 +15,126 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const tagline =
+    data?.tagline ?? 'Publish on your rhythm. Share a link. Readers know when you’re back.';
+
   return (
     <>
-      <section className="hero">
-        <div className="hero-inner">
-          <span className="hero-eyebrow">V0 validation launch</span>
-          <h1>Where Indian stories come alive</h1>
-          <p className="hero-tagline">
-            {data?.tagline ?? 'Publish on your rhythm, share a link, readers know when you\'re back.'}
-          </p>
-          <div className="hero-actions">
-            <a href="#catalog" className="btn btn-primary">
-              Browse catalog
+      <section className="landing-hero">
+        <div className="landing-hero-media" aria-hidden="true">
+          <img
+            className="landing-hero-art"
+            src="/hero-atmosphere.svg"
+            alt=""
+            width={1600}
+            height={1000}
+          />
+          <div className="landing-hero-fade" />
+        </div>
+        <div className="landing-hero-inner">
+          <p className="landing-brand">AmarKatha</p>
+          <h1 className="landing-headline">Indian indie comics, on your schedule</h1>
+          <p className="landing-tagline">{tagline}</p>
+          <div className="landing-actions">
+            <a href="#stories" className="btn btn-primary">
+              Browse stories
             </a>
-            <a href="/creator" className="btn btn-secondary">
-              Creator portal
-            </a>
-            <a href="#platform-map" className="btn btn-ghost">
-              See all routes
+            <a href="/creator/signup" className="btn btn-secondary">
+              Creators: get started
             </a>
           </div>
         </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-panel p1" />
-          <div className="hero-panel p2" />
-          <div className="hero-panel p3" />
+      </section>
+
+      <section className="how-it-works" aria-labelledby="how-heading">
+        <div className="section-shell">
+          <h2 id="how-heading">How it works</h2>
+          <p className="section-lead">Three steps from page to share link — no marketplace cold start.</p>
+          <ol className="how-steps">
+            <li>
+              <span className="how-num">1</span>
+              <div>
+                <h3>Upload chapters</h3>
+                <p>Drop page images, publish when ready.</p>
+              </div>
+            </li>
+            <li>
+              <span className="how-num">2</span>
+              <div>
+                <h3>Set your rhythm</h3>
+                <p>Weekly or custom days. Skip a slot or pause on hiatus.</p>
+              </div>
+            </li>
+            <li>
+              <span className="how-num">3</span>
+              <div>
+                <h3>Share the link</h3>
+                <p>Readers see the next update — and come back after a skip.</p>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
 
-      <section className="value-props">
-        <div className="value-card">
-          <h3>For creators</h3>
-          <p>Upload chapters, set weekly or biweekly cadence, skip a cycle or go on hiatus — then copy a share link.</p>
-          <a href="/creator">Open creator home →</a>
-        </div>
-        <div className="value-card">
-          <h3>For readers</h3>
-          <p>Mobile-first vertical scroll, schedule strip on every series page, no account required in V0.</p>
-          <a href="#catalog">Start reading →</a>
-        </div>
-        <div className="value-card">
-          <h3>V0 scope</h3>
-          <p>No trending, search, or comments yet. Chronological catalog + creator share links validate the wedge first.</p>
-          <a href="#platform-map">Full route map →</a>
-        </div>
-      </section>
-
-      <section className="catalog" id="catalog">
-        <div className="section-header">
-          <h2>Recently updated</h2>
-          <p>Chronological feed of series with published chapters. Editor&apos;s Picks and trending deferred to V1.</p>
-        </div>
-        {loading && <p className="state-message">Loading catalog…</p>}
-        {error && <p className="state-message error">{error}</p>}
-        {data && data.recentlyUpdated.length === 0 && !loading && (
-          <p className="state-message">No published series yet. Creators can publish from the portal.</p>
-        )}
-        {data && data.recentlyUpdated.length > 0 && (
-          <div className="series-grid">
-            {data.recentlyUpdated.map((series) => (
-              <SeriesCardView key={series.slug} series={series} />
-            ))}
+      <section className="catalog" id="stories">
+        <div className="section-shell">
+          <div className="section-header">
+            <h2>Recently updated</h2>
+            <p>Fresh chapters from invite creators. Open a series to read — no account needed.</p>
           </div>
-        )}
+          {loading && <p className="state-message">Loading stories…</p>}
+          {error && <p className="state-message error">{error}</p>}
+          {data && data.recentlyUpdated.length === 0 && !loading && (
+            <div className="catalog-empty">
+              <p>Stories are arriving soon.</p>
+              <p className="muted">
+                Got a share link from a creator? Open it to start reading.
+              </p>
+              <div className="landing-actions catalog-empty-actions">
+                <a href="/creator/signup" className="btn btn-secondary">
+                  Creators: sign up with invite
+                </a>
+                <a href="/creator/login" className="btn btn-ghost">
+                  Already a creator? Sign in
+                </a>
+              </div>
+            </div>
+          )}
+          {data && data.recentlyUpdated.length > 0 && (
+            <div className="series-grid">
+              {data.recentlyUpdated.map((series, i) => (
+                <div
+                  key={series.slug}
+                  className="series-grid-item"
+                  style={{ animationDelay: `${Math.min(i, 6) * 60}ms` }}
+                >
+                  <SeriesCardView series={series} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
-      {data && <PlatformMap routes={data.platformRoutes} />}
+      <section className="creators-strip">
+        <div className="section-shell creators-strip-inner">
+          <div>
+            <h2>For creators</h2>
+            <p>
+              Invite-only while we validate flexible schedules with Indian indie comics.
+              Publish, skip when life happens, share one link with your readers.
+            </p>
+          </div>
+          <div className="landing-actions">
+            <a href="/creator/signup" className="btn btn-primary">
+              Sign up with invite
+            </a>
+            <a href="/creator/login" className="btn btn-secondary">
+              Sign in
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

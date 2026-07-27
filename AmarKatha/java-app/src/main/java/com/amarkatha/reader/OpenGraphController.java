@@ -1,5 +1,6 @@
 package com.amarkatha.reader;
 
+import com.amarkatha.bootstrap.AbsoluteUrlBuilder;
 import com.amarkatha.publishing.ChapterRepository;
 import com.amarkatha.publishing.SeriesRepository;
 import com.amarkatha.publishing.SeriesScheduleService;
@@ -45,15 +46,18 @@ public class OpenGraphController {
     private final SeriesRepository seriesRepository;
     private final ChapterRepository chapterRepository;
     private final SeriesScheduleService seriesScheduleService;
+    private final AbsoluteUrlBuilder absoluteUrlBuilder;
 
     public OpenGraphController(
             SeriesRepository seriesRepository,
             ChapterRepository chapterRepository,
-            SeriesScheduleService seriesScheduleService
+            SeriesScheduleService seriesScheduleService,
+            AbsoluteUrlBuilder absoluteUrlBuilder
     ) {
         this.seriesRepository = seriesRepository;
         this.chapterRepository = chapterRepository;
         this.seriesScheduleService = seriesScheduleService;
+        this.absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     @GetMapping("/read/s/{slug}")
@@ -77,7 +81,7 @@ public class OpenGraphController {
         String path = "/read/s/" + series.getSlug();
         model.addAttribute("ogTitle", series.getTitle() + " · AmarKatha");
         model.addAttribute("ogDescription", truncate(description, 200));
-        model.addAttribute("ogUrl", absoluteUrl(request, path));
+        model.addAttribute("ogUrl", absoluteUrlBuilder.absolute(request, path));
         model.addAttribute("ogImage", coverImageUrl(request, series));
         model.addAttribute("ogType", "website");
         model.addAttribute("canonicalPath", path);
@@ -119,7 +123,7 @@ public class OpenGraphController {
                         200
                 )
         );
-        model.addAttribute("ogUrl", absoluteUrl(request, path));
+        model.addAttribute("ogUrl", absoluteUrlBuilder.absolute(request, path));
         model.addAttribute("ogImage", coverImageUrl(request, series));
         model.addAttribute("ogType", "article");
         model.addAttribute("canonicalPath", path);
@@ -140,30 +144,14 @@ public class OpenGraphController {
         return false;
     }
 
-    private static String coverImageUrl(HttpServletRequest request, Series series) {
+    private String coverImageUrl(HttpServletRequest request, Series series) {
         if (series.getCoverStorageKey() == null || series.getCoverStorageKey().isBlank()) {
             return null;
         }
-        return absoluteUrl(request, "/media/" + series.getCoverStorageKey() + "?v=" + series.getVersion());
-    }
-
-    private static String absoluteUrl(HttpServletRequest request, String path) {
-        String scheme = request.getHeader("X-Forwarded-Proto");
-        if (scheme == null || scheme.isBlank()) {
-            scheme = request.getScheme();
-        }
-        String host = request.getHeader("X-Forwarded-Host");
-        if (host == null || host.isBlank()) {
-            host = request.getHeader("Host");
-        }
-        if (host == null || host.isBlank()) {
-            host = request.getServerName() + (
-                    (request.getServerPort() == 80 || request.getServerPort() == 443)
-                            ? ""
-                            : ":" + request.getServerPort()
-            );
-        }
-        return scheme + "://" + host + path;
+        return absoluteUrlBuilder.absolute(
+                request,
+                "/media/" + series.getCoverStorageKey() + "?v=" + series.getVersion()
+        );
     }
 
     private static String truncate(String value, int max) {

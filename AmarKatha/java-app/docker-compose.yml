@@ -38,6 +38,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-docker-dev-placeholder}
       ADMIN_BOOTSTRAP_EMAILS: ${ADMIN_BOOTSTRAP_EMAILS:-}
       AMARKATHA_CONTACT_EMAIL: ${AMARKATHA_CONTACT_EMAIL:-hello@amarkatha.in}
+      AMARKATHA_PUBLIC_BASE_URL: ${AMARKATHA_PUBLIC_BASE_URL:-}
       AMARKATHA_MEDIA_ROOT: /data/media
     volumes:
       # Shared with local runs (AMARKATHA_MEDIA_ROOT=./data/media) so uploads are visible either way

@@ -1,0 +1,30 @@
+# HTTPS reverse-proxy overlay for public / pilot deploys.
+# Usage:
+#   export AMARKATHA_PUBLIC_BASE_URL=https://your.domain
+#   # Place fullchain.pem + privkey.pem in docker/nginx/certs/
+#   docker compose -f docker-compose.yml -f docker-compose.https.yml up --build -d
+#
+# See docs/deploy-https.md
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: amarkatha-nginx
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/certs:/etc/nginx/certs:ro
+      - ./docker/nginx/certbot-www:/var/www/certbot:ro
+    restart: unless-stopped
+
+  app:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      AMARKATHA_PUBLIC_BASE_URL: ${AMARKATHA_PUBLIC_BASE_URL:?Set AMARKATHA_PUBLIC_BASE_URL to https://your.domain}
+      AMARKATHA_GRIEVANCE_OFFICER: ${AMARKATHA_GRIEVANCE_OFFICER:-Founder (interim)}
+    # Keep 8080 published for health/debug on the VM; public traffic should use Nginx :443.

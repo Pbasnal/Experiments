@@ -6,11 +6,6 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-const navItems = [
-  { label: 'Home', href: '/', external: false },
-  { label: 'Creator', href: '/creator', external: true },
-];
-
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [auth, setAuth] = useState<AuthMeResponse | null>(null);
@@ -33,6 +28,8 @@ export default function Layout({ children }: LayoutProps) {
     window.location.href = '/';
   }
 
+  const isHome = location.pathname === '/';
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -42,21 +39,12 @@ export default function Layout({ children }: LayoutProps) {
             <span className="brand-text">AmarKatha</span>
           </Link>
           <nav className="site-nav" aria-label="Main">
-            {navItems.map((item) =>
-              item.external ? (
-                <a key={item.href} href={item.href} className="nav-link">
-                  {item.label}
-                </a>
-              ) : (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={`nav-link${location.pathname === item.href ? ' active' : ''}`}
-                >
-                  {item.label}
-                </Link>
-              ),
-            )}
+            <Link to="/" className={`nav-link${isHome ? ' active' : ''}`}>
+              Stories
+            </Link>
+            <a href="/creator/signup" className="nav-link">
+              For creators
+            </a>
           </nav>
           <div className="auth-actions">
             {auth?.authenticated ? (
@@ -64,6 +52,11 @@ export default function Layout({ children }: LayoutProps) {
                 {auth.role === 'ADMIN' && (
                   <a href="/admin" className="nav-link">
                     Admin
+                  </a>
+                )}
+                {(auth.role === 'CREATOR' || auth.role === 'ADMIN') && (
+                  <a href="/creator" className="nav-link">
+                    Dashboard
                   </a>
                 )}
                 <a href="/profile" className="auth-email" title={auth.email}>
@@ -74,8 +67,8 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </>
             ) : (
-              <a href="/creator/login" className="btn-signin">
-                Sign in
+              <a href="/creator/login" className="btn-signin btn-signin-quiet">
+                Creator sign in
               </a>
             )}
           </div>
@@ -83,7 +76,7 @@ export default function Layout({ children }: LayoutProps) {
       </header>
       <main>{children}</main>
       <footer className="site-footer">
-        <p>V0 UI preview · Scheduling-first Indian comics platform</p>
+        <p className="footer-tagline">Indian indie comics · flexible schedules · share a link</p>
         <div className="footer-links">
           <a href="/legal/terms">Terms</a>
           <a href="/legal/privacy">Privacy</a>
