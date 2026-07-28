@@ -87,14 +87,14 @@ class ChapterServiceTest {
 
         assertThrows(
                 ChapterException.class,
-                () -> chapterService.publishNow(seriesId, chapter.getId(), creatorId, false)
+                () -> chapterService.publishNow(seriesId, chapter.getId(), creatorId, false, "Ch 1")
         );
 
         doThrow(new ChapterException("Add at least one page before publishing."))
                 .when(mediaIntegrityService).requireIntactForPublish(chapter.getId());
         assertThrows(
                 ChapterException.class,
-                () -> chapterService.publishNow(seriesId, chapter.getId(), creatorId, true)
+                () -> chapterService.publishNow(seriesId, chapter.getId(), creatorId, true, "Ch 1")
         );
     }
 
@@ -108,11 +108,28 @@ class ChapterServiceTest {
         doNothing().when(mediaIntegrityService).requireIntactForPublish(chapter.getId());
         when(chapterRepository.save(any(Chapter.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Chapter published = chapterService.publishNow(seriesId, chapter.getId(), creatorId, true);
+        Chapter published = chapterService.publishNow(
+                seriesId, chapter.getId(), creatorId, true, "The first night"
+        );
 
         assertEquals(ChapterState.PUBLISHED, published.getState());
+        assertEquals("The first night", published.getTitle());
         verify(mediaIntegrityService).requireIntactForPublish(chapter.getId());
         verify(seriesScheduleService).onChapterPublished(eq(seriesId), eq(creatorId), any());
+    }
+
+    @Test
+    void publishNowRequiresTitle() {
+        Chapter chapter = Chapter.createDraft(seriesId, 1, "chapter-1", "Ch 1");
+        when(seriesService.requireOwned(seriesId, creatorId))
+                .thenReturn(Series.create(creatorId, "slug", "Title"));
+        when(chapterRepository.findBySeriesIdAndId(seriesId, chapter.getId()))
+                .thenReturn(Optional.of(chapter));
+
+        assertThrows(
+                ChapterException.class,
+                () -> chapterService.publishNow(seriesId, chapter.getId(), creatorId, true, "  ")
+        );
     }
 
     @Test

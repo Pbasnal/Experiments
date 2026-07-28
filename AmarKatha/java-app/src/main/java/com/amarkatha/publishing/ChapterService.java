@@ -252,12 +252,22 @@ public class ChapterService {
     }
 
     @Transactional
-    public Chapter publishNow(UUID seriesId, UUID chapterId, UUID creatorId, boolean copyrightAck) {
+    public Chapter publishNow(
+            UUID seriesId,
+            UUID chapterId,
+            UUID creatorId,
+            boolean copyrightAck,
+            String title
+    ) {
         if (!copyrightAck) {
             throw new ChapterException("You must confirm copyright ownership before publishing.");
         }
         Chapter chapter = requireOwnedChapter(seriesId, chapterId, creatorId);
         requireDraft(chapter);
+        if (title == null || title.isBlank()) {
+            throw new ChapterException("Chapter title is required before publishing.");
+        }
+        chapter.setTitle(title.trim());
         mediaIntegrityService.requireIntactForPublish(chapterId);
         Instant now = Instant.now();
         chapter.publishNow(now, now);

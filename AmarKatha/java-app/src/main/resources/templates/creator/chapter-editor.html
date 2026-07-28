@@ -23,11 +23,16 @@
             display: flex;
             flex-direction: column;
         }
+        .page-thumb.is-pending {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent);
+        }
         .page-thumb img {
             display: block;
             width: 100%;
             height: 9rem;
             object-fit: cover;
+            background: #111;
         }
         .page-thumb .ord {
             font-size: 0.75rem;
@@ -61,6 +66,18 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
+        .pending-empty {
+            display: none;
+            margin-top: 0.75rem;
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+        .pending-empty.is-visible { display: block; }
+        .pending-hint {
+            margin: 0.75rem 0 0;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
         .checkbox-row {
             display: flex;
             gap: 0.5rem;
@@ -83,7 +100,7 @@
     <h1 th:text="${chapter.title}">Chapter editor</h1>
     <p class="subtitle">
         Upload PNG/JPG/WebP pages (max <span th:text="${maxPageMb}">16</span> MB each,
-        up to <span th:text="${maxPages}">40</span> pages). Reorder with ↑ / ↓ after upload.
+        up to <span th:text="${maxPages}">40</span> pages). Choose files, rearrange, then upload.
     </p>
 
     <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
@@ -91,52 +108,57 @@
 
     <div class="card" th:if="${canEdit}">
         <h2 style="font-size:1.05rem; margin-bottom:0.75rem;">Draft details</h2>
-        <form class="js-busy-form"
+        <form id="save-draft-form" class="js-busy-form"
               th:action="@{/creator/series/{sid}/chapters/{cid}/save(sid=${series.id},cid=${chapter.id})}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <label for="title">Title</label>
             <input id="title" type="text" name="title" required maxlength="500" th:value="${chapter.title}">
+            <p class="hint" style="margin-top:0.35rem;">This name is what readers see. It is saved when you Save draft or Publish.</p>
             <button type="submit" class="btn btn-secondary" data-busy-label="Saving…">Save draft</button>
         </form>
     </div>
 
     <div class="card">
-        <h2 style="font-size:1.05rem; margin-bottom:0.35rem;">Pages</h2>
+        <h2 style="font-size:1.05rem; margin-bottom:0.35rem;">Uploaded pages</h2>
         <p class="meta" th:text="${#lists.size(pages)} + ' / ' + ${maxPages} + ' pages'">0 / 40</p>
 
-        <div th:if="${#lists.isEmpty(pages)}" class="empty">No pages yet.</div>
-        <div class="page-grid" th:unless="${#lists.isEmpty(pages)}">
-            <div class="page-thumb" th:each="p, iter : ${pages}">
+        <div th:if="${#lists.isEmpty(pages)}" class="empty">No pages uploaded yet.</div>
+        <div id="saved-page-grid" class="page-grid" th:unless="${#lists.isEmpty(pages)}">
+            <div class="page-thumb" th:each="p, iter : ${pages}" th:attr="data-page-id=${p.id}">
                 <img th:src="@{|/media/${p.originalStorageKey}|}"
                      th:alt="${p.originalFilename != null ? p.originalFilename : 'Page ' + p.sortOrder}">
                 <div class="ord" th:text="'#' + ${p.sortOrder}">#1</div>
                 <div class="filename"
                      th:text="${p.originalFilename != null ? p.originalFilename : '—'}">page-01.png</div>
                 <div class="reorder" th:if="${canEdit}">
-                    <form th:action="@{/creator/series/{sid}/chapters/{cid}/pages/{pid}/move(sid=${series.id},cid=${chapter.id},pid=${p.id})}"
-                          method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input type="hidden" name="direction" value="up">
-                        <button type="submit" th:disabled="${iter.first}" title="Move up">↑</button>
-                    </form>
-                    <form th:action="@{/creator/series/{sid}/chapters/{cid}/pages/{pid}/move(sid=${series.id},cid=${chapter.id},pid=${p.id})}"
-                          method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <input type="hidden" name="direction" value="down">
-                        <button type="submit" th:disabled="${iter.last}" title="Move down">↓</button>
-                    </form>
+                    <button type="button" class="js-saved-move" data-direction="up"
+                            th:disabled="${iter.first}" title="Move up">↑</button>
+                    <button type="button" class="js-saved-move" data-direction="down"
+                            th:disabled="${iter.last}" title="Move down">↓</button>
                 </div>
             </div>
         </div>
 
-        <form th:if="${canEdit}" class="js-busy-form" style="margin-top:1.25rem;"
+        <form th:if="${canEdit}" id="upload-pages-form" class="js-busy-form" style="margin-top:1.25rem;"
               th:action="@{/creator/series/{sid}/chapters/{cid}/pages(sid=${series.id},cid=${chapter.id})}"
-              method="post" enctype="multipart/form-data">
+              method="post" enctype="multipart/form-data"
+              th:attr="data-series-id=${series.id},
+                       data-chapter-id=${chapter.id},
+                       data-csrf-name=${_csrf.parameterName},
+                       data-csrf-token=${_csrf.token},
+                       data-max-pages=${maxPages},
+                       data-existing-count=${#lists.size(pages)}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <label for="files">Add pages</label>
-            <input id="files" type="file" name="files" accept="image/png,image/jpeg,image/webp" multiple required>
-            <div class="actions">
-                <button type="submit" class="btn btn-primary" data-busy-label="Uploading pages…">Upload</button>
+            <input id="files" type="file" name="files" accept="image/png,image/jpeg,image/webp" multiple>
+            <p class="pending-hint">Selected images appear below. Rearrange with ↑ / ↓, then click Upload.</p>
+            <p id="pending-empty" class="pending-empty is-visible">No images selected yet.</p>
+            <div id="pending-page-grid" class="page-grid" hidden></div>
+            <div class="actions" style="margin-top:1rem;">
+                <button type="button" id="clear-pending" class="btn btn-secondary" hidden>Clear selection</button>
+                <button type="submit" id="upload-pending" class="btn btn-primary" data-busy-label="Uploading pages…" disabled>
+                    Upload
+                </button>
             </div>
             <div class="form-progress" aria-live="polite">
                 <span class="form-progress-label">Uploading pages…</span>
@@ -147,9 +169,10 @@
 
     <div class="card" th:if="${canEdit}">
         <h2 style="font-size:1.05rem; margin-bottom:0.75rem;">Publish</h2>
-        <form class="js-busy-form"
+        <form id="publish-form" class="js-busy-form"
               th:action="@{/creator/series/{sid}/chapters/{cid}/publish(sid=${series.id},cid=${chapter.id})}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" id="publish-title" name="title" th:value="${chapter.title}">
             <label class="checkbox-row">
                 <input type="checkbox" name="copyrightAck" value="true" required>
                 <span>I confirm I own the rights to upload this content, or I have permission from the copyright holder.</span>
@@ -163,7 +186,7 @@
                 <div class="form-progress-bar"><span></span></div>
             </div>
         </form>
-        <p class="hint">Publish now lists the chapter immediately for readers.</p>
+        <p class="hint">Publish now lists the chapter immediately for readers (and saves the title above).</p>
     </div>
 
     <div class="card" th:unless="${canEdit}">
@@ -172,5 +195,258 @@
     </div>
 </main>
 <script th:replace="~{fragments/creator-layout :: busyForms}"></script>
+<script>
+(function () {
+  var titleInput = document.getElementById('title');
+  var publishTitle = document.getElementById('publish-title');
+  var publishForm = document.getElementById('publish-form');
+  var heading = document.querySelector('main.creator-main > h1');
+
+  function syncPublishTitle() {
+    if (titleInput && publishTitle) {
+      publishTitle.value = titleInput.value.trim();
+    }
+  }
+
+  if (titleInput) {
+    titleInput.addEventListener('input', function () {
+      syncPublishTitle();
+      if (heading && titleInput.value.trim()) {
+        heading.textContent = titleInput.value.trim();
+      }
+    });
+  }
+
+  if (publishForm) {
+    publishForm.addEventListener('submit', function (e) {
+      syncPublishTitle();
+      if (!publishTitle || !publishTitle.value.trim()) {
+        e.preventDefault();
+        window.alert('Enter a chapter title before publishing.');
+        if (titleInput) titleInput.focus();
+      }
+    });
+  }
+})();
+</script>
+<script>
+(function () {
+  var form = document.getElementById('upload-pages-form');
+  if (!form) {
+    return;
+  }
+
+  var fileInput = document.getElementById('files');
+  var pendingGrid = document.getElementById('pending-page-grid');
+  var pendingEmpty = document.getElementById('pending-empty');
+  var uploadBtn = document.getElementById('upload-pending');
+  var clearBtn = document.getElementById('clear-pending');
+  var savedGrid = document.getElementById('saved-page-grid');
+  var maxPages = parseInt(form.getAttribute('data-max-pages') || '40', 10);
+  var existingCount = parseInt(form.getAttribute('data-existing-count') || '0', 10);
+  var csrfName = form.getAttribute('data-csrf-name');
+  var csrfToken = form.getAttribute('data-csrf-token');
+  var seriesId = form.getAttribute('data-series-id');
+  var chapterId = form.getAttribute('data-chapter-id');
+
+  /** @type {{ file: File, url: string }[]} */
+  var pending = [];
+
+  function revokeAll() {
+    pending.forEach(function (item) {
+      URL.revokeObjectURL(item.url);
+    });
+  }
+
+  function syncFileInput() {
+    var dt = new DataTransfer();
+    pending.forEach(function (item) {
+      dt.items.add(item.file);
+    });
+    fileInput.files = dt.files;
+    uploadBtn.disabled = pending.length === 0;
+    clearBtn.hidden = pending.length === 0;
+  }
+
+  function renderPending() {
+    pendingGrid.innerHTML = '';
+    if (pending.length === 0) {
+      pendingGrid.hidden = true;
+      pendingEmpty.classList.add('is-visible');
+      syncFileInput();
+      return;
+    }
+    pendingEmpty.classList.remove('is-visible');
+    pendingGrid.hidden = false;
+
+    pending.forEach(function (item, index) {
+      var thumb = document.createElement('div');
+      thumb.className = 'page-thumb is-pending';
+
+      var img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.file.name;
+
+      var ord = document.createElement('div');
+      ord.className = 'ord';
+      ord.textContent = 'New #' + (index + 1);
+
+      var name = document.createElement('div');
+      name.className = 'filename';
+      name.textContent = item.file.name;
+
+      var reorder = document.createElement('div');
+      reorder.className = 'reorder';
+
+      var up = document.createElement('button');
+      up.type = 'button';
+      up.title = 'Move up';
+      up.textContent = '↑';
+      up.disabled = index === 0;
+      up.addEventListener('click', function () {
+        if (index === 0) return;
+        var tmp = pending[index - 1];
+        pending[index - 1] = pending[index];
+        pending[index] = tmp;
+        renderPending();
+      });
+
+      var down = document.createElement('button');
+      down.type = 'button';
+      down.title = 'Move down';
+      down.textContent = '↓';
+      down.disabled = index === pending.length - 1;
+      down.addEventListener('click', function () {
+        if (index >= pending.length - 1) return;
+        var tmp = pending[index + 1];
+        pending[index + 1] = pending[index];
+        pending[index] = tmp;
+        renderPending();
+      });
+
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.title = 'Remove';
+      remove.textContent = '✕';
+      remove.addEventListener('click', function () {
+        URL.revokeObjectURL(item.url);
+        pending.splice(index, 1);
+        renderPending();
+      });
+
+      reorder.appendChild(up);
+      reorder.appendChild(down);
+      reorder.appendChild(remove);
+      thumb.appendChild(img);
+      thumb.appendChild(ord);
+      thumb.appendChild(name);
+      thumb.appendChild(reorder);
+      pendingGrid.appendChild(thumb);
+    });
+
+    syncFileInput();
+  }
+
+  function addFiles(fileList) {
+    var incoming = Array.prototype.slice.call(fileList || []);
+    if (incoming.length === 0) {
+      return;
+    }
+    var room = maxPages - existingCount - pending.length;
+    if (room <= 0) {
+      window.alert('Chapter already has the maximum of ' + maxPages + ' pages.');
+      return;
+    }
+    if (incoming.length > room) {
+      window.alert('Only ' + room + ' more page(s) can be added (max ' + maxPages + '). Extra files were skipped.');
+      incoming = incoming.slice(0, room);
+    }
+    incoming.forEach(function (file) {
+      if (!file.type || !/^image\/(png|jpeg|jpg|webp)$/i.test(file.type)) {
+        return;
+      }
+      pending.push({ file: file, url: URL.createObjectURL(file) });
+    });
+    renderPending();
+  }
+
+  fileInput.addEventListener('change', function () {
+    var selected = Array.prototype.slice.call(fileInput.files || []);
+    // Clear native selection so re-picking the same files still fires change;
+    // pending[] + DataTransfer owns the ordered FileList for submit.
+    fileInput.value = '';
+    addFiles(selected);
+  });
+
+  clearBtn.addEventListener('click', function () {
+    revokeAll();
+    pending = [];
+    renderPending();
+  });
+
+  form.addEventListener('submit', function (e) {
+    syncFileInput();
+    if (pending.length === 0) {
+      e.preventDefault();
+      window.alert('Select at least one image to upload.');
+    }
+  });
+
+  function renumberSaved() {
+    if (!savedGrid) return;
+    var thumbs = savedGrid.querySelectorAll('.page-thumb');
+    thumbs.forEach(function (thumb, i) {
+      var ord = thumb.querySelector('.ord');
+      if (ord) ord.textContent = '#' + (i + 1);
+      var buttons = thumb.querySelectorAll('.js-saved-move');
+      if (buttons[0]) buttons[0].disabled = i === 0;
+      if (buttons[1]) buttons[1].disabled = i === thumbs.length - 1;
+    });
+  }
+
+  if (savedGrid) {
+    savedGrid.addEventListener('click', function (e) {
+      var btn = e.target.closest('.js-saved-move');
+      if (!btn || btn.disabled) return;
+      var thumb = btn.closest('.page-thumb');
+      if (!thumb) return;
+      var pageId = thumb.getAttribute('data-page-id');
+      var direction = btn.getAttribute('data-direction');
+      var sibling = direction === 'up' ? thumb.previousElementSibling : thumb.nextElementSibling;
+      if (!sibling || !sibling.classList.contains('page-thumb')) return;
+
+      btn.disabled = true;
+      var url = '/creator/series/' + seriesId + '/chapters/' + chapterId + '/pages/' + pageId + '/move';
+      var body = new FormData();
+      body.append('direction', direction);
+      body.append(csrfName, csrfToken);
+
+      fetch(url, {
+        method: 'POST',
+        body: body,
+        credentials: 'same-origin',
+        redirect: 'manual',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }).then(function (res) {
+        // 0/opaqueredirect or 3xx = success for redirecting controller
+        if (res.type === 'opaqueredirect' || (res.status >= 200 && res.status < 400)) {
+          if (direction === 'up') {
+            savedGrid.insertBefore(thumb, sibling);
+          } else {
+            savedGrid.insertBefore(sibling, thumb);
+          }
+          renumberSaved();
+        } else {
+          window.alert('Could not reorder page. Try again.');
+        }
+      }).catch(function () {
+        window.alert('Could not reorder page. Try again.');
+      }).finally(function () {
+        renumberSaved();
+      });
+    });
+  }
+})();
+</script>
 </body>
 </html>

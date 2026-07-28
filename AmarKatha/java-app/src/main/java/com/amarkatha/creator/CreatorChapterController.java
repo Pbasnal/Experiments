@@ -130,12 +130,13 @@ public class CreatorChapterController {
             @PathVariable UUID seriesId,
             @PathVariable UUID chapterId,
             @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "copyrightAck", required = false) String copyrightAck,
             RedirectAttributes redirectAttributes
     ) {
         try {
             boolean ack = "true".equalsIgnoreCase(copyrightAck) || "on".equalsIgnoreCase(copyrightAck);
-            chapterService.publishNow(seriesId, chapterId, principal.getId(), ack);
+            chapterService.publishNow(seriesId, chapterId, principal.getId(), ack, title);
             redirectAttributes.addFlashAttribute("success", "Chapter published.");
             return "redirect:/creator/series/" + seriesId;
         } catch (SeriesAccessException | ChapterException | ScheduleServiceException ex) {
