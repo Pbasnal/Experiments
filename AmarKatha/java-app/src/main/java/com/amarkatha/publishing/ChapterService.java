@@ -8,11 +8,17 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -147,6 +153,7 @@ public class ChapterService {
                         chapterId,
                         nextOrder,
                         uploaded.key(),
+                        sanitizeOriginalFilename(file.getOriginalFilename()),
                         uploaded.bytes(),
                         meta.width(),
                         meta.height()
@@ -161,6 +168,87 @@ public class ChapterService {
             }
         }
         return listPages(chapterId);
+    }
+
+    /**
+     * Reorder draft pages. {@code pageIdsInOrder} must list every page id for the chapter exactly once.
+     */
+    @Transactional
+    public List<ChapterPage> reorderPages(
+            UUID seriesId,
+            UUID chapterId,
+            UUID creatorId,
+            List<UUID> pageIdsInOrder
+    ) {
+        Chapter chapter = requireOwnedChapter(seriesId, chapterId, creatorId);
+        requireDraft(chapter);
+        List<ChapterPage> existing = listPages(chapterId);
+        if (existing.isEmpty()) {
+            return existing;
+        }
+        if (pageIdsInOrder == null || pageIdsInOrder.isEmpty()) {
+            throw new ChapterException("Provide the full page order.");
+        }
+        Set<UUID> existingIds = existing.stream().map(ChapterPage::getId).collect(Collectors.toSet());
+        if (pageIdsInOrder.size() != existingIds.size() || !existingIds.equals(new HashSet<>(pageIdsInOrder))) {
+            throw new ChapterException("Page order must include every page exactly once.");
+        }
+
+        Map<UUID, ChapterPage> byId = existing.stream()
+                .collect(Collectors.toMap(ChapterPage::getId, Function.identity()));
+
+        // Two-phase update avoids unique (chapter_id, sort_order) collisions mid-swap.
+        int tmp = -1;
+        List<ChapterPage> staged = new ArrayList<>(pageIdsInOrder.size());
+        for (UUID id : pageIdsInOrder) {
+            ChapterPage page = byId.get(id);
+            page.setSortOrder(tmp--);
+            staged.add(page);
+        }
+        chapterPageRepository.saveAll(staged);
+        chapterPageRepository.flush();
+
+        int order = 1;
+        for (ChapterPage page : staged) {
+            page.setSortOrder(order++);
+        }
+        chapterPageRepository.saveAll(staged);
+        return listPages(chapterId);
+    }
+
+    @Transactional
+    public List<ChapterPage> movePage(
+            UUID seriesId,
+            UUID chapterId,
+            UUID creatorId,
+            UUID pageId,
+            String direction
+    ) {
+        List<ChapterPage> pages = listPages(chapterId);
+        int index = -1;
+        for (int i = 0; i < pages.size(); i++) {
+            if (pages.get(i).getId().equals(pageId)) {
+                index = i;
+                break;
+            }
+        }
+        if (index < 0) {
+            throw new ChapterException("Page not found.");
+        }
+        boolean up = "up".equalsIgnoreCase(direction);
+        boolean down = "down".equalsIgnoreCase(direction);
+        if (!up && !down) {
+            throw new ChapterException("Direction must be up or down.");
+        }
+        int swapWith = up ? index - 1 : index + 1;
+        if (swapWith < 0 || swapWith >= pages.size()) {
+            return pages;
+        }
+        List<UUID> order = pages.stream().map(ChapterPage::getId).collect(Collectors.toCollection(ArrayList::new));
+        UUID a = order.get(index);
+        order.set(index, order.get(swapWith));
+        order.set(swapWith, a);
+        return reorderPages(seriesId, chapterId, creatorId, order);
     }
 
     @Transactional
@@ -232,6 +320,20 @@ public class ChapterService {
             case "image/webp" -> "webp";
             default -> "jpg";
         };
+    }
+
+    private static String sanitizeOriginalFilename(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        String name = Paths.get(raw.replace('\\', '/')).getFileName().toString().trim();
+        if (name.isEmpty() || ".".equals(name) || "..".equals(name)) {
+            return null;
+        }
+        if (name.length() > 255) {
+            return name.substring(0, 255);
+        }
+        return name;
     }
 
     private static ImageMeta readImageMeta(byte[] bytes) {

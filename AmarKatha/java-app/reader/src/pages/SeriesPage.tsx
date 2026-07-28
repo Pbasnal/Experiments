@@ -115,14 +115,19 @@ export default function SeriesPage() {
           <h2>Chapters</h2>
           <p className="muted">{series.chapterCount} listed chapter{series.chapterCount === 1 ? '' : 's'}</p>
           <ul>
-            {series.chapters.map((chapter) => (
-              <li key={chapter.slug}>
-                <Link to={`/read/s/${series.slug}/c/${chapter.slug}`} className="chapter-link">
-                  <span className="chapter-num">Ch. {formatChapterNumber(chapter.chapterNumber)}</span>
-                  <span className="chapter-title">{chapter.title}</span>
-                </Link>
-              </li>
-            ))}
+            {series.chapters.map((chapter) => {
+              const title =
+                chapter.title?.trim() ||
+                `Chapter ${formatChapterNumber(chapter.chapterNumber)}`;
+              return (
+                <li key={chapter.slug}>
+                  <Link to={`/read/s/${series.slug}/c/${chapter.slug}`} className="chapter-link">
+                    <span className="chapter-title">{title}</span>
+                    <span className="chapter-num">Ch. {formatChapterNumber(chapter.chapterNumber)}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
         <div className="share-box">

@@ -1036,7 +1036,7 @@ main {
 .chapter-link {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   gap: 1rem;
   width: 100%;
   padding: 0.75rem 1rem;
@@ -1050,13 +1050,17 @@ main {
 
 .chapter-title {
   flex: 1;
-  text-align: right;
-  color: var(--primary);
+  text-align: left;
+  color: var(--ink, var(--text));
   font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.35;
 }
 
 .chapter-num {
-  font-weight: 600;
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
@@ -1100,11 +1104,6 @@ main {
   padding: 1.5rem 1.25rem 0;
   display: flex;
   justify-content: center;
-}
-
-
-.chapter-num {
-  font-weight: 600;
 }
 
 .chapter-placeholder {

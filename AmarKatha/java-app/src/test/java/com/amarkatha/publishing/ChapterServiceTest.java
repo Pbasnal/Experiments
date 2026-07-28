@@ -139,4 +139,45 @@ class ChapterServiceTest {
         assertEquals("chapter-1", ChapterService.slugFromNumber(1));
         assertEquals("chapter-1-5", ChapterService.slugFromNumber(1.5));
     }
+
+    @Test
+    void createDraftUsesProvidedTitle() {
+        when(seriesService.requireOwned(seriesId, creatorId))
+                .thenReturn(Series.create(creatorId, "slug", "Title"));
+        when(chapterRepository.findMaxChapterNumber(seriesId)).thenReturn(null);
+        when(chapterRepository.existsBySeriesIdAndSlug(seriesId, "chapter-1")).thenReturn(false);
+        when(chapterRepository.save(any(Chapter.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Chapter chapter = chapterService.createDraft(seriesId, creatorId, "  The first night  ");
+
+        assertEquals("The first night", chapter.getTitle());
+        assertEquals(1.0, chapter.getChapterNumber());
+    }
+
+    @Test
+    void movePageSwapsAdjacentOrder() {
+        Chapter chapter = Chapter.createDraft(seriesId, 1, "chapter-1", "Ch 1");
+        when(seriesService.requireOwned(seriesId, creatorId))
+                .thenReturn(Series.create(creatorId, "slug", "Title"));
+        when(chapterRepository.findBySeriesIdAndId(seriesId, chapter.getId()))
+                .thenReturn(Optional.of(chapter));
+
+        var pageA = com.amarkatha.publishing.domain.ChapterPage.create(
+                chapter.getId(), 1, "a.jpg", "page-a.png", 10L, 100, 100
+        );
+        var pageB = com.amarkatha.publishing.domain.ChapterPage.create(
+                chapter.getId(), 2, "b.jpg", "page-b.png", 10L, 100, 100
+        );
+        when(chapterPageRepository.findByChapterIdOrderBySortOrderAsc(chapter.getId()))
+                .thenReturn(List.of(pageA, pageB))
+                .thenReturn(List.of(pageA, pageB))
+                .thenReturn(List.of(pageB, pageA));
+        when(chapterPageRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        chapterService.movePage(seriesId, chapter.getId(), creatorId, pageA.getId(), "down");
+
+        assertEquals(1, pageB.getSortOrder());
+        assertEquals(2, pageA.getSortOrder());
+        verify(chapterPageRepository, org.mockito.Mockito.atLeastOnce()).flush();
+    }
 }

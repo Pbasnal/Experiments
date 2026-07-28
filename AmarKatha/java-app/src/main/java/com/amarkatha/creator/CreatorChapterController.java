@@ -107,6 +107,24 @@ public class CreatorChapterController {
         return "redirect:/creator/series/" + seriesId + "/chapters/" + chapterId + "/edit";
     }
 
+    @PostMapping("/{chapterId}/pages/{pageId}/move")
+    public String movePage(
+            @PathVariable UUID seriesId,
+            @PathVariable UUID chapterId,
+            @PathVariable UUID pageId,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam String direction,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            chapterService.movePage(seriesId, chapterId, principal.getId(), pageId, direction);
+            redirectAttributes.addFlashAttribute("success", "Page order updated.");
+        } catch (SeriesAccessException | ChapterException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + seriesId + "/chapters/" + chapterId + "/edit";
+    }
+
     @PostMapping("/{chapterId}/publish")
     public String publish(
             @PathVariable UUID seriesId,

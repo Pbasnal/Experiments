@@ -22,6 +22,9 @@ public class ChapterPage {
     @Column(name = "original_storage_key", nullable = false, length = 500)
     private String originalStorageKey;
 
+    @Column(name = "original_filename", length = 255)
+    private String originalFilename;
+
     @Column(name = "webp_storage_key", length = 500)
     private String webpStorageKey;
 
@@ -42,6 +45,7 @@ public class ChapterPage {
             UUID chapterId,
             int sortOrder,
             String originalStorageKey,
+            String originalFilename,
             Long bytesOriginal,
             Integer width,
             Integer height
@@ -51,6 +55,7 @@ public class ChapterPage {
         page.chapterId = chapterId;
         page.sortOrder = sortOrder;
         page.originalStorageKey = originalStorageKey;
+        page.originalFilename = originalFilename;
         page.bytesOriginal = bytesOriginal;
         page.width = width;
         page.height = height;
@@ -69,8 +74,16 @@ public class ChapterPage {
         return sortOrder;
     }
 
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
     public String getOriginalStorageKey() {
         return originalStorageKey;
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
     }
 
     public String getWebpStorageKey() {

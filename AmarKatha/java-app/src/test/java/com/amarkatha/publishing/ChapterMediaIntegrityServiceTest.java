@@ -45,7 +45,7 @@ class ChapterMediaIntegrityServiceTest {
 
     @Test
     void requireIntactFailsWhenFileMissing() {
-        ChapterPage page = ChapterPage.create(chapterId, 1, "chapters/x/1.jpg", 10L, 100, 100);
+        ChapterPage page = ChapterPage.create(chapterId, 1, "chapters/x/1.jpg", "1.jpg", 10L, 100, 100);
         when(chapterPageRepository.findByChapterIdOrderBySortOrderAsc(chapterId)).thenReturn(List.of(page));
         when(mediaStore.exists("chapters/x/1.jpg")).thenReturn(false);
 
@@ -58,7 +58,7 @@ class ChapterMediaIntegrityServiceTest {
 
     @Test
     void intactWhenAllFilesPresent() {
-        ChapterPage page = ChapterPage.create(chapterId, 1, "chapters/x/1.jpg", 10L, 100, 100);
+        ChapterPage page = ChapterPage.create(chapterId, 1, "chapters/x/1.jpg", "1.jpg", 10L, 100, 100);
         when(chapterPageRepository.findByChapterIdOrderBySortOrderAsc(chapterId)).thenReturn(List.of(page));
         when(mediaStore.exists("chapters/x/1.jpg")).thenReturn(true);
 
