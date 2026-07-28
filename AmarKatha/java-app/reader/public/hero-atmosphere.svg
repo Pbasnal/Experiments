@@ -44,7 +44,7 @@
     <rect x="28" y="472" width="664" height="280" fill="#c2410c" opacity="0.25"/>
     <path d="M80 620 Q360 520 640 640" stroke="#fafaf9" stroke-width="4" opacity="0.3"/>
     <path d="M120 700 H580" stroke="#fafaf9" stroke-width="10" stroke-linecap="round" opacity="0.12"/>
-    <text x="56" y="720" fill="#fafaf9" font-family="Georgia, serif" font-size="42" opacity="0.28"></text>
+    <text x="56" y="720" fill="#fafaf9" font-family="Georgia, serif" font-size="42" opacity="0.28">क</text>
   </g>
 
   <!-- left accent panels -->
