@@ -133,6 +133,33 @@ class ChapterServiceTest {
     }
 
     @Test
+    void removePageDeletesMediaAndCompactsOrder() {
+        Chapter chapter = Chapter.createDraft(seriesId, 1, "chapter-1", "Ch 1");
+        when(seriesService.requireOwned(seriesId, creatorId))
+                .thenReturn(Series.create(creatorId, "slug", "Title"));
+        when(chapterRepository.findBySeriesIdAndId(seriesId, chapter.getId()))
+                .thenReturn(Optional.of(chapter));
+
+        var pageA = com.amarkatha.publishing.domain.ChapterPage.create(
+                chapter.getId(), 1, "a.jpg", "page-a.png", 10L, 100, 100
+        );
+        var pageB = com.amarkatha.publishing.domain.ChapterPage.create(
+                chapter.getId(), 2, "b.jpg", "page-b.png", 10L, 100, 100
+        );
+        when(chapterPageRepository.findById(pageA.getId())).thenReturn(Optional.of(pageA));
+        when(chapterPageRepository.findByChapterIdOrderBySortOrderAsc(chapter.getId()))
+                .thenReturn(List.of(pageB))
+                .thenReturn(List.of(pageB));
+        when(chapterPageRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        chapterService.removePage(seriesId, chapter.getId(), creatorId, pageA.getId());
+
+        verify(mediaStore).delete("a.jpg");
+        verify(chapterPageRepository).delete(pageA);
+        assertEquals(1, pageB.getSortOrder());
+    }
+
+    @Test
     void addPagesRejectsOverCap() {
         Chapter chapter = Chapter.createDraft(seriesId, 1, "chapter-1", "Ch 1");
         when(seriesService.requireOwned(seriesId, creatorId))

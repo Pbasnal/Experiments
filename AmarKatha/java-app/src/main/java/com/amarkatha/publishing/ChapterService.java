@@ -252,6 +252,47 @@ public class ChapterService {
     }
 
     @Transactional
+    public List<ChapterPage> removePage(
+            UUID seriesId,
+            UUID chapterId,
+            UUID creatorId,
+            UUID pageId
+    ) {
+        Chapter chapter = requireOwnedChapter(seriesId, chapterId, creatorId);
+        requireDraft(chapter);
+        ChapterPage page = chapterPageRepository.findById(pageId)
+                .filter(p -> p.getChapterId().equals(chapterId))
+                .orElseThrow(() -> new ChapterException("Page not found."));
+
+        if (page.getOriginalStorageKey() != null) {
+            mediaStore.delete(page.getOriginalStorageKey());
+        }
+        if (page.getWebpStorageKey() != null) {
+            mediaStore.delete(page.getWebpStorageKey());
+        }
+        chapterPageRepository.delete(page);
+        chapterPageRepository.flush();
+
+        List<ChapterPage> remaining = listPages(chapterId);
+        if (remaining.isEmpty()) {
+            return remaining;
+        }
+        // Compact sort_order to 1..n (two-phase for unique constraint).
+        int tmp = -1;
+        for (ChapterPage p : remaining) {
+            p.setSortOrder(tmp--);
+        }
+        chapterPageRepository.saveAll(remaining);
+        chapterPageRepository.flush();
+        int order = 1;
+        for (ChapterPage p : remaining) {
+            p.setSortOrder(order++);
+        }
+        chapterPageRepository.saveAll(remaining);
+        return listPages(chapterId);
+    }
+
+    @Transactional
     public Chapter publishNow(
             UUID seriesId,
             UUID chapterId,

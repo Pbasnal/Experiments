@@ -129,6 +129,23 @@ public class CreatorChapterController {
         return "redirect:/creator/series/" + seriesId + "/chapters/" + chapterId + "/edit";
     }
 
+    @PostMapping("/{chapterId}/pages/{pageId}/remove")
+    public String removePage(
+            @PathVariable UUID seriesId,
+            @PathVariable UUID chapterId,
+            @PathVariable UUID pageId,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            chapterService.removePage(seriesId, chapterId, principal.getId(), pageId);
+            redirectAttributes.addFlashAttribute("success", "Page removed.");
+        } catch (SeriesAccessException | ChapterException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + seriesId + "/chapters/" + chapterId + "/edit";
+    }
+
     @PostMapping("/{chapterId}/publish")
     public String publish(
             @PathVariable UUID seriesId,

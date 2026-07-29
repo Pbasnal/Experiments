@@ -49,11 +49,13 @@
         }
         .page-thumb .reorder {
             display: flex;
+            flex-wrap: wrap;
             gap: 0.25rem;
             padding: 0 0.5rem 0.5rem;
         }
         .page-thumb .reorder button {
             flex: 1;
+            min-width: 2rem;
             font-size: 0.75rem;
             padding: 0.25rem 0.35rem;
             border: 1px solid var(--border);
@@ -65,6 +67,12 @@
         .page-thumb .reorder button:disabled {
             opacity: 0.4;
             cursor: not-allowed;
+        }
+        .page-thumb .reorder button.is-danger {
+            flex-basis: 100%;
+            color: #b91c1c;
+            border-color: #fecaca;
+            background: #fef2f2;
         }
         .pending-empty {
             display: none;
@@ -135,6 +143,7 @@
                             th:disabled="${iter.first}" title="Move up">↑</button>
                     <button type="button" class="js-saved-move" data-direction="down"
                             th:disabled="${iter.last}" title="Move down">↓</button>
+                    <button type="button" class="js-saved-remove is-danger" title="Remove page">Remove</button>
                 </div>
             </div>
         </div>
@@ -152,7 +161,7 @@
             <input type="hidden" id="upload-title" name="title" th:value="${chapter.title}">
             <label for="files">Add pages</label>
             <input id="files" type="file" name="files" accept="image/png,image/jpeg,image/webp" multiple>
-            <p class="pending-hint">Selected images appear below. Rearrange with ↑ / ↓, then click Upload.</p>
+            <p class="pending-hint">Selected images appear below. Use ↑ / ↓ to reorder, <strong>Remove</strong> to drop one, then Upload.</p>
             <p id="pending-empty" class="pending-empty is-visible">No images selected yet.</p>
             <div id="pending-page-grid" class="page-grid" hidden></div>
             <div class="actions" style="margin-top:1rem;">
@@ -335,8 +344,9 @@
 
       var remove = document.createElement('button');
       remove.type = 'button';
-      remove.title = 'Remove';
-      remove.textContent = '✕';
+      remove.className = 'is-danger';
+      remove.title = 'Remove from selection';
+      remove.textContent = 'Remove';
       remove.addEventListener('click', function () {
         URL.revokeObjectURL(item.url);
         pending.splice(index, 1);
@@ -404,6 +414,8 @@
   function renumberSaved() {
     if (!savedGrid) return;
     var thumbs = savedGrid.querySelectorAll('.page-thumb');
+    existingCount = thumbs.length;
+    form.setAttribute('data-existing-count', String(existingCount));
     thumbs.forEach(function (thumb, i) {
       var ord = thumb.querySelector('.ord');
       if (ord) ord.textContent = '#' + (i + 1);
@@ -411,10 +423,49 @@
       if (buttons[0]) buttons[0].disabled = i === 0;
       if (buttons[1]) buttons[1].disabled = i === thumbs.length - 1;
     });
+    var meta = document.querySelector('.card .meta');
+    if (meta && meta.textContent && meta.textContent.indexOf('pages') !== -1) {
+      meta.textContent = existingCount + ' / ' + maxPages + ' pages';
+    }
   }
 
   if (savedGrid) {
     savedGrid.addEventListener('click', function (e) {
+      var removeBtn = e.target.closest('.js-saved-remove');
+      if (removeBtn) {
+        var removeThumb = removeBtn.closest('.page-thumb');
+        if (!removeThumb) return;
+        var removePageId = removeThumb.getAttribute('data-page-id');
+        if (!window.confirm('Remove this page from the chapter?')) return;
+        removeBtn.disabled = true;
+        var removeUrl = '/creator/series/' + seriesId + '/chapters/' + chapterId
+            + '/pages/' + removePageId + '/remove';
+        var removeBody = new FormData();
+        removeBody.append(csrfName, csrfToken);
+        fetch(removeUrl, {
+          method: 'POST',
+          body: removeBody,
+          credentials: 'same-origin',
+          redirect: 'manual',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(function (res) {
+          if (res.type === 'opaqueredirect' || (res.status >= 200 && res.status < 400)) {
+            removeThumb.remove();
+            renumberSaved();
+            if (savedGrid.querySelectorAll('.page-thumb').length === 0) {
+              window.location.reload();
+            }
+          } else {
+            window.alert('Could not remove page. Try again.');
+            removeBtn.disabled = false;
+          }
+        }).catch(function () {
+          window.alert('Could not remove page. Try again.');
+          removeBtn.disabled = false;
+        });
+        return;
+      }
+
       var btn = e.target.closest('.js-saved-move');
       if (!btn || btn.disabled) return;
       var thumb = btn.closest('.page-thumb');
@@ -437,7 +488,6 @@
         redirect: 'manual',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       }).then(function (res) {
-        // 0/opaqueredirect or 3xx = success for redirecting controller
         if (res.type === 'opaqueredirect' || (res.status >= 200 && res.status < 400)) {
           if (direction === 'up') {
             savedGrid.insertBefore(thumb, sibling);
