@@ -8,6 +8,7 @@ export default function SeriesPage() {
   const [series, setSeries] = useState<SeriesDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (!seriesSlug) {
@@ -62,6 +63,35 @@ export default function SeriesPage() {
         series.schedule.periodDays != null ? ` · every ${series.schedule.periodDays} days` : ''
       }`
     : (series.schedule?.scheduleLabel ?? series.scheduleLabel);
+
+  const shareUrl = `${window.location.origin}/read/s/${series.slug}?ref=share`;
+
+  async function handleShare() {
+    setShareFeedback(null);
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({
+          title: series!.title,
+          text: `Read ${series!.title} on AmarKatha`,
+          url: shareUrl,
+        });
+        return;
+      }
+    } catch (err) {
+      // User cancelled share sheet — don't fall through to clipboard noise.
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareFeedback('Link copied');
+      window.setTimeout(() => setShareFeedback(null), 2500);
+    } catch {
+      setShareFeedback('Could not copy link');
+      window.setTimeout(() => setShareFeedback(null), 2500);
+    }
+  }
 
   return (
     <div className="series-page">
@@ -130,11 +160,15 @@ export default function SeriesPage() {
             })}
           </ul>
         </section>
-        <div className="share-box">
-          <label>Share link</label>
-          <code>
-            {window.location.origin}/read/s/{series.slug}?ref=share
-          </code>
+        <div className="share-actions">
+          <button type="button" className="btn btn-primary" onClick={() => void handleShare()}>
+            Share
+          </button>
+          {shareFeedback && (
+            <span className="share-feedback" role="status">
+              {shareFeedback}
+            </span>
+          )}
         </div>
       </div>
     </div>
