@@ -113,7 +113,7 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <label for="title">Title</label>
             <input id="title" type="text" name="title" required maxlength="500" th:value="${chapter.title}">
-            <p class="hint" style="margin-top:0.35rem;">This name is what readers see. It is saved when you Save draft or Publish.</p>
+            <p class="hint" style="margin-top:0.35rem;">This name is what readers see. It is saved when you Save draft, Upload pages, or Publish.</p>
             <button type="submit" class="btn btn-secondary" data-busy-label="Saving…">Save draft</button>
         </form>
     </div>
@@ -149,6 +149,7 @@
                        data-max-pages=${maxPages},
                        data-existing-count=${#lists.size(pages)}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" id="upload-title" name="title" th:value="${chapter.title}">
             <label for="files">Add pages</label>
             <input id="files" type="file" name="files" accept="image/png,image/jpeg,image/webp" multiple>
             <p class="pending-hint">Selected images appear below. Rearrange with ↑ / ↓, then click Upload.</p>
@@ -199,27 +200,35 @@
 (function () {
   var titleInput = document.getElementById('title');
   var publishTitle = document.getElementById('publish-title');
+  var uploadTitle = document.getElementById('upload-title');
   var publishForm = document.getElementById('publish-form');
+  var uploadForm = document.getElementById('upload-pages-form');
   var heading = document.querySelector('main.creator-main > h1');
 
-  function syncPublishTitle() {
-    if (titleInput && publishTitle) {
-      publishTitle.value = titleInput.value.trim();
-    }
+  function syncTitleTargets() {
+    var value = titleInput ? titleInput.value.trim() : '';
+    if (publishTitle) publishTitle.value = value;
+    if (uploadTitle) uploadTitle.value = value;
   }
 
   if (titleInput) {
     titleInput.addEventListener('input', function () {
-      syncPublishTitle();
+      syncTitleTargets();
       if (heading && titleInput.value.trim()) {
         heading.textContent = titleInput.value.trim();
       }
     });
   }
 
+  if (uploadForm) {
+    uploadForm.addEventListener('submit', function () {
+      syncTitleTargets();
+    });
+  }
+
   if (publishForm) {
     publishForm.addEventListener('submit', function (e) {
-      syncPublishTitle();
+      syncTitleTargets();
       if (!publishTitle || !publishTitle.value.trim()) {
         e.preventDefault();
         window.alert('Enter a chapter title before publishing.');

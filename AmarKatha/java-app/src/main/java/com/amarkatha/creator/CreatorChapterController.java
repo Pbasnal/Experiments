@@ -94,10 +94,14 @@ public class CreatorChapterController {
             @PathVariable UUID seriesId,
             @PathVariable UUID chapterId,
             @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam(value = "title", required = false) String title,
             @RequestParam("files") MultipartFile[] files,
             RedirectAttributes redirectAttributes
     ) {
         try {
+            if (title != null && !title.isBlank()) {
+                chapterService.updateDraft(seriesId, chapterId, principal.getId(), title);
+            }
             List<MultipartFile> list = files == null ? List.of() : Arrays.asList(files);
             chapterService.addPages(seriesId, chapterId, principal.getId(), list);
             redirectAttributes.addFlashAttribute("success", "Pages uploaded.");
