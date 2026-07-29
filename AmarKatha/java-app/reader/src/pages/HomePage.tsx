@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchHome } from '../api/home';
 import type { HomeResponse } from '../types';
+import HowStepIcon from '../components/HowStepIcon';
 import SeriesCardView from '../components/SeriesCard';
 
 export default function HomePage() {
@@ -24,7 +25,7 @@ export default function HomePage() {
         <div className="landing-hero-media" aria-hidden="true">
           <img
             className="landing-hero-art"
-            src="/hero-atmosphere.svg"
+            src="/hero-atmosphere.png"
             alt=""
             width={1600}
             height={1000}
@@ -36,11 +37,11 @@ export default function HomePage() {
           <h1 className="landing-headline">Indian indie comics, on your schedule</h1>
           <p className="landing-tagline">{tagline}</p>
           <div className="landing-actions">
-            <a href="#stories" className="btn btn-primary">
-              Browse stories
-            </a>
-            <a href="/creator/signup" className="btn btn-secondary">
+            <a href="/creator/signup" className="btn btn-primary">
               Creators: get started
+            </a>
+            <a href="#stories" className="btn btn-secondary">
+              Browse stories
             </a>
           </div>
         </div>
@@ -52,27 +53,46 @@ export default function HomePage() {
           <p className="section-lead">Three steps from page to share link — no marketplace cold start.</p>
           <ol className="how-steps">
             <li>
-              <span className="how-num">1</span>
+              <HowStepIcon name="upload" step={1} />
               <div>
                 <h3>Upload chapters</h3>
                 <p>Drop page images, publish when ready.</p>
               </div>
             </li>
             <li>
-              <span className="how-num">2</span>
+              <HowStepIcon name="schedule" step={2} />
               <div>
                 <h3>Set your rhythm</h3>
                 <p>Weekly or custom days. Skip a slot or pause on hiatus.</p>
               </div>
             </li>
             <li>
-              <span className="how-num">3</span>
+              <HowStepIcon name="share" step={3} />
               <div>
                 <h3>Share the link</h3>
                 <p>Readers see the next update — and come back after a skip.</p>
               </div>
             </li>
           </ol>
+        </div>
+      </section>
+
+      <section className="creator-teaser" aria-labelledby="creator-teaser-heading">
+        <div className="section-shell creator-teaser-inner">
+          <div>
+            <h2 id="creator-teaser-heading">Built for creator rhythm</h2>
+            <p className="creator-teaser-lead">
+              While the catalog grows, the tools are ready — publish on your terms, not the feed’s.
+            </p>
+            <ul className="creator-teaser-features">
+              <li>Full control over your release schedule</li>
+              <li>Skip or pause when life happens</li>
+              <li>Direct share link — readers see the next update</li>
+            </ul>
+          </div>
+          <a href="/creator/signup" className="btn btn-primary">
+            Creators: get started
+          </a>
         </div>
       </section>
 
