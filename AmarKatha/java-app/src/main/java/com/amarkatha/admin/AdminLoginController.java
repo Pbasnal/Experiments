@@ -11,13 +11,13 @@ public class AdminLoginController {
 
     /**
      * Admin no longer has a separate public login. Bootstrap admins use Google on
-     * {@code /creator/signup} or {@code /creator/login}; email must be in ADMIN_BOOTSTRAP_EMAILS.
+     * {@code /creator/signup} or {@code /login}; email must be in ADMIN_BOOTSTRAP_EMAILS.
      */
     @GetMapping("/login")
     public String loginForm(@RequestParam(value = "error", required = false) String error) {
         if (error != null && !error.isBlank()) {
-            return "redirect:/creator/login?error=" + error;
+            return "redirect:/login?error=" + error;
         }
-        return "redirect:/creator/login";
+        return "redirect:/login";
     }
 }

@@ -35,7 +35,7 @@ export default function ProfilePage() {
       <section className="profile-page">
         <h1>Profile</h1>
         <p className="subtitle">Sign in to view your reader profile.</p>
-        <a href="/creator/login" className="btn btn-primary">
+        <a href="/login" className="btn btn-primary">
           Sign in
         </a>
       </section>

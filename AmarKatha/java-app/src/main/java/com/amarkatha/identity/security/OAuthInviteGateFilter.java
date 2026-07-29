@@ -57,6 +57,7 @@ public class OAuthInviteGateFilter extends OncePerRequestFilter {
         String value = intent.toString();
         return OAuthIntent.GOOGLE_AUTH.name().equals(value)
                 || OAuthIntent.CREATOR_LOGIN.name().equals(value)
+                || OAuthIntent.READER_LOGIN.name().equals(value)
                 || OAuthIntent.ADMIN_LOGIN.name().equals(value)
                 || OAuthIntent.CREATOR_SIGNUP.name().equals(value);
     }

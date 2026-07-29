@@ -50,6 +50,7 @@ public class UserOnboardingService {
         return switch (intent) {
             case ADMIN_LOGIN -> throw new OAuthOnboardingException(OAuthOnboardingException.Reason.ADMIN_ACCESS_DENIED);
             case CREATOR_LOGIN -> throw new OAuthOnboardingException(OAuthOnboardingException.Reason.ACCOUNT_NOT_FOUND);
+            case READER_LOGIN -> userRepository.save(User.create(googleSub, email, displayName, UserRole.READER));
             case GOOGLE_AUTH, CREATOR_SIGNUP -> createCreator(googleSub, email, displayName, pendingInviteToken);
         };
     }

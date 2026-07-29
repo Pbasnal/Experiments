@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in · AmarKatha</title>
+    <th:block th:replace="~{fragments/auth-layout :: styles}"></th:block>
+    <style>
+        .signin-options {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .signin-options .btn-google {
+            margin-top: 0;
+        }
+        .signin-option-hint {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <a href="/" class="logo">AmarKatha</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/creator/signup">For creators</a>
+    </div>
+</nav>
+<main>
+    <div class="card">
+        <h1>Sign in</h1>
+        <p class="subtitle">Choose how you want to continue with Google.</p>
+
+        <div class="alert alert-error" th:if="${errorCode == 'account_not_found'}">
+            No creator account found.
+            <a href="/creator/signup">Sign up with an invite</a>
+            or sign in as a reader instead.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'admin_denied'}">
+            Not authorized.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'oauth_failed'}">
+            Google sign-in failed. Please try again.
+        </div>
+        <div class="alert alert-error" th:if="${errorCode == 'unknown'}">
+            Something went wrong. Please try again.
+        </div>
+
+        <div class="signin-options">
+            <div>
+                <span class="signin-option-hint">Creators</span>
+                <a class="btn btn-google" th:href="@{/login/creator}">
+                    Sign in as creator
+                </a>
+            </div>
+            <div>
+                <span class="signin-option-hint">Readers</span>
+                <a class="btn btn-google" th:href="@{/login/reader}">
+                    Sign in as reader
+                </a>
+            </div>
+        </div>
+
+        <span class="footer-link">Creators: <a href="/creator/signup">sign up with invite</a></span>
+    </div>
+</main>
+</body>
+</html>

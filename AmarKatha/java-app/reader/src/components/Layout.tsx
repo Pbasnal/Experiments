@@ -67,8 +67,8 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </>
             ) : (
-              <a href="/creator/login" className="btn-signin btn-signin-quiet">
-                Creator sign in
+              <a href="/login" className="btn-signin btn-signin-quiet">
+                Sign in
               </a>
             )}
           </div>

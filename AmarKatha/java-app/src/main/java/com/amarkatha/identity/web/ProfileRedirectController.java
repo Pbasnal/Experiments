@@ -11,7 +11,7 @@ public class ProfileRedirectController {
     @GetMapping("/profile")
     public String profile(@AuthenticationPrincipal AmarKathaPrincipal principal) {
         if (principal == null) {
-            return "redirect:/creator/login";
+            return "redirect:/login";
         }
         return switch (principal.getRole()) {
             case ADMIN -> "redirect:/admin/profile";

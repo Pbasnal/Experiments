@@ -153,6 +153,52 @@ class UserOnboardingServiceTest {
         assertEquals(OAuthOnboardingException.Reason.INVITE_INVALID, ex.getReason());
     }
 
+    @Test
+    void readerLoginCreatesReaderAccount() {
+        when(userRepository.findByGoogleSub("sub-8")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User user = service.completeOAuthLogin(
+                oauthUser("sub-8", "reader@example.com"),
+                OAuthIntent.READER_LOGIN,
+                null
+        );
+
+        assertEquals(UserRole.READER, user.getRole());
+        verify(inviteService, never()).consume(any(), any());
+    }
+
+    @Test
+    void readerLoginReturnsExistingCreator() {
+        User existing = User.create("sub-9", "creator@example.com", "Creator", UserRole.CREATOR);
+        when(userRepository.findByGoogleSub("sub-9")).thenReturn(Optional.of(existing));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User user = service.completeOAuthLogin(
+                oauthUser("sub-9", "creator@example.com"),
+                OAuthIntent.READER_LOGIN,
+                null
+        );
+
+        assertEquals(UserRole.CREATOR, user.getRole());
+        verify(inviteService, never()).consume(any(), any());
+    }
+
+    @Test
+    void creatorLoginRejectsUnknownUser() {
+        when(userRepository.findByGoogleSub("sub-10")).thenReturn(Optional.empty());
+
+        OAuthOnboardingException ex = assertThrows(
+                OAuthOnboardingException.class,
+                () -> service.completeOAuthLogin(
+                        oauthUser("sub-10", "unknown@example.com"),
+                        OAuthIntent.CREATOR_LOGIN,
+                        null
+                )
+        );
+        assertEquals(OAuthOnboardingException.Reason.ACCOUNT_NOT_FOUND, ex.getReason());
+    }
+
     private static OAuth2User oauthUser(String sub, String email) {
         return new DefaultOAuth2User(
                 java.util.List.of(),

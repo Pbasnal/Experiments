@@ -94,7 +94,8 @@ public class AmarKathaOAuth2SuccessHandler implements AuthenticationSuccessHandl
     private static String redirectFor(User user) {
         return switch (user.getRole()) {
             case ADMIN -> "/admin";
-            case CREATOR, READER -> "/creator";
+            case CREATOR -> "/creator";
+            case READER -> "/";
         };
     }
 
@@ -104,9 +105,9 @@ public class AmarKathaOAuth2SuccessHandler implements AuthenticationSuccessHandl
             case INVITE_EXPIRED -> "/creator/signup?error=invite_expired";
             case INVITE_EXHAUSTED -> "/creator/signup?error=invite_exhausted";
             case INVITE_INVALID -> "/creator/signup?error=invite_not_found";
-            case ACCOUNT_NOT_FOUND -> "/creator/login?error=account_not_found";
-            case ADMIN_ACCESS_DENIED -> "/creator/login?error=admin_denied";
-            case MISSING_PROFILE -> "/creator/login?error=oauth_failed";
+            case ACCOUNT_NOT_FOUND -> "/login?error=account_not_found";
+            case ADMIN_ACCESS_DENIED -> "/login?error=admin_denied";
+            case MISSING_PROFILE -> "/login?error=oauth_failed";
         };
     }
 }

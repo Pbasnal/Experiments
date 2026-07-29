@@ -114,7 +114,7 @@ export default function HomePage() {
                 <a href="/creator/signup" className="btn btn-secondary">
                   Creators: sign up with invite
                 </a>
-                <a href="/creator/login" className="btn btn-ghost">
+                <a href="/login" className="btn btn-ghost">
                   Already a creator? Sign in
                 </a>
               </div>
@@ -149,7 +149,7 @@ export default function HomePage() {
             <a href="/creator/signup" className="btn btn-primary">
               Sign up with invite
             </a>
-            <a href="/creator/login" className="btn btn-secondary">
+            <a href="/login" className="btn btn-secondary">
               Sign in
             </a>
           </div>

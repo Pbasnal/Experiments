@@ -40,6 +40,8 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/info",
                                 "/error",
+                                "/login",
+                                "/login/**",
                                 "/creator/signup",
                                 "/creator/signup/**",
                                 "/creator/login",
@@ -53,14 +55,14 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/creator/login")
+                        .loginPage("/login")
                         .successHandler(successHandler)
                 )
                 .exceptionHandling(ex -> ex
                         .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/creator/login"),
+                                new LoginUrlAuthenticationEntryPoint("/login"),
                                 request -> request.getRequestURI().startsWith("/admin"))
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/creator/login"))
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
                 )
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reader/**", "/api/auth/**"))
                 .logout(logout -> logout

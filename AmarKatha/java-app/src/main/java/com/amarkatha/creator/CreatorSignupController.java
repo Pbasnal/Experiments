@@ -57,15 +57,11 @@ public class CreatorSignupController {
     }
 
     @GetMapping("/login")
-    public String loginForm(
-            @RequestParam(value = "error", required = false) String error,
-            HttpSession session,
-            Model model
-    ) {
-        session.setAttribute(AuthSessionKeys.OAUTH_INTENT, OAuthIntent.CREATOR_LOGIN.name());
-        session.removeAttribute(AuthSessionKeys.PENDING_INVITE_TOKEN);
-        addErrorMessage(error, model);
-        return "creator/login";
+    public String loginForm(@RequestParam(value = "error", required = false) String error) {
+        if (error != null && !error.isBlank()) {
+            return "redirect:/login?error=" + error.trim();
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/onboard")
