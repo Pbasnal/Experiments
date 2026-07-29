@@ -16,6 +16,7 @@ public class InviteInvalidException extends RuntimeException {
     public enum InviteInvalidReason {
         NOT_FOUND,
         ALREADY_USED,
+        EXHAUSTED,
         EXPIRED,
         BLANK
     }

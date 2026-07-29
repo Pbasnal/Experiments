@@ -101,6 +101,9 @@ public class AmarKathaOAuth2SuccessHandler implements AuthenticationSuccessHandl
     private static String failureRedirect(OAuthOnboardingException.Reason reason) {
         return switch (reason) {
             case INVITE_REQUIRED -> "/creator/signup?error=invite_required";
+            case INVITE_EXPIRED -> "/creator/signup?error=invite_expired";
+            case INVITE_EXHAUSTED -> "/creator/signup?error=invite_exhausted";
+            case INVITE_INVALID -> "/creator/signup?error=invite_not_found";
             case ACCOUNT_NOT_FOUND -> "/creator/login?error=account_not_found";
             case ADMIN_ACCESS_DENIED -> "/creator/login?error=admin_denied";
             case MISSING_PROFILE -> "/creator/login?error=oauth_failed";

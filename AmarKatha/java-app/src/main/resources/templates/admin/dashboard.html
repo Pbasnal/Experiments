@@ -15,8 +15,10 @@
     <h1>Admin</h1>
     <p class="subtitle">Invite creators and monitor cohort basics.</p>
 
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
     <div class="alert alert-success" th:if="${newToken != null}">
-        <p>Invite created.</p>
+        <p>Invite created<span th:if="${newMaxUses != null}" th:text="${' (max ' + newMaxUses + ' uses)'}"></span>.</p>
         <p>
             Signup link:
             <a th:href="@{/creator/signup(invite=${newToken})}"
@@ -32,10 +34,18 @@
 
     <div class="card">
         <h2>Quick actions</h2>
-        <div class="actions">
-            <form th:action="@{/admin/invites}" method="post">
+        <div class="actions" style="flex-wrap:wrap; align-items:flex-end;">
+            <form th:action="@{/admin/invites}" method="post"
+                  style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:flex-end;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <input type="hidden" name="redirect" value="dashboard">
+                <div>
+                    <label for="dashMaxUses" style="display:block; font-size:0.75rem; color:var(--muted); margin-bottom:0.25rem;">
+                        Max uses
+                    </label>
+                    <input id="dashMaxUses" type="number" name="maxUses" min="1" max="100" value="1"
+                           style="width:5.5rem; padding:0.45rem 0.5rem; border:1px solid var(--border); border-radius:0.4rem;">
+                </div>
                 <button type="submit" class="btn btn-primary">Generate invite</button>
             </form>
             <a th:href="@{/admin/invites}" class="btn btn-secondary">View invites</a>
@@ -51,7 +61,7 @@
             <div class="value" th:text="${dashboard.availableInvites}">0</div>
         </div>
         <div class="stat">
-            <div class="label">Used (30 days)</div>
+            <div class="label">Tokens touched (30d)</div>
             <div class="value" th:text="${dashboard.usedInvitesLast30Days}">0</div>
         </div>
         <div class="stat">
@@ -73,6 +83,8 @@
             <tr>
                 <th>Token</th>
                 <th>Status</th>
+                <th>Uses</th>
+                <th>Redeemed by</th>
                 <th>Expires</th>
                 <th>Created</th>
             </tr>
@@ -90,6 +102,8 @@
                     <span th:class="${'status status-' + #strings.toLowerCase(invite.status)}"
                           th:text="${invite.status}">Available</span>
                 </td>
+                <td th:text="${invite.usesLabel}">0 / 1</td>
+                <td th:text="${invite.redeemedByLabel}">-</td>
                 <td th:text="${invite.expiresLabel}">-</td>
                 <td th:text="${invite.createdLabel}">-</td>
             </tr>

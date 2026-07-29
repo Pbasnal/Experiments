@@ -15,6 +15,9 @@ public class OAuthOnboardingException extends RuntimeException {
 
     public enum Reason {
         INVITE_REQUIRED,
+        INVITE_EXPIRED,
+        INVITE_EXHAUSTED,
+        INVITE_INVALID,
         ACCOUNT_NOT_FOUND,
         ADMIN_ACCESS_DENIED,
         MISSING_PROFILE

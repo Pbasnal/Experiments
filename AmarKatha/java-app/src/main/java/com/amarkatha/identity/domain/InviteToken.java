@@ -34,18 +34,26 @@ public class InviteToken {
     @Column(name = "expires_at")
     private Instant expiresAt;
 
+    @Column(name = "max_uses", nullable = false)
+    private int maxUses = 1;
+
+    @Column(name = "use_count", nullable = false)
+    private int useCount = 0;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
     protected InviteToken() {
     }
 
-    public static InviteToken create(String token, User createdBy, Instant expiresAt) {
+    public static InviteToken create(String token, User createdBy, Instant expiresAt, int maxUses) {
         InviteToken invite = new InviteToken();
         invite.id = UUID.randomUUID();
         invite.token = token;
         invite.createdBy = createdBy;
         invite.expiresAt = expiresAt;
+        invite.maxUses = maxUses;
+        invite.useCount = 0;
         return invite;
     }
 
@@ -73,19 +81,40 @@ public class InviteToken {
         return expiresAt;
     }
 
+    public int getMaxUses() {
+        return maxUses;
+    }
+
+    public int getUseCount() {
+        return useCount;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
 
+    /** True when all allowed redemptions have been consumed. */
+    public boolean isExhausted() {
+        return useCount >= maxUses;
+    }
+
+    /** @deprecated Prefer {@link #isExhausted()} for multi-use tokens. */
+    @Deprecated
     public boolean isUsed() {
-        return usedAt != null;
+        return isExhausted();
     }
 
     public boolean isExpired(Instant now) {
         return expiresAt != null && now.isAfter(expiresAt);
     }
 
-    public void markUsed(User user, Instant now) {
+    public int remainingUses() {
+        return Math.max(0, maxUses - useCount);
+    }
+
+    /** Apply an atomic consume result into this in-memory entity (after successful DB update). */
+    public void applyConsumed(User user, Instant now) {
+        this.useCount = this.useCount + 1;
         this.usedBy = user;
         this.usedAt = now;
     }

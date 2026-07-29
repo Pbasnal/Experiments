@@ -68,11 +68,24 @@ public class AdminInviteController {
     public String generateInvite(
             @AuthenticationPrincipal AmarKathaPrincipal principal,
             @RequestParam(value = "redirect", required = false) String redirect,
+            @RequestParam(value = "maxUses", required = false, defaultValue = "1") int maxUses,
             RedirectAttributes redirectAttributes
     ) {
+        if (maxUses < InviteService.minMaxUses() || maxUses > InviteService.maxMaxUses()) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Max uses must be between " + InviteService.minMaxUses()
+                            + " and " + InviteService.maxMaxUses() + "."
+            );
+            if ("dashboard".equals(redirect)) {
+                return "redirect:/admin";
+            }
+            return "redirect:/admin/invites";
+        }
         User admin = userRepository.getReferenceById(principal.getId());
-        InviteToken invite = inviteService.generate(admin);
+        InviteToken invite = inviteService.generate(admin, maxUses);
         redirectAttributes.addFlashAttribute("newToken", invite.getToken());
+        redirectAttributes.addFlashAttribute("newMaxUses", invite.getMaxUses());
         if ("dashboard".equals(redirect)) {
             return "redirect:/admin";
         }

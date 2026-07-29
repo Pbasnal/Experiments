@@ -93,6 +93,66 @@ class UserOnboardingServiceTest {
         assertEquals("creator@example.com", userCaptor.getValue().getEmail());
     }
 
+    @Test
+    void creatorSignupMapsExpiredInvite() {
+        when(userRepository.findByGoogleSub("sub-5")).thenReturn(Optional.empty());
+        when(featureFlagService.isInviteRequired()).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(inviteService.consume(any(), any())).thenThrow(
+                new InviteInvalidException(InviteInvalidException.InviteInvalidReason.EXPIRED)
+        );
+
+        OAuthOnboardingException ex = assertThrows(
+                OAuthOnboardingException.class,
+                () -> service.completeOAuthLogin(
+                        oauthUser("sub-5", "creator@example.com"),
+                        OAuthIntent.CREATOR_SIGNUP,
+                        "stale-token"
+                )
+        );
+        assertEquals(OAuthOnboardingException.Reason.INVITE_EXPIRED, ex.getReason());
+    }
+
+    @Test
+    void creatorSignupMapsExhaustedInvite() {
+        when(userRepository.findByGoogleSub("sub-6")).thenReturn(Optional.empty());
+        when(featureFlagService.isInviteRequired()).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(inviteService.consume(any(), any())).thenThrow(
+                new InviteInvalidException(InviteInvalidException.InviteInvalidReason.EXHAUSTED)
+        );
+
+        OAuthOnboardingException ex = assertThrows(
+                OAuthOnboardingException.class,
+                () -> service.completeOAuthLogin(
+                        oauthUser("sub-6", "creator@example.com"),
+                        OAuthIntent.CREATOR_SIGNUP,
+                        "used-token"
+                )
+        );
+        assertEquals(OAuthOnboardingException.Reason.INVITE_EXHAUSTED, ex.getReason());
+    }
+
+    @Test
+    void creatorSignupMapsInvalidInvite() {
+        when(userRepository.findByGoogleSub("sub-7")).thenReturn(Optional.empty());
+        when(featureFlagService.isInviteRequired()).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(inviteService.consume(any(), any())).thenThrow(
+                new InviteInvalidException(InviteInvalidException.InviteInvalidReason.NOT_FOUND)
+        );
+
+        OAuthOnboardingException ex = assertThrows(
+                OAuthOnboardingException.class,
+                () -> service.completeOAuthLogin(
+                        oauthUser("sub-7", "creator@example.com"),
+                        OAuthIntent.CREATOR_SIGNUP,
+                        "missing-token"
+                )
+        );
+        assertEquals(OAuthOnboardingException.Reason.INVITE_INVALID, ex.getReason());
+    }
+
     private static OAuth2User oauthUser(String sub, String email) {
         return new DefaultOAuth2User(
                 java.util.List.of(),

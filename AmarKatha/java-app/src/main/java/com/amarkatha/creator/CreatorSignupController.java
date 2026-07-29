@@ -82,6 +82,9 @@ public class CreatorSignupController {
         }
         model.addAttribute("errorCode", switch (error) {
             case "invite_required" -> "invite_required";
+            case "invite_expired" -> "invite_expired";
+            case "invite_exhausted", "invite_used" -> "invite_exhausted";
+            case "invite_not_found" -> "invite_not_found";
             case "account_not_found" -> "account_not_found";
             case "oauth_failed" -> "oauth_failed";
             case "admin_denied" -> "admin_denied";
@@ -92,7 +95,7 @@ public class CreatorSignupController {
     private static String mapInviteError(InviteInvalidException.InviteInvalidReason reason) {
         return switch (reason) {
             case NOT_FOUND -> "invite_not_found";
-            case ALREADY_USED -> "invite_used";
+            case ALREADY_USED, EXHAUSTED -> "invite_exhausted";
             case EXPIRED -> "invite_expired";
             case BLANK -> "invite_blank";
         };

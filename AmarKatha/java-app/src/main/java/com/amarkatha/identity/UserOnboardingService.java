@@ -61,10 +61,22 @@ public class UserOnboardingService {
             }
             User user = User.create(googleSub, email, displayName, UserRole.CREATOR);
             user = userRepository.save(user);
-            inviteService.consume(pendingInviteToken, user);
+            try {
+                inviteService.consume(pendingInviteToken, user);
+            } catch (InviteInvalidException ex) {
+                throw new OAuthOnboardingException(mapInviteReason(ex.getReason()));
+            }
             return user;
         }
         return userRepository.save(User.create(googleSub, email, displayName, UserRole.CREATOR));
+    }
+
+    private static OAuthOnboardingException.Reason mapInviteReason(InviteInvalidException.InviteInvalidReason reason) {
+        return switch (reason) {
+            case EXPIRED -> OAuthOnboardingException.Reason.INVITE_EXPIRED;
+            case EXHAUSTED, ALREADY_USED -> OAuthOnboardingException.Reason.INVITE_EXHAUSTED;
+            case NOT_FOUND, BLANK -> OAuthOnboardingException.Reason.INVITE_INVALID;
+        };
     }
 
     private void applyBootstrapAdmin(User user, String email) {

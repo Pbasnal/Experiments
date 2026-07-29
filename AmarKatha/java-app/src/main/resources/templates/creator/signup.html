@@ -23,8 +23,8 @@
         <div class="alert alert-error" th:if="${errorCode == 'invite_not_found'}">
             Invite code not found.
         </div>
-        <div class="alert alert-error" th:if="${errorCode == 'invite_used'}">
-            This invite has already been used.
+        <div class="alert alert-error" th:if="${errorCode == 'invite_used' or errorCode == 'invite_exhausted'}">
+            This invite has no remaining uses.
         </div>
         <div class="alert alert-error" th:if="${errorCode == 'invite_expired'}">
             This invite has expired.
