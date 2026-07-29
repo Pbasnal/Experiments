@@ -2,6 +2,7 @@ package com.amarkatha.creator;
 
 import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.publishing.ChapterRepository;
+import com.amarkatha.publishing.SeriesCoverPresentation;
 import com.amarkatha.publishing.SeriesScheduleService;
 import com.amarkatha.publishing.SeriesService;
 import com.amarkatha.publishing.domain.Series;
@@ -58,18 +59,7 @@ public class CreatorController {
                 needsScheduleCount++;
             }
             ScheduleStripView strip = seriesScheduleService.stripFor(series);
-            homeSeries.add(new CreatorHomeSeriesView(
-                    series.getId(),
-                    series.getTitle(),
-                    series.getSlug(),
-                    series.getStatus().name(),
-                    series.getContentLanguage(),
-                    formatNextSlot(series),
-                    strip.scheduleLabel(),
-                    drafts,
-                    prompt,
-                    series.getStatus() == SeriesStatus.HIATUS
-            ));
+            homeSeries.add(toRow(series, drafts, prompt, strip.scheduleLabel(), formatNextSlot(series)));
         }
 
         model.addAttribute("user", principal);
@@ -86,6 +76,30 @@ public class CreatorController {
     public String profile(@AuthenticationPrincipal AmarKathaPrincipal principal, Model model) {
         model.addAttribute("user", principal);
         return "creator/profile";
+    }
+
+    static CreatorHomeSeriesView toRow(
+            Series series,
+            long drafts,
+            boolean needsSchedulePrompt,
+            String scheduleSummary,
+            String nextSlotLabel
+    ) {
+        return new CreatorHomeSeriesView(
+                series.getId(),
+                series.getTitle(),
+                series.getSlug(),
+                series.getStatus().name(),
+                series.getContentLanguage(),
+                SeriesCoverPresentation.coverUrl(series.getCoverStorageKey(), series.getVersion()),
+                SeriesCoverPresentation.coverGradient(series.getSlug()),
+                series.getDescription(),
+                nextSlotLabel,
+                scheduleSummary,
+                drafts,
+                needsSchedulePrompt,
+                series.getStatus() == SeriesStatus.HIATUS
+        );
     }
 
     private static String formatNextSlot(Series series) {

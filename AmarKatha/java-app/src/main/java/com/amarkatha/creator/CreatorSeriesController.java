@@ -6,6 +6,7 @@ import com.amarkatha.publishing.ChapterService;
 import com.amarkatha.publishing.OngoingSeriesCapExceededException;
 import com.amarkatha.publishing.ScheduleServiceException;
 import com.amarkatha.publishing.SeriesAccessException;
+import com.amarkatha.publishing.SeriesCoverPresentation;
 import com.amarkatha.publishing.SeriesScheduleService;
 import com.amarkatha.publishing.SeriesService;
 import com.amarkatha.publishing.domain.Series;
@@ -13,6 +14,7 @@ import com.amarkatha.scheduling.ScheduleCalendar;
 import com.amarkatha.scheduling.ScheduleStripView;
 import java.time.DateTimeException;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,8 +52,11 @@ public class CreatorSeriesController {
     @GetMapping({"", "/"})
     public String list(@AuthenticationPrincipal AmarKathaPrincipal principal, Model model) {
         UUID creatorId = principal.getId();
+        List<CreatorHomeSeriesView> rows = seriesService.listForCreator(creatorId).stream()
+                .map(series -> CreatorController.toRow(series, 0, false, null, null))
+                .toList();
         model.addAttribute("user", principal);
-        model.addAttribute("seriesList", seriesService.listForCreator(creatorId));
+        model.addAttribute("seriesList", rows);
         model.addAttribute("ongoingCount", seriesService.countOngoing(creatorId));
         model.addAttribute("maxOngoing", SeriesService.MAX_ONGOING_SERIES_PER_CREATOR);
         model.addAttribute("canCreate", seriesService.canCreateOngoing(creatorId));
@@ -132,10 +137,9 @@ public class CreatorSeriesController {
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
         });
         if (series.getCoverStorageKey() != null && !series.getCoverStorageKey().isBlank()) {
-            // Bust browser cache: re-uploads often reuse .../cover/original.jpg
             model.addAttribute(
                     "coverUrl",
-                    "/media/" + series.getCoverStorageKey() + "?v=" + series.getVersion()
+                    SeriesCoverPresentation.coverUrl(series.getCoverStorageKey(), series.getVersion())
             );
         }
         return "creator/series-detail";

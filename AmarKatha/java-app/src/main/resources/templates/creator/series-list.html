@@ -13,19 +13,28 @@
 <nav th:replace="~{fragments/creator-layout :: nav(active='series')}"></nav>
 <main class="creator-main">
     <h1>My Series</h1>
-    <p class="subtitle">Manage up to <span th:text="${maxOngoing}">5</span> ongoing series.</p>
+    <p class="subtitle">
+        Manage up to <span th:text="${maxOngoing}">5</span> ongoing series
+        (active titles with status Ongoing — not chapter count).
+    </p>
 
     <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
 
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:0.5rem;">
-            <p class="meta" style="margin:0;">
-                Ongoing: <span th:text="${ongoingCount}">0</span> /
-                <span th:text="${maxOngoing}">5</span>
-            </p>
+            <div>
+                <p class="meta ongoing-cap"
+                   style="margin:0;"
+                   title="Limit is 5 ongoing series. Completed or hiatus series do not count toward this cap.">
+                    Ongoing: <span th:text="${ongoingCount}">0</span> /
+                    <span th:text="${maxOngoing}">5</span>
+                </p>
+                <p class="cap-hint">Active series with status Ongoing (not chapter count).</p>
+            </div>
             <a th:if="${canCreate}" th:href="@{/creator/series/new}" class="btn btn-primary">New series</a>
-            <span th:unless="${canCreate}" class="btn btn-primary is-disabled" title="Ongoing series cap reached">New series</span>
+            <span th:unless="${canCreate}" class="btn btn-primary is-disabled"
+                  title="Limit is 5 ongoing series. Completed or hiatus series do not count toward this cap.">New series</span>
         </div>
 
         <div th:if="${#lists.isEmpty(seriesList)}" class="empty">
@@ -33,21 +42,40 @@
             <a th:if="${canCreate}" th:href="@{/creator/series/new}">Create your first series</a>
         </div>
         <div th:each="s : ${seriesList}" class="series-item">
-            <div>
-                <a class="title" th:href="@{/creator/series/{id}(id=${s.id})}" th:text="${s.title}">Title</a>
-                <div class="meta" style="margin-top:0.25rem;">
-                    <span class="badge" th:text="${s.status}">ONGOING</span>
-                    · <span th:text="${s.contentLanguage}">en</span>
-                    · <span th:text="${s.slug}">slug</span>
+            <div class="series-item-main">
+                <div class="series-thumb" th:if="${s.coverUrl == null}"
+                     th:style="|background:${s.coverGradient}|"
+                     aria-hidden="true"></div>
+                <img th:if="${s.coverUrl != null}" class="series-thumb" th:src="${s.coverUrl}"
+                     th:alt="|${s.title} cover|" width="56" height="72">
+                <div class="series-item-body">
+                    <a class="title" th:href="@{/creator/series/{id}(id=${s.id})}" th:text="${s.title}">Title</a>
+                    <div class="meta" style="margin-top:0.25rem;">
+                        <span class="badge" th:text="${s.status}">ONGOING</span>
+                        · <span th:text="${s.contentLanguage}">en</span>
+                    </div>
+                    <div class="share-path-row">
+                        <span class="share-path" th:text="'/read/s/' + ${s.slug}">/read/s/slug</span>
+                        <button type="button" class="btn-icon js-copy-share"
+                                title="Copy link" aria-label="Copy link"
+                                th:attr="data-path=@{/read/s/{slug}(slug=${s.slug},ref=share)}">
+                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="meta" th:if="${s.description != null}" th:text="${s.description}"
+                       style="margin-top:0.35rem; max-width:28rem;"></p>
                 </div>
-                <p class="meta" th:if="${s.description != null}" th:text="${s.description}"
-                   style="margin-top:0.35rem; max-width:28rem;"></p>
             </div>
             <div class="actions" style="margin:0;">
-                <a class="btn btn-secondary" th:href="@{/creator/series/{id}(id=${s.id})}">Open</a>
+                <a class="btn btn-secondary" th:href="@{/creator/series/{id}(id=${s.id})}">Manage / Add chapter</a>
             </div>
         </div>
     </div>
 </main>
+<script th:replace="~{fragments/creator-layout :: copyShare}"></script>
 </body>
 </html>

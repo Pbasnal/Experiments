@@ -113,10 +113,47 @@
         }
         .series-item:last-child { border-bottom: none; padding-bottom: 0; }
         .series-item:first-child { padding-top: 0; }
+        .series-item-main {
+            display: flex; gap: 0.85rem; align-items: flex-start; min-width: 0; flex: 1;
+        }
+        .series-item-body { min-width: 0; flex: 1; }
+        .series-thumb {
+            flex-shrink: 0;
+            width: 3.5rem; height: 4.5rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--border);
+            object-fit: cover;
+            background: #e5e7eb;
+        }
         .series-item a.title {
             font-weight: 600; color: var(--text); text-decoration: none;
         }
         .series-item a.title:hover { color: var(--primary); }
+        .share-path-row {
+            display: flex; align-items: center; gap: 0.35rem; margin-top: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .share-path {
+            font-size: 0.8rem; color: var(--muted); font-family: ui-monospace, monospace;
+            word-break: break-all;
+        }
+        .btn-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 1.85rem; height: 1.85rem; padding: 0;
+            border: 1px solid var(--border); border-radius: 0.4rem;
+            background: white; color: var(--muted); cursor: pointer;
+        }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-icon.is-copied { border-color: var(--success-text); color: var(--success-text); }
+        .cap-hint {
+            margin: 0.2rem 0 0; font-size: 0.78rem; color: var(--muted); line-height: 1.35;
+            max-width: 22rem;
+        }
+        .ongoing-cap { cursor: help; }
+        .share-box-row {
+            display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+        }
+        .share-box-row a { word-break: break-all; }
         .badge {
             display: inline-block; font-size: 0.75rem; font-weight: 600;
             padding: 0.15rem 0.5rem; border-radius: 999px; background: #eef2ff; color: var(--primary);
@@ -152,6 +189,36 @@
     </style>
     </th:block>
 
+    <script th:fragment="copyShare">
+        document.querySelectorAll('.js-copy-share').forEach(function (el) {
+            el.addEventListener('click', function () {
+                var path = el.getAttribute('data-path');
+                if (!path) return;
+                var text = window.location.origin + path;
+                navigator.clipboard.writeText(text).then(function () {
+                    el.classList.add('is-copied');
+                    var label = el.querySelector('.js-copy-label');
+                    if (label) {
+                        var prev = label.textContent;
+                        label.textContent = 'Copied';
+                        setTimeout(function () {
+                            label.textContent = prev;
+                            el.classList.remove('is-copied');
+                        }, 1200);
+                    } else {
+                        var prevTitle = el.getAttribute('title') || 'Copy link';
+                        el.setAttribute('title', 'Copied');
+                        el.setAttribute('aria-label', 'Copied');
+                        setTimeout(function () {
+                            el.setAttribute('title', prevTitle);
+                            el.setAttribute('aria-label', prevTitle);
+                            el.classList.remove('is-copied');
+                        }, 1200);
+                    }
+                });
+            });
+        });
+    </script>
     <script th:fragment="busyForms">
         (function () {
             function markBusy(form, button) {
