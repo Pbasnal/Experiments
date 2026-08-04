@@ -1,5 +1,5 @@
 # Chapter 1: The Weight of Desperate Choices
-
+## Scene 1
 The candle had been dying for an hour, but Harbin Greel couldn't bring himself to light another. Something about the growing darkness felt appropriate—honest, even. Like Gravedawn itself, slowly suffocating in the shadow of that damned tower.
 
 He'd been staring at the same report for twenty minutes. *Thornfield boy, age fourteen, last seen near the harbor at dusk.* Seven this month. Seven families with empty chairs at their tables, seven mothers who'd stopped cooking full meals.
@@ -77,7 +77,7 @@ Outside, the wind picked up, carrying with it the salt smell of the sea and some
 Harbin turned away. The winter solstice was still weeks away, but already he could feel the tower watching. Waiting.
 
 --------
-Scene 2
+## Scene 2
 
 The cart's wheels had been grinding against the same rutted track for what felt like days, the kind of road that punished every axle and spine with equal malice. Forest scents clung to everything—pine sap and damp earth, undercut by the sharp tang of wild mint crushed under hooves. Somewhere behind them, a crow cawed its endless commentary, and ahead, nothing but more trees and the promise of ghosts.
 
@@ -208,7 +208,7 @@ Theron stopped at the Town Hall steps and turned to them. Behind him, Gravedawn 
 He pushed the door open. “Inside.”
 
 ---
-Scene 3
+## Scene 3
 
 The chapel lamps had burned low by the time Brenn returned. Brother Tovin was stacking prayer books with the stiff, angry precision of a man trying not to break something.
 
@@ -361,3 +361,4 @@ Evening had begun its slow descent over Gravedawn by the time Brenn stepped back
 He paused at the corner and looked back—at Lysa guiding Rurik across a threshold dusted white, at Joren knotting netline by lanternlight, at Mira ladling stew for three men with tired faces.
 
 He pressed his thumb over the burn scar in his palm, then turned toward Town Hall.
+
