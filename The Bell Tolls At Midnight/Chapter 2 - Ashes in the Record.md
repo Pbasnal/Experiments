@@ -2,173 +2,215 @@
 
 ## Scene 1
 
-Harbin’s office felt smaller with seven people in it.
+Harbin's office had not been built for seven people, and it resented every one of them.
 
-Theron stood by the window, sipping tea in silence. Lyra had claimed the chair closest to the desk, elbows on knees, ready to pounce on any useful detail. Cassius occupied the second chair with his notebook already open. Raven had taken the darkest corner near the bookshelf. Elena sat on a folded cloak by the hearth, close enough to feel its low heat.
+A kettle sweated on the iron trivet by the hearth, its spout ghosting steam. It was the third of the evening. The first two had gone cold and been drained anyway, and their spent leaves lay heaped in the dustbin beside the desk—a small brown midden of them, days deep, the topmost still wet. Harbin measured a fresh pinch into a chipped cup without appearing to notice his hands were doing it at all. They wanted work. He gave them some.
 
-Harbin stood behind his desk, palms on ledgers, as if papers and ink could hold a town together.
+The ledgers lay open across the desk, and there were more gaps in them than entries: a name, then a name, then a blank line where a name should have been.
 
-A knock came once.
+Theron had taken the window. He stood the way old soldiers stand at windows—half the room, half the street—and offered nothing to either. The hill was out there behind the fog, and his gaze kept returning to where it should have been.
 
-Before Harbin answered, the door opened and Father Brenn stepped inside.
+Lyra sat nearest the desk, forearms on her knees, the weapons still across her back. A chair was no reason to set them down. She had the particular stillness of someone who could be moving very fast in under a breath.
 
-“Father Brenn,” Harbin said quickly. “Good. I was about to introduce you to—”
+Cassius filled the second chair and the air around it—an open notebook, two crystals he kept turning over, a pen he chewed and then remembered not to chew. He had the look of a student the night before an examination he expected to fail.
 
-“We have already met,” Brenn said.
+Raven stood in the far corner with her back to the shelves, where she could watch the door, the window, and everyone between. She had not sat. Raven seldom sat in a room she did not yet trust.
 
-Lyra gave a short nod. “At the chapel.”
+Elena had chosen the hearth, close enough to the low flame to feel it. She sat with her hands quiet in her lap, listening.
 
-“Briefly,” Elena said.
+The door opened before its knock had finished, and Father Brenn came in on a draft of cold air and candle smoke.
 
-“Long enough,” Brenn replied, removing his gloves, “to know they ask the right questions.”
+“You started a kettle without me,” he said.
 
-Harbin exhaled, unfolded a map, and tapped the hill north of town. “Then let’s not waste time. You wanted the official church account of the tower. Here it is as recorded.”
+“I started the third kettle,” Harbin said. “The good one went hours ago.”
 
-Cassius raised his quill. “As close to exact wording as possible, please.”
+“Then I'm late twice over.” Brenn drew off his gloves finger by finger, and his eyes were already working the room—Lyra's weapons, Cassius's clutter, the corner where Raven stood, the healer by the fire. Counting them. Weighing what he counted. “Forgive an old man his staring. Harbin's had five swords promised to him for the better part of a month. I've a mind to see what a month of a desperate man's hope looks like in the flesh.”
 
-Harbin nodded. “A hundred years ago, a witch lived in the tower. Church records call her a heretic who practiced forbidden rites and summoned celestial monsters. She grew powerful. Three acolytes confronted her, killed her, and crucified her on the observation deck. As she died, she cursed them and the land.”
+Lyra met the look and did not flinch from it. “It looks tired, Father, and it would like your map.”
 
-Raven spoke first. “Heresy can mean anything when institutions want clean language.”
+Something that was almost a smile touched Brenn's mouth. “We've met,” he said aside to Harbin. “At the chapel. Briefly.”
 
-Cassius leaned forward. “If she was that dangerous, why acolytes? Why not sanctioned clergy or trained exorcists?”
+“Long enough,” Elena said from the hearth, “for you to decide whether you cared for us.”
 
-Lyra added, “If those three were cursed too, what happened to them after?”
+“Long enough to decide you asked the right questions.” He said it to her, but his attention swept them all. “Whether I care for you is a longer conversation, and I fear we've spent our evening on shorter ones.”
 
-Brenn answered before Harbin could. “Summoning celestial monsters is heresy. Demonic art is condemned in every faith worth naming.” He placed his gloves on the desk. “And those acolytes were not officially sent. They acted on their own.”
+Harbin set the fresh cup down—untouched, already cooling like the rest—and drew the map toward him. It was worn soft along the hill's crease. He pressed the fold flat; it lifted again the moment his hand left it. “Sit where you can. There aren't chairs enough.” He looked up, and there was something almost shy under the exhaustion. “I gathered what I could. For you. You're the first who've come asking about that tower instead of asking the price to burn it down. It isn't much—God knows it isn't much—but you're the first in a long while who've made me think it might be enough to matter. So. Take it for what it's worth, and be gentle with it. It cost me.”
 
-He pointed to the tower crest drawn on the map. “I also believe the witch’s body is the source of the curse. If her remains are still bound there, the curse has an anchor.”
+Cassius uncapped his ink. “As close to the wording as you have it. Please.”
 
-Cassius frowned. “Three junior acolytes took it upon themselves to strike a witch of that scale?”
+“A hundred years past, a witch lived in that tower.” Harbin's thumb settled on the crest. “She worked heretical magic. Prayed to devils and demons, the account says. Three acolytes went up the hill, killed her, and crucified her on the observation deck. As she died she cursed them, and she cursed the ground, and that was the end of her.” He was quiet a moment. “A hundred years in the grave, and somehow I'm the one left holding her.”
 
-Brenn held his gaze. “Do not underestimate what young acolytes will dare when they believe they are saving souls.”
+Raven spoke from her corner without stirring. “Heresy's a convenient word. It means whatever the man writing it needs it to mean.”
 
-Harbin rubbed his eyes. “There’s more. I pulled favors in church archives. Quietly. Those three were removed from church service not long after. No reason attached.”
+Harbin shook his head once, mild but sure. “The Church keeps the record, and the record is true. She worked heresy. That is what she was.”
 
-Lyra looked to Harbin. “So they survived the witch and still got removed?”
+Cassius leaned in. “If she was strong enough to curse a whole valley, why send acolytes? Why not sanctioned clergy, trained exorcists—”
 
-“Administrative phrasing,” Harbin said. “ ‘Struck from active service.’ ‘Privileges revoked.’ ‘Inquiry closed.’ ”
+“Because the acolytes weren't sent.” Brenn crossed to the desk and laid his gloves beside the map, unhurried, deliberate. “Not by anyone with the authority to send them. Three young men climbed that hill on nothing but their own faith. And young men who believe they're saving souls—” he paused “—will do a great deal no one ever asked of them.”
 
-Brenn spoke quickly. “The church often hides details when members are suffering from curse effects. Not always to bury truth—sometimes to preserve dignity. Records exist, but access is restricted. Even I could not see those files unless we prove the knowledge is absolutely necessary.”
+Lyra's eyes stayed on him. “And after? Three men kill a witch, live through her curse. What becomes of them?”
 
-No one answered. Raven looked at Brenn for a second too long, then looked away. Cassius made a note he did not read back.
+Harbin pressed the heels of his hands into his eyes, held them there, and let them fall. The skin came away red. “I called in every favor I had left in the church archives to learn that much. Quietly, so as not to look like a man chasing ghosts in his old age. And what came back was this: struck from service, all three, inside the year. No cause set down. Privileges revoked. Inquiry closed.” His palm came down flat on the ledger, over one of the blank lines. “Three words on a page, and three living men simply stop. The way these stop.” His finger moved down the empty entries. “A line, and then nothing beneath it.”
 
-Harbin broke the silence. “Whatever the reason, the file is buried. That much is fact.”
+Brenn's voice dropped, and now he spoke to the party more than to his friend. “The church seals its records when its own have been touched by dark workings. Sometimes to bury a thing. More often to spare a family the shame of watching one of theirs come apart. I've worn this cloth the better part of my life, and even I can't open those doors without a cause the Prelate will accept.”
 
-Brenn nodded once. “Then hold to the part that matters now. The curse remains. People keep disappearing. Solstice is tomorrow night.”
+Raven's gaze rested on him a beat longer than was comfortable, then slid away. Cassius wrote something down and did not read it back.
 
-He turned toward the window.
+“Buried, then.” Harbin turned toward the window, toward the grey where the hill should have been. “A family went last week. Three of them—the father, and the two little ones. The mother's still here. She's at my door every morning before I've the lamps lit, and I give her tea, and there is nothing else left in the world for me to give her.” His voice did not rise; it went the other way, flat and worn smooth as old stone. “Solstice is tomorrow night. Whatever you can make of what's on this desk, make it quickly. There's nothing after this. Not coin. Not comfort. Not another year of mornings like hers.”
 
-Theron had not moved.
+The room held that a moment.
 
-Brenn studied him. “You have the oldest eyes in this room. You have said almost nothing. What is your role in this party?”
+Then Brenn straightened, and turned his attention to the one man who had said nothing at all. “You. At the window. You've weighed every word spoken in this room and spent none of your own.” It was not a compliment. “I'm about to lay this town's last hope in your people's hands. I'll know whose hands they are.”
 
-Lyra started to speak. Theron lifted two fingers, and she stopped.
+Lyra shifted to rise. Theron lifted two fingers from the sill, and she settled again.
 
-Brenn continued, voice lower. “I am placing the future of this town in your hands. I need to know exactly whose hands those are.”
+Theron turned from the glass without hurry. “Theron Blackwood. Guild invigilator. I don't fight their fights for them. I assess, I correct, and I keep them breathing long enough to finish the work.” He let it sit. “This lot put down a wraith last month. Before that, a cursed creature and a dozen ghouls with no one at their backs. On my review, they'll wear the Guild badge.”
 
-Theron set his cup on the sill and faced him. “I am their invigilator. I assess, correct, and keep them alive long enough to finish the job.”
+The word caught wrong in the air. Brenn found it first.
 
-He looked around the room as he spoke. “They have already exorcised a powerful wraith. They also survived an engagement with a cursed creature backed by a dozen ghouls, without outside support. Based on my review of their work, they will become full-fledged guild members.”
+“Will wear,” he said. “Will.”
 
-Brenn’s expression hardened. “Then the guild sent novices to a century curse while Gravedawn empties its treasury? We paid for veterans.”
+A silence.
 
-Theron did not flinch. “You paid for results. They deliver results.”
+“They don't have it yet.”
 
-He continued before Brenn could answer. “Their badge delay was not because they failed. In the wraith case, validation was incomplete. The body was cleared, but not all potential anchor sites were checked before closure.”
+Theron did not blink. “No.”
 
-Cassius covered his face with one hand. “In our defense, no one told us we had to check the man’s balls after the possession broke.”
+Harbin came up out of his chair. The cup at his elbow rocked and did not quite fall. “Probationers.” He said it like a word he'd learned to fear late in life. “You've sent me probationers.” He came around the desk because he could not stay behind it—he needed the floor, needed to move on it. “I wrote it in plain ink. This curse eats people. It has eaten trained men by the dozen. And you send me—” a hand flung toward them “—students.”
 
-Raven muttered, “You shouted that across a sacred office.”
+Brenn had gone very still, which on him was worse than shouting. He crossed the small room and stopped a single pace from Theron, near enough that the window's grey light lay across both their faces. “We paid the Guild for veterans,” he said, quiet. “We buried this town's last savings in that contract. And you stroll in here with novices and a smooth tongue to dress them up.”
 
-Lyra sighed. “He’s not wrong, unfortunately.”
+Cassius had stopped turning his crystals. Raven had come off the wall by half a step, weight forward, hands loose—the posture of someone who has decided a room might turn.
 
-Harbin coughed into his fist, trying not to laugh. Even Brenn’s mouth twitched despite himself.
+Theron held Brenn's eyes from a hand's breadth away and gave not an inch of ground. “The badge is late for one reason. The last contract wasn't closed clean. The victim was safe, the haunt was broken—but they hadn't walked every anchor before they called it finished. The Guild wants such things verified. That is the whole of the crime.”
 
-The tension thinned, but Harbin did not let it pass.
+Cassius spoke up from his chair, in the fragile voice of a man trying to be useful and half-suspecting he was making it worse. “In fairness—who, in their right mind, thinks to check a man's balls for a cursed anchor?”
 
-He looked at Theron, jaw tight. “No. I wrote clearly that this curse eats people and failed veterans by the dozen. I did not ask for probationers.”
+Lyra exhaled. “He's not wrong. Regrettably.”
 
-Theron met his stare. “And I reviewed what you sent. This team was chosen because they are highly skilled in exactly this kind of work. They may not hold the guild badge yet, but they were dealing with monsters long before they walked into our hall.”
+Harbin's fist rose to his mouth. The sound behind it might, in a kinder year, have been a laugh. Even Brenn's jaw eased by a hair.
 
-Harbin held the stare, then gave a short nod. “Fine. Then we judge by what they do on that hill.”
+But Harbin was not done. “Charm won't hold that hill.” He rounded on Theron again. “And if they fail? If they die up there like all the rest—what then? I have stood in too many doorways with my hands empty. I will not empty this town's purse a second time. I cannot.”
 
-He tapped the map. “Logistics. Tower route and structure.”
+“If they fall,” Theron said, steady as a set stone, “the Guild sends the next party. Same contract. Gravedawn pays nothing further. You have my word, and you'll have it in writing, under seal, before I sleep.”
 
-Everyone leaned in.
+That took the shape from Harbin's fear, though not the fear itself. He stood in the middle of his own office, for a moment unsure where to put a man of his size.
 
-“The tower is on the hill crown,” Harbin said. “Main ascent is the old pilgrim road from the north bend. It’s exposed and broken in parts. There’s a narrower shepherd path on the east face—faster but steep. South side is a sheer drop with fractured stone shelves. One bad step and you disappear into black rock.”
+Into that, Lyra rose. She did not hurry. She walked to the centre of the room, where all of them could see her, and it was plain she had done this before—taken the middle of a frightened room and made it go quiet.
 
-Raven traced the east path with a fingertip. “Advance pair takes this. Less visible approach.”
+“Lyra Steelfist. Ten years in the Crown's Aegis, in the North.” Her voice was level, unshowy, the voice of someone reporting rather than boasting. “I led men through winter campaigns against things that do not die politely. I held the line at Frostspire when the walls came down around us.” She turned, unhurried, so the burn scar up her right arm caught the firelight—and did not name it, only let them find it. “I have buried soldiers, Father. I have walked a great many more of them home. Badge or none, keeping people alive on bad ground is the one thing I have ever truly been good at.”
 
-“Make it fast,” Brenn said. “Past teams attempted exorcism by day and by night. Most never saw the anchor spirit at all. Only one attempt reported seeing it clearly—at midnight. That team died before dawn.”
+Brenn studied her. “And these three. Are they yours to walk home?”
 
-Cassius stilled. “How do we know they saw it?”
+“They're mine the moment we set foot on that hill,” Lyra said. “That's the arrangement.”
 
-“One ran,” Brenn said. “Barely. They dragged him back from the road at sunrise, half-mad, screaming about a knight and the witch. He died that evening.”
+Elena spoke from the hearth without rising. “I've been at this longer than any badge would show for. Years. With another company. We cleared cursed ground, plague villages, battlefields the priests wouldn't set a boot on.” Something moved beneath the words, surfaced, and was carefully put away. “There aren't many of that company left to vouch for me. But I know what a haunting does to the living, and I know how to hold a room together when it begins to come apart.”
 
-Raven’s eyes sharpened instead of widening. “That sounds like a layered curse. The spirit is not only bound to place; it phases in and out of our plane by time and season.” She paused, almost impressed. “And somehow a dead witch is still maintaining it. That is… difficult to do.”
+She did not look up as she said it. Brenn looked at her for a long moment—at the too-careful hands, at the name she had not spoken—and whatever he read there, he did not ask it aloud. He only inclined his head, once, the way a man does at a graveside.
 
-“Difficult or not,” Brenn said, “if the rite is not completed at midnight tomorrow, we lose the window.”
+“Raven,” said Raven, before the quiet could turn into a question aimed at Elena. “Scout. I read ground, and I find the ways in that other people walk past. I've kept quieter teams than this one alive by getting them off a road before the road did the killing.” Her chin tipped a fraction toward the map. “I've three ways down off that hill in my head already, and I've not so much as seen it.”
 
-That landed like cold iron.
+The last of them looked, finally, to Cassius, who wore the face of a man who would have paid gold to be elsewhere.
 
-Lyra nodded. “Then we climb before dusk tomorrow, clear floor by floor, and hold the deck for the rite window.”
+“Cassius Vale. Celestial Academy.” He straightened the notebook that needed no straightening, then seemed to forget it was there. “I'm—I'm the youngest one in this room. I know that. I froze once, and I'll hear about the—the anchor business until I'm grey.” He looked up at Brenn, and the stammer fell away. “But I didn't climb all those academy stairs so I could stand in a dying town and shrug. People are vanishing. That curse is why. So I will understand it. I don't care how thick it is or how long the night gets. If there's a way to break it, I'll find it. And I won't stop until I do.”
 
-Harbin turned the map to reveal a cleaner interior sketch. “Four levels in the records. Level one: entrance hall, an old living room, and a small kitchen. Level two: a chamber full of books and study tables. Level three: storage, crates, old tools, rotted cloth. Level four: what appears to be a bedroom.”
+The room eased by a degree. Not trust—not yet. But the first rough shape of it.
 
-He tapped the top margin. “Attached to level four is the observation deck. Above the bedroom sits the bell dome. That bell rings by itself now.”
+Brenn let out a slow breath and, at last, stepped back from Theron. The anger had cost him; it left him older than he'd come in. “Sit. All of you, please.” He rubbed the scarred back of one hand. “Forgive an old man his temper. Watch enough good people climb that hill, and you stop being gracious about who climbs it next.”
 
-Elena looked up. “Known hostiles?”
+Harbin returned to his chair as though the short walk had aged him. “The roads, then. Before I lose the thread of my own thinking.” He tapped the map. “Pilgrim road, off the north bend—open to the sky, and half the paving surrendered to a hundred winters. The east face has a shepherd's path. Steeper. But the hill can't watch you so well from there.” His finger drifted to the southern edge and stopped. “South is a clean fall into black rock. I've lost men off that lip who never came near a spirit at all. Don't let the dark coax you toward it.”
 
-Harbin counted on his fingers. “Ghosts in the lower hallways. Ghouls near old feeding grounds on the approach. Undead around stair landings after dusk. Wraith signs near upper levels when the bell starts acting wrong. Mad animals around the hill too—dogs, goats, even birds. Curse-sick and aggressive. Beyond that, I won’t pretend certainty.”
+Raven came to the desk to look. “East path. Less sky. Fewer eyes.” Mild approval. “Good ground to move on.”
 
-“Good,” Raven said. “Uncertain is honest.”
+Brenn's hand settled on the drawn hill. “Before you choose your hour, you should know what other hours have cost.” He told it the way a man tells over names he'd rather forget. “Priests went up by daylight, censers swinging, salt to the ankle. Sellswords by night, steel freshly oiled. Spring. Autumn. The height of summer. Most never laid eyes on her at all—only on the things that keep her company. They died just the same.”
 
-Then the equipment planning began in overlapping bursts.
+Cassius's pen had stopped. He stared at the map as if it had insulted him. “They tried to exorcise it. More than once.”
 
-“Rock salt, lots of it,” Lyra said.
+“More times than I care to count,” Harbin said.
 
-“Blessed chalk, silver wire, mirror shards, ward nails,” Cassius added.
+“And it came back.” Cassius looked up, glasses slipping. “That's—that's not how this is meant to work. A proper cleansing weakens the knot. Scrapes at it, at least. If priests and sellswords both spent their rites on that hill and the thing still stands—” He gestured sharply. “Either they never touched the real bind, or it renews itself. Or both.”
 
-“Bandages, burn salve, fever bark, willow tincture, sleeproot,” Elena said. “Also clean cloth, boiled water, and food that can be eaten cold.”
+Elena's brow furrowed. “A curse that returns after the work is done. And the town is worse now than it was ten years ago. Worse than twenty.”
 
-“Climbing rope, pitons, spare lanterns, oil flasks, waxed tinder,” Raven said.
+“It's thickening,” Raven said. Flat. Practical. “You can feel it on the road. More dead things. More mad animals. A haunt that grows instead of settling—that doesn't fit anything I've tracked.”
 
-“No full ration packs,” Lyra said. “This is a one-night operation. Just light food—dried fruit, nuts, water, and a little salt to keep hands steady.”
+Cassius nodded hard, almost relieved someone else had said it. “Exactly. Curses fade, or they hold a level, or they feed on a single wound and stay put. They don't—don't swell like this. Not without something feeding them. An anchor still active. A rite unfinished. Timing that opens a door once a year and packs a century of hunger into that hour.” He swallowed. “Which means if we're wrong about when she can be faced, we climb into an empty tower and die for nothing while the town waits another year.”
 
-Cassius pointed at the map. “I need copies of every page on this layout, even damaged ones.”
+Brenn watched him for a long moment. Then his finger pressed the hill.
 
-Harbin nodded and started his own list. “Then I start procurement now.”
+“There's one account older than all the rest,” he said. “Near seventy years back. A man reached the observation deck and saw her—standing there, he swore, plain as a woman lit by a lamp. The curse was younger then. Thinner. He came down with his life and his wits, and told what he'd seen.” A pause. “It was the night of the winter Solstice. Midnight, or a breath from it.”
 
-Brenn placed both hands on the desk. “One more matter. I am coming with you.”
+The fire ticked in the grate.
 
-Harbin stared. “Brenn—”
+“After him, nothing. Day-climbs found empty stone. Ordinary nights found worse, and kept the men who went looking. Until, some years on, a party timed their climb for Solstice midnight.” His jaw set. “They found her. And something at her side—a knight, the one survivor kept screaming, a knight and the witch. They pulled him off the road at dawn. He was dead by evening, and no one else came down at all.”
 
-“I know how to conduct a tower exorcism under pressure,” Brenn said. “Not from books. From field work. I can hold my own.”
+He straightened and tapped the hill once. “She shows herself on the Solstice, and by all a hundred years of corpses can teach us, only then. Tomorrow is that night. We face her tomorrow, or we wait a year—and I don't believe this town has a year left in it.”
 
-Raven’s eyes narrowed. “Can you follow command?”
+Cassius was already flipping pages, muttering half under his breath, then out loud as the room watched him. “Two entities. Not one. That matters.” He stabbed the air with the pen. “The witch—crucified, cursing as she died, still holding a hill a century later, and thickening instead of fading. That isn't a simple grief-haunt. Either she's burned past herself into pure hate—a Wraith—or she became what she practiced and the evil remade her—an Umbra.” He looked up. “Those are the two we pack for. Soulbane either way. Soulfire if she's Wraith. Consecration and a mirror if she's Umbra. Guess wrong and we waste the hour.”
+
+“And the knight?” Lyra asked.
+
+“Church account says the curse took the three who killed her.” Cassius tapped the map. “If he's also cursed like them—bound by her dying rite, not by his own choice—he's Cursed. Trapped, not malevolent. Nullifying salt on whatever still holds him. Consecration on the blade if we have to cut.” A breath. “Witch: Wraith or Umbra. Knight: Cursed. That's the kit. I still need how and why they died to know which oil goes on first—but this is the shape. Layered. Time-bound. Feeding. Not a simple haunt.”
+
+Silence held a beat.
+
+Then Harbin let out a breath he seemed to have been storing since they walked in. “Saints. The boy named it in one sitting.”
+
+Brenn's mouth had softened despite himself. “Academy or no—I've watched priests talk in circles for years and never put it that clean. All right, Cassius Vale. You've earned your seat at this table.”
+
+Cassius went pink to the ears and tried, poorly, to hide it behind his notebook.
+
+Harbin turned the map to its inner face—a sketch of the tower, floors marked, half the labels smudged to grey, one whole wing blank where the ink had simply run dry. He touched the empty space and drew his fingers back. “This is all we have of the inside. The bell up in the dome still rings itself, some nights.”
+
+“Whatever waits in there,” Elena said, “we'll want all of it. Even the parts that sound like madness.”
+
+“Everything that's been reported,” Raven agreed. “Every scrap.”
+
+Harbin counted it off, slower with each count. “The lower halls—pale things that step through walls and leave the air cold. A baker's boy swears one smiled at him. The approach—ghouls, or near enough, turning up the old feeding pits. Stairs after dark—dead men who climb them still. Higher, when the bell goes wrong, a shape they name a wraith, though no two give it the same face.” He swallowed. “And the beasts. Dogs that foam and turn on the hands that fed them. Goats that run until their necks break. Birds that fall and rise again wrong. Most of it from people already running. I write it down anyway.”
+
+Cassius laid a fingertip on the blank wing. “And this. No walls. No doors. How do we plan for rooms that aren't on the page?”
+
+Lyra had been quiet through the taxonomy. Now she stepped back to the map and set her knuckle on the east path. “We don't wait for dusk to climb.” Heads turned. “Night on that approach means more of everything Harbin just named. We march in daylight—east face, less sky, fewer eyes—and we get to the tower while we still have legs under us. Exhausted people die at midnight. Fresh people might not.”
+
+Raven's chin tipped. “Sensible.”
+
+“Inside, we clear one room. Ward it. Hold it.” Lyra looked to Elena. “We rest what we can before the hour. Then we face them. Soulbane either way for the witch—Soulfire or Consecration depending which she is. Salt and Consecration for the knight. We switch when we know.”
+
+Elena nodded once. “I can hold a room. Salt, chalk, wards—enough for a few hours. Not a fortress. Not overnight. But enough to sit until midnight without the walls walking in on us.”
+
+“A few hours is the difference between standing and folding,” Lyra said. She looked to Harbin. “Every copy of this layout. Torn, smudged, half-drawn—all of them. The rest of what we need, we settle tonight and bring you a list in the morning.”
+
+Harbin nodded. “I'll be here. Where else would I be.”
+
+Brenn set both hands flat on the desk. “There's one thing more, and not one of you will care for it. I'm going up with you.”
+
+Harbin's head came up sharply. “Brenn. No.” The refusal came out ahead of its reasons. “This town needs you standing. I need you standing. Don't make me wait at that window tomorrow night wondering if you've come down off it.”
+
+“I can hold my own on that hill,” Brenn said. “Not from books. I've done the work before. I won't be dead weight.”
+
+Raven's voice was even. “Can you take an order you don't like, in the middle of a fight, and not stop to argue it?”
 
 “Yes.”
 
-Cassius asked, “Can you recognize shifting anchors mid-rite?”
+“Can you feel an anchor shift mid-rite?” Cassius asked. “They do move.”
 
-“Yes.”
+“Yes. I've had one turn under my hands while the man tied to it died.”
 
-Elena’s gaze dropped to Brenn’s scarred hands. “Those scars weren’t made in chapel work.”
+Elena's eyes had gone to Brenn's hands—the old burn scars, the older marks a blade leaves behind. “Those weren't earned lighting candles.”
 
-Brenn looked at his palms. “No. Before I took vows, I ran with an adventuring party. Cursed ruins, breach cleansings, night escorts. I buried friends there. I learned.”
+Brenn turned his palms up and considered them as though they belonged to a man he used to be. “No. Mercenary company, before the cloth. I buried every last one of them, and the church was what I crawled to afterward.” He closed his hands. “I know precisely what that hill can take from a person. That is rather the point of my coming.”
 
-Elena held his gaze, then nodded once. “You have my support, Father. Field calls will come fast in there—follow them without argument, and we’ll make this work.”
+Elena held his gaze, then gave a single nod—one field hand to another. “Then you follow the calls the instant they come, Father. Fast, and without the sermon. Agree to that, and you're welcome at my side.”
 
-Brenn inclined his head. “Understood.”
+“Agreed.”
 
-Lyra glanced at Elena, then at the others. No one objected.
+Lyra looked round the room. No voice rose against it.
 
-Harbin swallowed. “I’ll have supplies staged by post noon tomorrow.”
+Harbin's jaw worked. He looked at Brenn a long moment, then down at the ruined map with all its blank and smudged places. “Tomorrow, then. After your list. You'll have whatever you ask of me if I strip this hall to the beams to find it.” The steadiness left his voice at the last. “Only come back down. All of you. I've watched enough mornings come up empty.”
 
-Brenn gave a small nod. “Good. Then we move before first dark.”
+Brenn rested a hand, briefly, on his old friend's shoulder. “We leave with the light.”
 
-This time, no one argued.
+And this time, no one argued.
 
 ## Scene 2
 
@@ -222,215 +264,105 @@ Cassius blinked at her. "How have you been this calm all day? Theron was breathi
 
 Lyra gave him a flat look. "By opening my mouth and speaking."
 
-"You know what I mean," he said. He pushed himself upright on the bed, suddenly younger again than he'd looked all day. "If this goes badly, Theron writes us up as a failed first team, the Guild thanks us for our enthusiasm, and we go back to waiting for pity work."
+"You know what I mean," he said. He pushed himself upright on the bed, suddenly younger again than he'd looked all day. "If this goes badly, Theron writes us up as a failed first team, and we go back to pity work."
 
 Raven tipped her chair back onto two legs. "He's got a point. You and Elena are acting like we misplaced a mule, not our membership."
 
-Lyra began tugging off one gauntlet, then the other. "When a blade is already at your throat, you don't waste breath worrying about tomorrow's scar." She glanced at Cassius, then Raven. "You remove the blade first."
+Lyra began tugging off one gauntlet, then the other. "Blade at the throat first. Scar later."
 
-At the washstand, Elena folded a linen strip in half, then in half again. "There are bigger things than membership." Tension deepened the lines on her forehead. "I am worried about the town, and I am worried about—" She broke off as if the rest would not pass her throat. Her gaze flicked over the room, over each of them. Her fingers tightened on the linen. "—the missing people. You know."
+At the washstand, Elena folded a linen strip in half, then in half again. "There are bigger things than membership." Her gaze flicked over the room, over each of them. "The town. The missing. You know."
 
-Raven let the chair legs drop back to the floor and gave a short nod.
+Raven let the chair legs drop and gave a short nod.
 
-The room settled into work: Cassius's crystals clicked as he emptied his pockets, Elena unrolled ward-linen across the washstand, and Raven's boot heel tapped the floor under the window.
+The room settled into work: Cassius's crystals clicked as he emptied his pockets, Elena unrolled ward-linen, Raven's boot heel tapped under the window.
 
-Elena laid out her medical kit with the same care she used in chapel light and roadside mud: bone needles, salves, salt vials, linen, charcoal chalk. One strip she retied because the knot displeased her. Another she checked against the light before setting it down. When she finally looked up, her mismatched eyes moved from Cassius's heap of notes to Lyra's posture to Raven by the shutter.
+Lyra crossed to the shutter, cracked it two fingers, squinted at the tower through the fog, and shut it against harbor stink and distant bell-metal. "Brenn is holding something back."
 
-Lyra crossed to the window, shoved it open two fingers' width, and squinted at the tower through the fog before shutting it again against the harbor stink and distant bell-metal. "Brenn is hiding something. There is more to that tower than he said."
+Cassius looked up, glasses hanging from two fingers. "On what grounds?"
 
-Cassius looked up from the bed, glasses hanging from two fingers. "What?"
+"Men who give you half a map," Lyra said. "Churches included."
 
-Raven straightened in her chair. "On what grounds?"
+Cassius pushed his glasses on. "His people are disappearing. I don't think he's playing games with that."
 
-"Instinct," Lyra said. "And experience."
+"Neither do I. That doesn't mean he told us everything about the tower."
 
-Raven leaned her shoulder to the frame. "You don't think it was just panic?"
+Elena tied off a ward strip. "He meant it when he said he's coming. Whatever he's keeping, his heart is with the town."
 
-Lyra barked a humorless laugh. "I've served under men who called missing scouts 'temporary delays' because the truth damaged morale. I've watched nobles send soldiers into bad ground with half a map because a full one raised questions about their judgment." She looked at the three of them in turn. "And churches are no cleaner when their own shadows get involved. If the tower has ugliness tied to the cloth, Brenn won't lay that on the table for strangers in his chapel."
+"Or with something he thinks he can control," Lyra said.
 
-Cassius pushed his glasses back on. "Brenn's people are disappearing. Harbin looks like he hasn't slept in a year. I don't think either of them would play games with that."
+Cassius bent for a notebook, flipped too fast, nearly tore a page. "Fine. Hold that. Practical problem." He slid to the floor and spread notes across the boards—quick hands now, the Theron-voice gone. "Curse is pulling things toward the tower and down into town. Dates cluster on the full moon. Priests have already tried the hill. It should have weakened. It came back."
 
-"Neither do I," Lyra said. "That doesn't mean Brenn told us everything about the tower."
+Elena crouched beside the spread. "Renews itself—or they never touched the real knot."
 
-Elena tied off another ward strip. "Brenn wasn't pretending in the town office. The way he spoke—he meant it when he said he's coming with us." She set the strip down carefully. "At least his heart is with the town."
+Cassius's glasses slipped. "Worse. If I can't name what she is, I can't break her. Wrong oil. Wrong hour. Wrong rite. We burn the window on a guess."
 
-Lyra inclined her head. "Maybe. And maybe that's why he's hiding something he thinks he can control."
+Raven's boot went still. "So we don't know what we're fighting."
 
-Raven narrowed her eyes. "So we keep our guard up around Brenn too?"
+"Wraith. Cursed spirit. Umbra-grade." Cassius tapped three different pages. "Each one hates different steel. Guess wrong and midnight is wasted."
 
-"Around everyone," Lyra said. "Until time tells us what matters."
+Lyra exhaled through her nose. "Dusk is coming whether we like it or not. Moonbane, Specter if we can get it, Soulfire on my blade. Kill what walks before it kills us."
 
-Cassius bent to retrieve a notebook from the floor. "Fine. Suppose Brenn held something back. That still leaves the practical problem." He opened the book against his knee and began flipping pages too fast, then slower when the paper nearly tore. "This curse is too strong, and I still can't name it cleanly. That bothers me."
+Elena's voice flattened. "Force destruction when peace was possible and the town may sleep—but the hill stays sick for decades."
 
-Raven's brow lifted. "It should. I said as much in the town office." She tilted her head toward the notes. "The tower's bad enough. The fact that things are spilling beyond it is worse."
+"People are vanishing now."
 
-"And there's more." Cassius slid from the bed to the floor and began spreading notes across the boards between them. The cautious, measured answers he'd been feeding Theron all day vanished; in their place came quick hands, restless movement, and a mind finally allowed to run. "Forget theory for a moment. Facts. The curse is drawing monsters and spirits toward the tower and down into the town. That means negative energy, concentrated, active and increasing. I checked old reports: missing people, deaths by maddened animals, monster sightings—every date clusters around the full moon. And it'll peak on the winter solstice, if Brenn's right. Priests have already tried to exorcise the tower before. It should have weakened by now. Instead it returned."
+Elena nodded once. "Then the living first. If we have to scar the ground to keep them, we scar it."
 
-Elena crouched beside the spread notes. "So either the curse renews itself, or the exorcisms only scraped the surface."
+Cassius kept his eyes on the notes. "I'm not asking for perfect. I'm asking what she is before we turn her to ash. Wrong preparation is how the last teams died screaming."
 
-Cassius looked up at her so fast his glasses slipped down his nose. "It's worse. Unless we figure out the nature of the curse, we won't be able to exorcise it."
+Raven worried the seam of her glove. "We're not heroes for the dead. But killing the wrong thing the wrong way—" She broke off. "Turns my stomach."
 
-Raven stared at him. "Then we're walking into a mission with no way to finish it."
+Lyra looked at Elena.
 
-Elena's jaw tightened. "If we can't identify what we're breaking, we're just surviving until we fail."
+"Classify first," Elena said. "If the room turns, if civilians are at risk, if we lose the fight—kill doctrine. No hesitation."
 
-For a moment no one moved. Even Raven's restless boot went still; fear sat plain on all four faces, raw and newly named.
+"Fine," Lyra said. "Your way until it isn't. Cassius—what do you need by tomorrow?"
 
-Lyra remained calm. "I don't need all the supernatural theory. Tell me what it takes for you to understand the curse."
+"Death how. Death why. Anything that says which spirit class she fell into." He hesitated. "Pressing Brenn again might help."
 
-Cassius swallowed. "Depending on how and why a person died, a spirit can be anything from a ghost looking for closure to an Umbra that burns everything in its path."
+Elena shook her head. "Not cleanly. Not in one room. Ledgers. Burial records. Tavern mouths. Fishwives. Alchemists. Clerks who keep dates."
 
-Raven folded her arms. "So what do you think this witch is?"
+Lyra nodded. "Investigation before we march. If you still can't give me a read by departure, we do it my way at the door. Either path—we prep oils for all three classes if the church will sell them."
 
-Cassius pushed his glasses up. "Based on Brenn and Harbin? This witch could be a Wraith, a Cursed spirit, or Umbra-grade. Each one needs a different method, and guessing wrong wastes our only window."
+Cassius answered at once. "Moonbane baseline. Specter. Soulbane if they keep any for sanctioned work. Carry one and meet another, and we've packed for a different contract."
 
-Lyra exhaled through her nose. "And where exactly are we finding clean history by tomorrow? Brenn is holding back, the tower is hostile, and dusk is coming whether we like it or not." She pointed to his notes. "We do it my way: moonbane, Specter if available, Soulfire on my blade, Consecration if Elena can sustain it. We go in ready to kill the thing before it kills us."
+Raven leaned forward. "Iron shavings. Cedar smoke. Approach may already be infested if the curse is pulling things in. Ready from the town gate, not the tower door."
 
-Elena's expression flattened with clinical focus. "If we force destruction when peace is possible, the town may sleep again, but the tower and the nearby ground won't. Lingering negative energy. Haunt activity that can last for decades."
+"Shortest route before dusk," Lyra said. "Clear a room inside, ward it, rest what we can before midnight. Elena?"
 
-Lyra held her gaze. "People are vanishing now. I won't gamble the living on perfect knowledge of the dead."
+"A few hours. No more. After that I wouldn't trust the ward."
 
-Elena met her gaze and nodded once. "Then I choose the town. If we must leave the hill scarred to keep people alive, we do it."
+A bell sounded outside, low and blunt through the shutters.
 
-Cassius set both palms on the papers to stop their tremor, then folded one hand tight over the other. "I know. I saw them in the square." He kept his eyes on the notes until the last moment, then looked up. "I'm not asking for perfect knowledge. I'm asking for one honest attempt before we turn her into ash. If she was wronged in life and we answer with steel in death, then we're just the next ones to wrong her."
+Raven tested the latch with two fingers. "Brenn asked the right question. Why send us?"
 
-Silence tightened again, then softened.
+Cassius pushed his glasses higher. "Theron answered like a man already committed. Not like a man who proved it."
 
-Raven looked from Lyra to Cassius, jaw tight. "People are in danger, and we still don't know what we'll be fighting. We're not heroes for the dead." She paused, thumb worrying the seam of her glove. "But the thought of wronging someone twice—once in life, once in death—turns my stomach."
+Lyra paced once, rug end to rug end. "One real operation under him. One. Keep the guard up—around Theron too."
 
-Silence pooled between them. Lyra looked at each face in turn, measuring what had shifted. "Elena?"
+Elena set salt and chalk beside the notes. "Morning. Raven: route in daylight, then town office and church archive on the way back. Cassius: library, shops, alchemist counters. I'll take Brenn. Lyra—"
 
-Elena answered without hesitation. "We investigate and classify first. But if the room turns, if civilians are at risk, or if we lose control of the fight, we switch to kill doctrine immediately. No hesitation."
+"Theron and Harbin," Lyra said. "We meet back here without Theron. Compare. Decide what we tell whom."
 
-Lyra's jaw flexed once. "Fine. We try it your way first. Investigation and classification on contact."
+Elena's fingers closed on the salt vial. She bowed her head a fraction. "Keep them through the night." Lyra heard it, and said nothing.
 
-She looked directly at Cassius. "What do you need to identify it if Brenn and Harbin keep dodging the truth?"
+The bell again. Closer—or the night thinner.
 
-"I—" Cassius hesitated, then pushed his glasses higher. "I'd press Brenn and Harbin again. Harder this time. Maybe they break if we ask the right way."
+Lyra dragged a chair from the table and sat. That did more than another speech would have.
 
-Elena shook her head gently. "Maybe. But men like that don't yield cleanly in one room." She began counting on her fingers. "Library ledgers. Church burial records. Tavern keepers who hear every rumor before dawn. Harbor brokers and old fishwives who track every family feud in town."
-
-Lyra nodded once. "And the townmaster's clerks if we can pry open the archive. Popular mouths know gossip. Clerks know dates."
-
-Cassius listened, then nodded, taking it in. "Right. I can work with that."
-
-Lyra drew a breath and made the call. "Then this is the order. Investigation first, before we march. Brenn and Harbin get one more chance to speak plainly. If you still can't give me a clean spirit read by departure, we do it my way at the tower door."
-
-Elena's gaze flicked between them. "We prepare both paths either way."
-
-Lyra nodded once. "Good. Then we have a path. You read the curse, Raven and I hold the line, and Elena keeps us alive long enough to end it."
-
-"Before tomorrow afternoon—before dusk—we settle marching order, fallback calls, and who can shout stop when things go wrong." Her gaze shifted to Raven. "And we need to stop pretending the danger begins at the tower door."
-
-Raven's boot heel stopped tapping. She glanced at Lyra once, brief and checking, then leaned forward when no correction came.
-
-Cassius frowned. "Meaning?"
-
-"Meaning the whole path up to that hill may already be infested," Raven said. Her words came easy now, clipped but unforced. "If the curse is pulling spirits and monsters toward it, then the roads, trees, and broken walls between here and the tower are part of the fight. We need to be ready for battle from the moment we leave town, not from the moment we step inside."
-
-Cassius opened his mouth, thought better of arguing, and nodded.
-
-Lyra braced both hands on the table edge behind her. "Shortest route. We leave in the afternoon before dusk. Fewer things in our way if we hit the hill before the dark starts thinking."
-
-Cassius looked up sharply. "That gets us to the tower cleaner, yes. It also leaves us inside fighting until midnight, and the witch materializes at midnight. We'll be exhausted before we even face her."
-
-Lyra gave one short nod. "Then we make that survivable. We clear one room, ward it, and hold it as a camp. We rest close to midnight, recover what we can with magic and potions, and then hit the witch. If that fails, we grit our teeth and move anyway. That's the work."
-
-Raven's eyes narrowed with quick approval. "Inside the tower?"
-
-Lyra only nodded again.
-
-Elena nodded slowly. "It can be done. I can secure a room well enough for a short rest and emergency treatment." Her mouth thinned. "A few hours, no more. After that I would not trust the ward to hold."
-
-"A few hours is still better than none," Lyra said.
-
-A bell sounded somewhere outside, low and blunt through the shutters.
-
-Silence fell in the room until Raven broke it with the one question no one had an answer to. "Brenn asked the right question, didn't he?"
-
-She gave the shutter latch an idle test with two fingers. "Back in the town office. Why send novices after something like this? I thought Theron answered well enough then, but now I'm not sure."
-
-Cassius pushed his glasses higher again. "He answered like a man already committed. Not like a man who proved anything."
-
-Lyra looked from one to the other. "Good. So we're all awake now." She pushed off the table and began pacing, slow, measured, one end of the rug to the other.
-
-Elena answered, voice low. "The Guild sent who it had ready. Or Theron vouched for us and the Guild trusted his field judgment. Or Brenn asked for a priest, a curse-breaker, and fighters in a hurry, and we happened to fit the shape of the request better than anyone else on short notice."
-
-Cassius glanced up. "But why would Theron lie? Isn't it possible we were sent because we're capable?"
-
-Lyra kept pacing. "Maybe. Maybe not. What matters is this: Theron has seen us in one real operation. One. Yet when Brenn challenged him, all he had was trust in our capability. That's thin."
-
-Raven rubbed a thumb along the shutter latch. "Thin enough to sound rehearsed."
-
-Cassius winced. "So you think we were picked because we were expendable."
-
-Lyra didn't blink. "No clear answer, and no point spinning theories. The problem stands no matter how we got here. We keep our guard up—even around Theron."
-
-Elena shifted one of his pages toward herself. "Adventurers are almost never told the whole truth before they're sent in. The work is learning which lie kills you first."
-
-Cassius stared at the notes until the ink blurred. His jaw locked; his fingers curled over the page edges hard enough to crease them.
-
-Raven's frustration finally broke through. "We're walking into a cursed tower half-blind with scraps for truth. That's not a plan. That's dice in a graveyard."
-
-Elena's mouth thinned. "Ignorance kills."
-
-Lyra let the words hang, then spoke evenly. "Then we stop being ignorant before dusk. We collect what we can, we prepare for what we can't, and we walk in together. Panic burns daylight. Discipline buys a chance."
-
-Cassius swallowed, still pale, then gave one stiff nod. "All right. Then we build for uncertainty."
-
-Elena rose and crossed to the washstand, returning with a small salt vial and a stub of chalk. She set both beside the notes and began in clipped, orderly lines.
-
-"First, survival stock. Healing potions. Rations infused with recovery tonic. Warding strips, chalk, salt, iron, holy water, and one enchanted lantern with spare torches. I will prepare spell scrolls for barriers and emergency fallback."
-
-She lifted a second finger.
-
-"Second, combat stock. Weapon enchantments for steel and arrows. Oils by spirit class." She glanced at Cassius.
-
-Cassius answered at once. "Three tiers if we can afford them: Moonbane baseline, Specter if available, Soulbane if the church stores any for sanctioned exorcists. If we carry only one and meet the wrong class, we burn stamina for nothing."
-
-Raven leaned forward, voice rough with focus. "Iron shavings in sealed pouches. Cedar resin for smoke. Nothing loose in my pack."
-
-Elena nodded once. "Nullifying salt and consecrated ash too. We may need to unbind before we strike."
-
-She drew a careful breath, then shifted from supplies to roles. "Morning assignments. Raven scouts the route in daylight and checks approach points without taking contact. On the way back, she slips through the town office and church archive for records."
-
-Raven gave a curt nod. "In and out. No heroics."
-
-"Cassius covers library shelves, shop rumors, and anything whispered near the alchemists' counters," Elena continued. "Names, dates, family feuds, old tower accounts."
-
-Cassius nodded, still pale but steadier. "I can do that."
-
-"I'll press Brenn for what he's still hiding, prepare scrolls, and make sure he's ready to step into that tower with us," Elena said.
-
-Lyra held her gaze. "Then Theron and Harbin are my problem."
-
-Elena inclined her head. "All of us buy what we can while we run those tasks. No one returns empty-handed."
-
-Lyra looked around the room and made it official. "Good. That's the plan."
-
-For a heartbeat Elena's control slipped; something older moved behind her eyes, grief worn smooth by years. She closed her fingers around the salt vial, bowed her head a fraction, and whispered, "Keep them through the night." Lyra noticed, and said nothing.
-
-Outside, the bell sounded again. Closer this time. Or perhaps the night had simply thinned.
-
-Lyra dragged the chair from the table and finally sat. It made more impression than any speech she could have given.
-
-"All right," she said after a moment. "No more speeches. Tomorrow we run our assignments. Then we meet back in this room—without Theron—compare what we found, and decide what we disclose to Brenn and to him before we set out."
-
-Elena inclined her head. "Agreed."
-
-Cassius gathered two pages into a stack, then ruined the order immediately by adding a third sideways. "Tomorrow, if I start spiraling in front of Brenn, throw chalk at me."
+Cassius stacked two pages, then ruined them with a third sideways. "If I start spiraling in front of Brenn tomorrow, throw chalk at me."
 
 Raven snorted. "Happily."
 
-He pointed a charcoal finger at her. "Not at my face. I need this face for credibility."
+"Not the face. I need the face."
 
 "You need a leash, mage."
 
-"Put it on the expense list."
+"Expense list."
 
-Elena smiled before she could stop herself. Lyra laughed once, short and sharp, like a blade tapping stone.
+Elena smiled before she could stop herself. Lyra laughed once, short—blade on stone.
 
-Outside the door, Theron stood in the dim hall with one hand on the railing, listening to their voices soften through old wood and plaster. He did not knock. He did not speak. After a moment, a thin smile touched his mouth, and he went down the corridor without a sound.
+Outside the door, Theron stood in the dim hall with one hand on the railing, listening to their voices soften through old wood. He did not knock. After a moment, a thin smile touched his mouth, and he went down the corridor without a sound.
 
 ## Scene 3
 
@@ -438,11 +370,7 @@ The vestry smelled of wax, old linen, and cold stone.
 
 Only three candles burned. Their light clung to the low ceiling and left the corners brown with shadow. A draft worried the narrow window in its frame. In the brazier, one coal showed red through a skin of ash, like an eye half-lidded and unwilling to close.
 
-Against the far wall stood Brenn's display cupboard. It had once been meant for silver reliquaries, but no silver had survived Bell's End. Behind the warped glass sat a cracked blue cup from a fisherman's widow, a child's wooden horse with three legs, a brass button polished thin by a soldier's thumb, a lace glove without its twin, two river stones painted with clumsy suns, and a little book with a broken spine.
-
-Tovin's book.
-
-Brenn kept it on the middle shelf, not because it was rare, but because the boy who had given it to him had stopped being a boy the day he placed it there.
+Against the far wall stood Brenn's display cupboard. It had once been meant for silver reliquaries, but no silver had survived Bell's End. Behind the warped glass, shelf after shelf held the town's small payments—hundreds of them, crowded tight: chipped cups, broken toys, buttons, gloves, river stones, scraps of lace, carved bones, bent coins, and among them, somewhere on the middle shelf, a little book with a broken spine.
 
 Brother Tovin had laid Father Brenn's supplies across the table and kept finding reasons to touch them. Censer. Oil. Salt. A coil of silver chain. Three bundles of ward tapers tied with red thread.
 
@@ -496,7 +424,7 @@ Tovin pointed at the case. "Send the rite with them. Send instructions. Send me,
 
 "No."
 
-"You are the only priest this town has left."
+"You walk every dock in this town. If you don't come back—"
 
 Brenn looked at him then, fully, and the room seemed to pause around that look.
 
@@ -520,139 +448,121 @@ Tovin's eyes shone with anger, or grief, or both. "Knowing the list is not the s
 
 "No. But it is how ready begins."
 
-Tovin turned away before his face betrayed him. He crossed to the display cupboard and slid it aside on its swollen runners. The glass complained softly. His reflection broke across the cracked cup, the wooden horse, the painted stones.
+Tovin turned away before his face betrayed him. He crossed to the display cupboard and slid it aside on its swollen runners. The glass complained softly. His reflection broke across the crowded shelves—token after token, the small debts of years pressed glass-deep.
 
-He touched the little book on the middle shelf.
+His hand found the little book on the middle shelf without looking. The spine was still broken where it had always been broken. Preservation wax sealed the edges; the drawings inside would still be sharp if either of them opened it. Neither did.
 
-"I gave you this after you found me behind the tanner's shed," he said. "I thought the Flame had no use for me. You made me read one page every morning until I stopped hating the sound of my own voice."
+"You kept it," Tovin said.
+
+"You left it in my hands."
+
+"I didn't have anything else."
 
 Brenn said nothing.
 
-"I told myself I would help people as you did." Tovin's finger rested on the broken spine. "Then I watched you take payment from a widow in a cup with a crack through it. From a child in a toy horse that could not stand. From a man with nothing but a button. I never understood why."
+Tovin's finger rested on the broken spine. "I told myself I would help people as you did. Then I watched you take payment from people who had nothing left to give. A cracked cup. A toy that could not stand. A button polished thin by a soldier's thumb. I never understood why."
 
-"Yes, you did."
-
-Tovin looked back.
-
-Brenn nodded toward the shelves. "If I refuse everything, they owe me. Gratitude becomes a chain when people are poor enough. So I take what they can part with. A cup. A stone. A book. Then the matter is finished. No debt. No shame."
+Brenn nodded toward the shelves. "If I refuse everything, they owe me. Gratitude becomes a chain when people are poor enough. So I take what they can part with. Then the matter is finished. No debt. No shame."
 
 The little room held the silence between them.
 
-Tovin shut the cupboard with care. "Come back," he said.
+Tovin shut the cupboard. His hands locked on the handle until the wood creaked. Shoulders hunched. Head down. Eyes shut so tight the lashes trembled—and still the tears came, falling to the stone between his boots.
 
-Brenn did not promise. He put his free hand over Tovin's trembling fingers.
+"Come back," he said, the words shaking loose.
+
+Brenn did not promise. He covered Tovin's white-knuckled grip with his free hand.
 
 "Keep the Flame lit."
-
-"And the town?"
-
-"That is how we keep the town."
 
 A knock came at the vestry door. Tovin flinched hard enough to strike his elbow on the latch.
 
 Brenn set the cloak down. "Come."
 
-The door opened, and a man in a grey cassock stepped inside as if the chapel had sent him up from its own cold stones. Dust marked the hem. An iron sun hung at his throat, black in the candlelight.
+The coal in the brazier sank. The draft at the window went still, as if the room had drawn breath and held it.
+
+The door opened. Wool the color of wet ash, cut long, belted plain. A prayer book under one arm, leather dark with years of thumb. Thin pale marks on one cheekbone. At his throat, an iron sun—edges worn soft by decades of fingers, dull with age, clean of rust.
 
 "Father Brenn," he said. "Brother Tovin."
 
 Brenn gave a small bow. "Prelate Orsan."
 
-Tovin looked from one priest to the other. His hand stayed on the latch.
+Tovin looked from one to the other. His hand stayed on the latch.
 
-Orsan glanced at the packed case. "I need a word with Father Brenn."
+Orsan glanced at the packed case. "A word with Father Brenn."
 
 "I'll check the chapel lamps," Tovin said.
 
-He gathered his prayer beads from the table and left. The door clicked shut with a small, final sound.
+He gathered his prayer beads and left. The door clicked shut.
 
-Orsan waited until his footsteps faded into the nave. "You are going with the Guild party."
+Orsan waited until the footsteps faded. "You are going with them."
 
-"I am. The town needs the hill silent."
+"I am."
 
-"The hill needs more than silence." Orsan touched the iron sun at his throat. "That tower was a sanctuary of light before Bell's End had walls worth naming. Pilgrims climbed there. Acolytes kept the high lamps. Priests marked the star-seasons only to prove that every lesser fire obeyed the Flame. Then Elaria corrupted it."
+"The tower was a sanctuary before this town had walls worth naming." Orsan touched the iron sun. "Pilgrims. High lamps. Then a witch. She left heresy behind her—knowledge and practices the Flame does not bless. You will not dig for it."
 
 Brenn's eyes moved to the window. The hill could not be seen from there. Both men looked anyway.
 
-"Elaria was a witch," Brenn said.
+"If something still holds the curse in place," Brenn said, "we may have to find what."
 
-"A witch with charts," Orsan replied. "The Star-Charts of the Heretic, if even half the inventories survived. Journals. Names cut into observatory stone. She studied the stars as if distant sparks could correct the Flame. As if heat and light began in the dark above us instead of in the God who grants them."
+"You will not." Mild. Exact. "Every spirit on that hill can be ended with the right preparation. Oil. Iron. Consecrated fire. Enchantments the Church already permits you to carry. That is enough. Classification is a scholar's vanity. Investigation invites questions the town cannot afford."
 
-The coal in the brazier broke apart. A red seam opened, then dimmed.
+Brenn's fingers rested on the travel case. "And if preparation alone fails?"
 
-Brenn rested one hand on the travel case. "If her writings explain the curse, the Guild will look. So will I."
+"Then you prepare better. You do not open what was closed."
 
-"Looking for an anchor is not theft. Carrying sacred knowledge down the hill for Guild judgment is heresy. Plain and simple."
+Silence. Wax ran down a candle and hardened on the stone.
 
-"The Flame commands us to preach truth, Prelate. Not bury it."
+"Why now?" Brenn asked. "The hill has stood a century. What makes the clean account so fragile tonight?"
 
-"Half-truth is a worm in bread." Orsan's voice remained mild, which made it colder. "A team of unbadged sellswords will not read history with reverence. They will find a page, miss the page before it, and sell the wound as revelation."
+For the first time, something sharp moved behind Orsan's eyes. It was gone almost at once.
 
-Brenn watched him closely. "You are not afraid they will misunderstand Elaria. You are afraid they will understand the men who killed her."
+"Three acolytes were guided by holy visions," he said. "They pruned the branch before rot reached the root. That is the record."
 
-For the first time, anger sharpened Orsan's face. It was gone almost at once.
+"The Church record."
 
-"Three acolytes were guided by holy visions," he said. "They performed a necessary pruning of the branch before rot reached the root. That is the record."
+"The only record that matters."
 
-"That is the clean record."
+Brenn did not raise his voice. "Religious men have done foolish things before. Robes did not stop them. If the Guild asks how the witch died—"
 
-"It is the Church record."
-
-Brenn drew a slow breath through his nose. The room seemed smaller around him, pressed tight by shelves, vestments, damp stone, and all the useless little payments that proved the Church could be good when it knelt low enough.
-
-"Religious men have done cruel, foolish things in our past," he said. "Fear makes cowards. Pride makes liars. Robes do not save us from either. What makes this century-old trial so dangerous now?"
-
-Orsan stepped closer. "The Flame has warmed millions, healed the broken, and held back the dark for generations. Misjudgment by a few dead men must not stain the Church entire. If the faith fractures, Father, the poor suffer first. The sick. The frightened. The children sent to copy psalms because words are all that stand between them and panic."
+"They will be answered from the ledger we keep," Orsan said. "Not from rubble and rumor. Misjudgment by a few dead men must not stain the faith. If the faith fractures, Father, the poor suffer first. The sick. The children copying psalms because words are all that stand between them and panic."
 
 Brenn said nothing.
 
-"Tell me," Orsan continued. "Do you truly believe accounting for a dead man's mistake is more important than the faith itself?"
+"Do you place a dead inquiry above the Flame itself?"
 
 Brenn opened his mouth. Stopped.
 
-The window frame clicked softly in the wind. Somewhere in the chapel, Tovin moved a ladder and muttered an apology to no one when it scraped the floor.
+Somewhere in the chapel, Tovin moved a ladder and muttered an apology when it scraped the floor.
 
-At last Brenn lowered his eyes and recited softly, each word worn smooth by years of funerals and winter sermons.
+At last Brenn lowered his eyes and recited softly, words worn smooth by funerals and winter sermons.
 
-"The lamp may flicker in the draft, yet the hearth remains pure. For in the shadow of the altar, man passes, but the Light endures." He gave a slow nod. "The faith must endure, Prelate."
+"The lamp may flicker in the draft, yet the hearth remains pure. For in the shadow of the altar, man passes, but the Light endures." He nodded once. "The faith must endure, Prelate."
 
-Orsan studied him.
+Orsan studied him. Then answered from the high canons, low and exact, as if reading from a page neither of them held.
 
-Then the prelate answered from the high canons, low and exact.
+"Ash gathers where the foundation softens. The Flame does not ask which hand laid the soft stone. It asks that the hearth be made clean."
 
-"Yet the Flame is not mere warmth to be sheltered; it is a sword that purges the ash. Where darkness breeds in the foundation, the Light burns both the heresy and the hand that hides it."
+The words settled. Cold as ash.
 
-The words settled between them like a blade laid on cloth.
+Orsan reached into his sleeve and placed a folded paper on the table. Red wax. The iron sun ringed by thorns: the Inquisition Seal of Secrecy.
 
-Orsan reached into his sleeve and placed a folded paper on the table. Red wax sealed it. The stamp showed the iron sun ringed by thorns: the Inquisition Seal of Secrecy.
+"Any heretical knowledge or practice you meet on that hill ends there," he said. "No scrap leaves with sellswords. Destroy what walks. Keep your oils and your iron. Do not keep what teaches."
 
-"If they find charts, journals, or names etched into the observatory stone, you wipe them clean," Orsan said. "No scrap of star-heresy leaves that hill. The Flame's light is not subject to dead ink."
+Brenn looked at the seal. Did not touch it. "They will want to know what they are killing."
 
-Brenn looked at the seal, not touching it. "Some of those names may belong to the dead. Proper names matter in cleansing."
+"Remind them consecrated ground answers to the Church. Remind them the Guild eats because we permit useful work."
 
-"Use what you must. Preserve nothing that can be stolen."
+"Theron will not take that kindly."
 
-"And if the adventurers object?"
+"Then do not make him choose."
 
-"Remind them that theft from consecrated ground is heresy. Remind them that the Guild survives because the Church permits useful violence."
+Orsan's gaze held. He had heard the pause before the verse. He had heard the hollow place in it.
 
-Brenn gave a humorless breath. "They are stronger than you think. Theron especially. If this becomes a contest of force, I will lose."
-
-"Then do not make it one."
-
-"You speak as if obedience solves fear."
-
-"No. Obedience gives fear a shape."
-
-Orsan's gaze did not leave Brenn's face. He had heard the hesitation before the verse. He had heard the hollow place in the older priest's piety. Brenn had agreed with his mouth, not his heart.
-
-A righteous man performing compliance, Orsan understood, was more dangerous than a coward refusing it.
-
-"Perform the cleansing, Father," he said softly. "Save the town, if the Flame permits it. Preserve what belongs to the Church. And pray the Flame finds you worthy of its fire."
+"Cleanse the hill, Father. Save the town, if the Flame permits. And pray you are found worthy of its fire."
 
 He opened the door and walked into the grey corridor without looking back.
 
-Brenn stood alone with the sealed paper on the table between the salt and the spare flint. Behind him, the cupboard held its cup, its stones, its broken toy, its little book. The thorned sun stared up at him.
+Brenn stood alone with the sealed paper between the salt and the spare flint. Behind him, the cupboard held its crowded shelves. The thorned sun stared up from the table.
 
 After a long moment, he slid the paper beneath the folded linen before Tovin could return.
 
