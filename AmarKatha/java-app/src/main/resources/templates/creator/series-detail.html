@@ -19,6 +19,29 @@
         .alert-warn { background: #fffbeb; color: #b45309; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem; }
         .preset-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
         .preset-row button { font-size: 0.8rem; }
+        .chapters-head {
+            display: flex; flex-direction: column; gap: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        .chapters-head h2 { font-size: 1.1rem; margin: 0; }
+        .new-chapter-form {
+            display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.65rem;
+        }
+        .new-chapter-field {
+            flex: 1 1 14rem; min-width: 0; max-width: 22rem;
+        }
+        .new-chapter-field label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            color: var(--muted); margin-bottom: 0.3rem;
+        }
+        .new-chapter-field input[type="text"] {
+            width: 100%; margin-bottom: 0; padding: 0.65rem 0.75rem;
+        }
+        .new-chapter-form .btn {
+            flex: 0 0 auto;
+            height: 2.7rem;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -196,15 +219,15 @@
     </div>
 
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap;">
-            <h2 style="font-size:1.1rem; margin:0;">Chapters</h2>
-            <form class="js-busy-form" th:action="@{/creator/series/{id}/chapters(id=${series.id})}" method="post"
-                  style="display:flex; gap:0.5rem; align-items:flex-end; flex-wrap:wrap;">
+        <div class="chapters-head">
+            <h2>Chapters</h2>
+            <form class="js-busy-form new-chapter-form"
+                  th:action="@{/creator/series/{id}/chapters(id=${series.id})}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <div>
-                    <label for="newChapterTitle" style="display:block; font-size:0.75rem; color:var(--muted); margin-bottom:0.25rem;">Chapter title</label>
+                <div class="new-chapter-field">
+                    <label for="newChapterTitle">Chapter title</label>
                     <input id="newChapterTitle" type="text" name="title" maxlength="500"
-                           placeholder="e.g. The first night" style="min-width:12rem;">
+                           placeholder="e.g. The first night" autocomplete="off">
                 </div>
                 <button type="submit" class="btn btn-primary" data-busy-label="Creating…">New chapter</button>
             </form>

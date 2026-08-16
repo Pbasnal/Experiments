@@ -95,6 +95,20 @@
             margin: 1rem 0;
         }
         .checkbox-row input { margin-top: 0.2rem; }
+        .publish-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1rem;
+        }
+        .publish-blocker {
+            margin: 0;
+            max-width: 22rem;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: #9a3412;
+        }
+        .publish-blocker[hidden] { display: none; }
     </style>
 </head>
 <body>
@@ -187,10 +201,20 @@
                 <input type="checkbox" name="copyrightAck" value="true" required>
                 <span>I confirm I own the rights to upload this content, or I have permission from the copyright holder.</span>
             </label>
-            <button type="submit" class="btn btn-primary"
-                    data-busy-label="Publishing…"
-                    th:disabled="${#lists.isEmpty(pages)}"
-                    th:classappend="${#lists.isEmpty(pages)} ? ' is-disabled'">Publish now</button>
+            <div class="publish-actions">
+                <button type="submit" id="publish-now-btn" class="btn btn-primary"
+                        data-busy-label="Publishing…"
+                        th:disabled="${#lists.isEmpty(pages)}"
+                        th:classappend="${#lists.isEmpty(pages)} ? ' is-disabled'"
+                        th:attr="aria-describedby=${#lists.isEmpty(pages)} ? 'publish-blocker' : null">
+                    Publish now
+                </button>
+                <p id="publish-blocker" class="publish-blocker" role="status"
+                   th:hidden="${!#lists.isEmpty(pages)}"
+                   th:text="${#lists.isEmpty(pages)} ? 'Upload at least one page before publishing.' : ''">
+                    Upload at least one page before publishing.
+                </p>
+            </div>
             <div class="form-progress" aria-live="polite">
                 <span class="form-progress-label">Publishing…</span>
                 <div class="form-progress-bar"><span></span></div>
@@ -212,7 +236,14 @@
   var uploadTitle = document.getElementById('upload-title');
   var publishForm = document.getElementById('publish-form');
   var uploadForm = document.getElementById('upload-pages-form');
+  var publishBtn = document.getElementById('publish-now-btn');
+  var publishBlocker = document.getElementById('publish-blocker');
   var heading = document.querySelector('main.creator-main > h1');
+  var existingPageCount = parseInt(
+    (uploadForm && uploadForm.getAttribute('data-existing-count')) || '0',
+    10
+  );
+  var pendingPageCount = 0;
 
   function syncTitleTargets() {
     var value = titleInput ? titleInput.value.trim() : '';
@@ -220,12 +251,53 @@
     if (uploadTitle) uploadTitle.value = value;
   }
 
+  function updatePublishGate(existingCount, pendingCount) {
+    if (typeof existingCount === 'number') {
+      existingPageCount = existingCount;
+    }
+    if (typeof pendingCount === 'number') {
+      pendingPageCount = pendingCount;
+    }
+    if (!publishBtn || !publishBlocker) {
+      return;
+    }
+
+    var titleValue = titleInput ? titleInput.value.trim() : (publishTitle ? publishTitle.value.trim() : '');
+    var reason = '';
+
+    if (existingPageCount <= 0) {
+      if (pendingPageCount > 0) {
+        reason = 'Click Upload to save your selected pages, then you can publish.';
+      } else {
+        reason = 'Upload at least one page before publishing.';
+      }
+    } else if (!titleValue) {
+      reason = 'Enter a chapter title before publishing.';
+    }
+
+    var blocked = reason !== '';
+    publishBtn.disabled = blocked;
+    publishBtn.classList.toggle('is-disabled', blocked);
+    if (blocked) {
+      publishBtn.setAttribute('aria-describedby', 'publish-blocker');
+      publishBlocker.hidden = false;
+      publishBlocker.textContent = reason;
+    } else {
+      publishBtn.removeAttribute('aria-describedby');
+      publishBlocker.hidden = true;
+      publishBlocker.textContent = '';
+    }
+  }
+
+  window.updatePublishGate = updatePublishGate;
+
   if (titleInput) {
     titleInput.addEventListener('input', function () {
       syncTitleTargets();
       if (heading && titleInput.value.trim()) {
         heading.textContent = titleInput.value.trim();
       }
+      updatePublishGate();
     });
   }
 
@@ -240,11 +312,13 @@
       syncTitleTargets();
       if (!publishTitle || !publishTitle.value.trim()) {
         e.preventDefault();
-        window.alert('Enter a chapter title before publishing.');
+        updatePublishGate();
         if (titleInput) titleInput.focus();
       }
     });
   }
+
+  updatePublishGate(existingPageCount, 0);
 })();
 </script>
 <script>
@@ -284,6 +358,9 @@
     fileInput.files = dt.files;
     uploadBtn.disabled = pending.length === 0;
     clearBtn.hidden = pending.length === 0;
+    if (typeof window.updatePublishGate === 'function') {
+      window.updatePublishGate(existingCount, pending.length);
+    }
   }
 
   function renderPending() {
@@ -426,6 +503,9 @@
     var meta = document.querySelector('.card .meta');
     if (meta && meta.textContent && meta.textContent.indexOf('pages') !== -1) {
       meta.textContent = existingCount + ' / ' + maxPages + ' pages';
+    }
+    if (typeof window.updatePublishGate === 'function') {
+      window.updatePublishGate(existingCount, pending.length);
     }
   }
 
