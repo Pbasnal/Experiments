@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState, type ReactNode } from 'react';
 import { fetchMe, logout, type AuthMeResponse } from '../api/auth';
+import FeedbackFab from './FeedbackFab';
 
 interface LayoutProps {
   children: ReactNode;
@@ -83,6 +84,7 @@ export default function Layout({ children }: LayoutProps) {
           <a href="/legal/grievance">Grievance</a>
         </div>
       </footer>
+      <FeedbackFab />
     </div>
   );
 }

@@ -186,6 +186,29 @@
             0% { transform: translateX(-120%); }
             100% { transform: translateX(320%); }
         }
+        .feedback-fab {
+            position: fixed;
+            left: calc(0.85rem + env(safe-area-inset-left, 0px));
+            bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+            z-index: 55;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.55rem 0.95rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 8px 28px rgba(17, 24, 39, 0.08);
+        }
+        .feedback-fab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
     </style>
     </th:block>
 
@@ -273,6 +296,10 @@
             <button type="submit" class="signout">Sign out</button>
         </form>
     </div>
+    <a class="feedback-fab"
+       href="https://docs.google.com/forms/d/e/1FAIpQLSd2ZC6GS-92iA7TkiijEL_DkCnGaT3OYyr8sqMTkHa3Vm6b3Q/viewform"
+       target="_blank" rel="noopener noreferrer"
+       aria-label="Send feedback" title="Send feedback">Feedback</a>
 </nav>
 </body>
 </html>
