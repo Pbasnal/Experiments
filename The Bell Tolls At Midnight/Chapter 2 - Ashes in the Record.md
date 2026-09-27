@@ -523,17 +523,17 @@ Orsan waited until the footsteps faded. "You are going with them."
 
 "I am."
 
-"The tower was a sanctuary before this town had walls worth naming." Orsan touched the iron sun. "Pilgrims. High lamps. Then a witch. She left heresy behind her—knowledge and practices the Flame does not bless. You will not dig for it."
+"The tower was a sanctuary before this town had walls worth naming." Orsan touched the iron sun. "Pilgrims. High lamps. Then a witch. She left heresy behind her—knowledge and practices the Flame does not bless. You will make sure that her knowledge, and the events of the past remain burried on the hill."
 
 Brenn's eyes moved to the window. The hill could not be seen from there. Both men looked anyway.
 
-"If something still holds the curse in place," Brenn said, "we may have to find what."
+"If something still holds the curse in place," Brenn said, "we may have to find what.."
 
-"You will not." Mild. Exact. "Every spirit on that hill can be ended with the right preparation. Oil. Iron. Consecrated fire. Enchantments the Church already permits you to carry. That is enough. Classification is a scholar's vanity. Investigation invites questions the town cannot afford."
+"You will not." Mild. Exact. "Every spirit on that hill can be ended with the right preparation. Enchantments the Church already permits you to carry. That is enough. Classification is a scholar's vanity. Investigation invites questions the town cannot afford."
 
 Brenn's fingers rested on the travel case. "And if preparation alone fails?"
 
-"Then you prepare better. You do not open what was closed."
+"Then you prepare better."
 
 Silence. Wax ran down a candle and hardened on the stone.
 
@@ -547,9 +547,9 @@ For the first time, something sharp moved behind Orsan's eyes. It was gone almos
 
 "The only record that matters."
 
-Brenn did not raise his voice. "Religious men have done foolish things before. Robes did not stop them. If the Guild asks how the witch died—"
+Brenn did not raise his voice. "Religious men have done foolish things before. Church has acknoledged them and grown from them. If the Guild asks how the witch died—"
 
-"They will be answered from the ledger we keep," Orsan said. "Not from rubble and rumor. Misjudgment by a few dead men must not stain the faith. If the faith fractures, Father, the poor suffer first. The sick. The children copying psalms because words are all that stand between them and panic."
+"They will be answered from the ledger we keep," Orsan said. "Not from rubble and rumor. Misjudgment by a few dead men must not stain the faith. If the faith fractures, Father, the poor suffer first. The sick. The children copying psalms because words are all that stand between them and panic. Our priests including yourself have brought so much light into this dark world. Why risk all that?"
 
 Brenn said nothing.
 
@@ -559,11 +559,13 @@ Brenn opened his mouth. Stopped.
 
 Somewhere in the chapel, Tovin moved a ladder and muttered an apology when it scraped the floor.
 
-At last Brenn lowered his eyes and recited softly, words worn smooth by funerals and winter sermons.
+At last Brenn lowered his eyes and recited softly, words worn smooth by funerals and winter sermons—the kind of line you say when the answer is already decided and you’re only expected to say it.
 
-"The lamp may flicker in the draft, yet the hearth remains pure. For in the shadow of the altar, man passes, but the Light endures." He nodded once. "The faith must endure, Prelate."
+“The lamp may flicker in the draft, yet the hearth remains pure. For in the shadow of the altar, man passes, but the Light endures.”
 
-Orsan studied him. Then answered from the high canons, low and exact, as if reading from a page neither of them held.
+He did not look up. "We must protect the flame."
+
+Orsan studied him. Then answered from the high canons, low and exact.
 
 "Ash gathers where the foundation softens. The Flame does not ask which hand laid the soft stone. It asks that the hearth be made clean."
 
@@ -571,11 +573,11 @@ The words settled. Cold as ash.
 
 Orsan reached into his sleeve and placed a folded paper on the table. Red wax. The iron sun ringed by thorns: the Inquisition Seal of Secrecy.
 
-"Any heretical knowledge or practice you meet on that hill ends there," he said. "No scrap leaves with sellswords. Destroy what walks. Keep your oils and your iron. Do not keep what teaches."
+"Any heretical knowledge or practice you meet on that hill ends there," he said. "No scrap leaves with sellswords. Destroy what walks. Keep your oils and your iron."
 
 Brenn looked at the seal. Did not touch it. "They will want to know what they are killing."
 
-"Remind them consecrated ground answers to the Church. Remind them the Guild eats because we permit useful work."
+"Remind them consecrated ground answers to the Church."
 
 "Theron will not take that kindly."
 
@@ -583,7 +585,7 @@ Brenn looked at the seal. Did not touch it. "They will want to know what they ar
 
 Orsan's gaze held. He had heard the pause before the verse. He had heard the hollow place in it.
 
-"Cleanse the hill, Father. Save the town, if the Flame permits. And pray you are found worthy of its fire."
+"Cleanse the hill, Father. Save the town, the Flame desires the same. But you must follow your duty to flame as well and bury the past there itself."
 
 He opened the door and walked into the grey corridor without looking back.
 
