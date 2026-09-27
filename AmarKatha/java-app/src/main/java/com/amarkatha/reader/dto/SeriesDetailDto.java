@@ -17,6 +17,10 @@ public record SeriesDetailDto(
         String status,
         Instant lastUpdatedAt,
         int chapterCount,
-        List<ChapterSummaryDto> chapters
+        List<ChapterSummaryDto> chapters,
+        boolean viewerOwnsSeries,
+        double rating,
+        int readerCount,
+        boolean editorsPick
 ) {
 }

@@ -32,7 +32,9 @@ class ModuleArchitectureTest {
                         "com.amarkatha.media..",
                         "com.amarkatha.analytics..",
                         "com.amarkatha.scheduling..",
-                        "com.amarkatha.payments..")
+                        "com.amarkatha.engagement..",
+                        "com.amarkatha.payments..",
+                        "com.amarkatha.outbox..")
                 .because("identity depends only on shared per architecture.md");
         rule.check(classes);
     }
@@ -47,9 +49,31 @@ class ModuleArchitectureTest {
                         "com.amarkatha.reader..",
                         "com.amarkatha.admin..",
                         "com.amarkatha.analytics..",
+                        "com.amarkatha.engagement..",
                         "com.amarkatha.payments..",
                         "com.amarkatha.bootstrap..")
-                .because("publishing depends on shared, scheduling, media per architecture.md");
+                .because("publishing depends on shared, scheduling, media, outbox — not engagement");
+        rule.check(classes);
+    }
+
+    @Test
+    void outboxMayOnlyDependOnShared() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.amarkatha.outbox..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.amarkatha.identity..",
+                        "com.amarkatha.publishing..",
+                        "com.amarkatha.catalog..",
+                        "com.amarkatha.reader..",
+                        "com.amarkatha.admin..",
+                        "com.amarkatha.media..",
+                        "com.amarkatha.analytics..",
+                        "com.amarkatha.scheduling..",
+                        "com.amarkatha.engagement..",
+                        "com.amarkatha.payments..",
+                        "com.amarkatha.business..",
+                        "com.amarkatha.bootstrap..")
+                .because("outbox is infrastructure — shared/Spring only");
         rule.check(classes);
     }
 
@@ -65,9 +89,33 @@ class ModuleArchitectureTest {
                         "com.amarkatha.admin..",
                         "com.amarkatha.media..",
                         "com.amarkatha.analytics..",
+                        "com.amarkatha.engagement..",
                         "com.amarkatha.payments..",
-                        "com.amarkatha.bootstrap..")
+                        "com.amarkatha.business..",
+                        "com.amarkatha.bootstrap..",
+                        "com.amarkatha.outbox..")
                 .because("scheduling is pure domain — shared only");
+        rule.check(classes);
+    }
+
+    @Test
+    void businessMayOnlyDependOnShared() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.amarkatha.business..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.amarkatha.identity..",
+                        "com.amarkatha.publishing..",
+                        "com.amarkatha.catalog..",
+                        "com.amarkatha.reader..",
+                        "com.amarkatha.admin..",
+                        "com.amarkatha.media..",
+                        "com.amarkatha.analytics..",
+                        "com.amarkatha.scheduling..",
+                        "com.amarkatha.engagement..",
+                        "com.amarkatha.payments..",
+                        "com.amarkatha.bootstrap..",
+                        "com.amarkatha.outbox..")
+                .because("business is pure domain — shared only");
         rule.check(classes);
     }
 
@@ -80,8 +128,25 @@ class ModuleArchitectureTest {
                         "com.amarkatha.payments..",
                         "com.amarkatha.identity..",
                         "com.amarkatha.media..",
+                        "com.amarkatha.engagement..",
+                        "com.amarkatha.outbox..")
+                .because("reader depends on shared, catalog, publishing, scheduling, analytics, business");
+        rule.check(classes);
+    }
+
+    @Test
+    void engagementMayOnlyDependOnAllowedModules() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.amarkatha.engagement..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.amarkatha.reader..",
+                        "com.amarkatha.admin..",
+                        "com.amarkatha.media..",
+                        "com.amarkatha.catalog..",
+                        "com.amarkatha.business..",
+                        "com.amarkatha.payments..",
                         "com.amarkatha.bootstrap..")
-                .because("reader depends on shared, catalog, publishing, scheduling, analytics");
+                .because("engagement depends on shared, publishing, identity, outbox, analytics");
         rule.check(classes);
     }
 }

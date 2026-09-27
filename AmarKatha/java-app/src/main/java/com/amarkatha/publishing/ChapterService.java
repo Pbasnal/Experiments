@@ -1,8 +1,11 @@
 package com.amarkatha.publishing;
 
 import com.amarkatha.media.MediaStore;
+import com.amarkatha.outbox.DomainEventPublisher;
+import com.amarkatha.outbox.DomainEventTypes;
 import com.amarkatha.publishing.domain.Chapter;
 import com.amarkatha.publishing.domain.ChapterPage;
+import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.shared.domain.ChapterState;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -11,6 +14,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +48,7 @@ public class ChapterService {
     private final MediaStore mediaStore;
     private final ChapterMediaIntegrityService mediaIntegrityService;
     private final WebpConversionService webpConversionService;
+    private final DomainEventPublisher domainEventPublisher;
     private final int maxPagesPerChapter;
     private final long maxPageBytes;
 
@@ -55,6 +60,7 @@ public class ChapterService {
             MediaStore mediaStore,
             ChapterMediaIntegrityService mediaIntegrityService,
             WebpConversionService webpConversionService,
+            DomainEventPublisher domainEventPublisher,
             @Value("${amarkatha.media.max-pages-per-chapter:40}") int maxPagesPerChapter,
             @Value("${amarkatha.media.max-page-bytes:16777216}") long maxPageBytes
     ) {
@@ -65,6 +71,7 @@ public class ChapterService {
         this.mediaStore = mediaStore;
         this.mediaIntegrityService = mediaIntegrityService;
         this.webpConversionService = webpConversionService;
+        this.domainEventPublisher = domainEventPublisher;
         this.maxPagesPerChapter = maxPagesPerChapter;
         this.maxPageBytes = maxPageBytes;
     }
@@ -303,7 +310,9 @@ public class ChapterService {
         if (!copyrightAck) {
             throw new ChapterException("You must confirm copyright ownership before publishing.");
         }
-        Chapter chapter = requireOwnedChapter(seriesId, chapterId, creatorId);
+        Series series = seriesService.requireOwned(seriesId, creatorId);
+        Chapter chapter = chapterRepository.findBySeriesIdAndId(seriesId, chapterId)
+                .orElseThrow(() -> new ChapterException("Chapter not found"));
         requireDraft(chapter);
         if (title == null || title.isBlank()) {
             throw new ChapterException("Chapter title is required before publishing.");
@@ -314,7 +323,27 @@ public class ChapterService {
         chapter.publishNow(now, now);
         chapterRepository.save(chapter);
         seriesScheduleService.onChapterPublished(seriesId, creatorId, now);
+        appendChapterPublishedOutbox(series, chapter, now);
         return chapter;
+    }
+
+    private void appendChapterPublishedOutbox(Series series, Chapter chapter, Instant publishedAt) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("seriesId", series.getId().toString());
+        payload.put("chapterId", chapter.getId().toString());
+        payload.put("seriesSlug", series.getSlug());
+        payload.put("seriesTitle", series.getTitle());
+        payload.put("chapterSlug", chapter.getSlug());
+        payload.put("chapterTitle", chapter.getTitle());
+        payload.put("chapterNumber", chapter.getChapterNumber());
+        payload.put("publishedAt", publishedAt.toString());
+        domainEventPublisher.append(
+                DomainEventTypes.CHAPTER_PUBLISHED,
+                "chapter",
+                chapter.getId(),
+                DomainEventTypes.CHAPTER_PUBLISHED + ":" + chapter.getId(),
+                payload
+        );
     }
 
     public int getMaxPagesPerChapter() {

@@ -19,6 +19,16 @@ public class AnalyticsEventController {
         this.analyticsIngestionService = analyticsIngestionService;
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void productOrRumEvent(
+            @RequestBody ProductEventRequest body,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        analyticsIngestionService.recordClientEvent(body, request, response);
+    }
+
     @PostMapping("/series-view")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void seriesView(

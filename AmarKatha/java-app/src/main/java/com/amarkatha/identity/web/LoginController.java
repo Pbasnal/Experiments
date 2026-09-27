@@ -2,6 +2,7 @@ package com.amarkatha.identity.web;
 
 import com.amarkatha.identity.OAuthIntent;
 import com.amarkatha.identity.security.AuthSessionKeys;
+import com.amarkatha.identity.security.SafeReturnPath;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,13 +25,33 @@ public class LoginController {
     public String signInAsCreator(HttpSession session) {
         session.setAttribute(AuthSessionKeys.OAUTH_INTENT, OAuthIntent.CREATOR_LOGIN.name());
         session.removeAttribute(AuthSessionKeys.PENDING_INVITE_TOKEN);
+        session.removeAttribute(AuthSessionKeys.OAUTH_RETURN_TO);
+        session.removeAttribute(AuthSessionKeys.PENDING_FOLLOW_SERIES_SLUG);
         return "redirect:/oauth2/authorization/google";
     }
 
     @GetMapping("/login/reader")
-    public String signInAsReader(HttpSession session) {
+    public String signInAsReader(
+            @RequestParam(value = "returnTo", required = false) String returnTo,
+            @RequestParam(value = "follow", required = false) String followSlug,
+            HttpSession session
+    ) {
         session.setAttribute(AuthSessionKeys.OAUTH_INTENT, OAuthIntent.READER_LOGIN.name());
         session.removeAttribute(AuthSessionKeys.PENDING_INVITE_TOKEN);
+
+        SafeReturnPath.normalizeSeriesSlug(followSlug).ifPresentOrElse(
+                slug -> {
+                    session.setAttribute(AuthSessionKeys.PENDING_FOLLOW_SERIES_SLUG, slug);
+                    SafeReturnPath.store(
+                            session,
+                            SafeReturnPath.normalize(returnTo).orElse("/read/s/" + slug)
+                    );
+                },
+                () -> {
+                    session.removeAttribute(AuthSessionKeys.PENDING_FOLLOW_SERIES_SLUG);
+                    SafeReturnPath.store(session, returnTo);
+                }
+        );
         return "redirect:/oauth2/authorization/google";
     }
 

@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { postProgress } from '../api/engagement';
 import { fetchChapter, fetchSeries, trackChapterView } from '../api/home';
 import type { ChapterReader, ChapterSummary } from '../types';
 import ChapterBlock from '../components/reader/ChapterBlock';
@@ -55,6 +56,7 @@ export default function ChapterReaderPage() {
         setError(null);
         bootstrappedSeriesRef.current = seriesSlug;
         void trackChapterView(seriesSlug, chapterSlug);
+        void postProgress(seriesSlug, chapterSlug);
       })
       .catch((e: Error) => {
         if (!cancelled) {

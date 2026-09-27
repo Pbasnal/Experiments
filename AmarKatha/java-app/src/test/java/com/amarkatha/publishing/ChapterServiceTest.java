@@ -10,15 +10,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.amarkatha.media.MediaStore;
+import com.amarkatha.outbox.DomainEventPublisher;
+import com.amarkatha.outbox.DomainEventTypes;
 import com.amarkatha.publishing.domain.Chapter;
 import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.shared.domain.ChapterState;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
@@ -40,6 +44,8 @@ class ChapterServiceTest {
     private ChapterMediaIntegrityService mediaIntegrityService;
     @Mock
     private WebpConversionService webpConversionService;
+    @Mock
+    private DomainEventPublisher domainEventPublisher;
 
     private ChapterService chapterService;
     private UUID creatorId;
@@ -55,6 +61,7 @@ class ChapterServiceTest {
                 mediaStore,
                 mediaIntegrityService,
                 webpConversionService,
+                domainEventPublisher,
                 40,
                 16 * 1024 * 1024
         );
@@ -100,9 +107,10 @@ class ChapterServiceTest {
 
     @Test
     void publishNowSucceedsWithPagesAndAck() {
+        Series series = Series.create(creatorId, "slug", "Title");
+        seriesId = series.getId();
         Chapter chapter = Chapter.createDraft(seriesId, 1, "chapter-1", "Ch 1");
-        when(seriesService.requireOwned(seriesId, creatorId))
-                .thenReturn(Series.create(creatorId, "slug", "Title"));
+        when(seriesService.requireOwned(seriesId, creatorId)).thenReturn(series);
         when(chapterRepository.findBySeriesIdAndId(seriesId, chapter.getId()))
                 .thenReturn(Optional.of(chapter));
         doNothing().when(mediaIntegrityService).requireIntactForPublish(chapter.getId());
@@ -116,6 +124,19 @@ class ChapterServiceTest {
         assertEquals("The first night", published.getTitle());
         verify(mediaIntegrityService).requireIntactForPublish(chapter.getId());
         verify(seriesScheduleService).onChapterPublished(eq(seriesId), eq(creatorId), any());
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, Object>> payloadCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(domainEventPublisher).append(
+                eq(DomainEventTypes.CHAPTER_PUBLISHED),
+                eq("chapter"),
+                eq(chapter.getId()),
+                eq(DomainEventTypes.CHAPTER_PUBLISHED + ":" + chapter.getId()),
+                payloadCaptor.capture()
+        );
+        assertEquals(seriesId.toString(), payloadCaptor.getValue().get("seriesId"));
+        assertEquals(chapter.getId().toString(), payloadCaptor.getValue().get("chapterId"));
+        assertEquals("slug", payloadCaptor.getValue().get("seriesSlug"));
     }
 
     @Test

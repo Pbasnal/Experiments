@@ -23,7 +23,7 @@ public class AnalyticsEvent {
     @Column(nullable = false, length = 32)
     private AnalyticsEventType type;
 
-    @Column(name = "series_id", nullable = false)
+    @Column(name = "series_id")
     private UUID seriesId;
 
     @Column(name = "chapter_id")
@@ -34,6 +34,9 @@ public class AnalyticsEvent {
 
     @Column(nullable = false, length = 32)
     private String referrer;
+
+    @Column(name = "meta_json", length = 512)
+    private String metaJson;
 
     @Column(name = "occurred_at", nullable = false)
     private Instant occurredAt = Instant.now();
@@ -46,7 +49,8 @@ public class AnalyticsEvent {
             UUID seriesId,
             UUID chapterId,
             String readerId,
-            String referrer
+            String referrer,
+            String metaJson
     ) {
         AnalyticsEvent event = new AnalyticsEvent();
         event.type = type;
@@ -54,6 +58,7 @@ public class AnalyticsEvent {
         event.chapterId = chapterId;
         event.readerId = readerId;
         event.referrer = referrer;
+        event.metaJson = metaJson;
         event.occurredAt = Instant.now();
         return event;
     }
@@ -80,6 +85,10 @@ public class AnalyticsEvent {
 
     public String getReferrer() {
         return referrer;
+    }
+
+    public String getMetaJson() {
+        return metaJson;
     }
 
     public Instant getOccurredAt() {

@@ -1,4 +1,4 @@
-package com.amarkatha.bootstrap;
+package com.amarkatha.shared.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
  * Builds absolute public URLs for OG tags, emails, and share links.
  * Prefer {@code AMARKATHA_PUBLIC_BASE_URL} in production; otherwise use
  * forwarded headers / the incoming request (for local and reverse-proxy setups).
+ * Email delivery requires a configured public base URL (no request context).
  */
 @Component
 public class AbsoluteUrlBuilder {
@@ -27,6 +28,21 @@ public class AbsoluteUrlBuilder {
             return publicBaseUrl + normalizedPath;
         }
         return requestOrigin(request) + normalizedPath;
+    }
+
+    /**
+     * Absolute URL from the configured public base only (no request fallback).
+     * Used for email bodies where there is no inbound HTTP request.
+     */
+    public String absolute(String path) {
+        if (!hasConfiguredBaseUrl()) {
+            throw new IllegalStateException("amarkatha.public-base-url is required for absolute email links");
+        }
+        return publicBaseUrl + normalizePath(path);
+    }
+
+    public boolean hasConfiguredBaseUrl() {
+        return StringUtils.hasText(publicBaseUrl);
     }
 
     public String configuredBaseUrl() {

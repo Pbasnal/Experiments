@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import SeriesPage from './pages/SeriesPage';
 import ChapterReaderPage from './pages/ChapterReaderPage';
 import ProfilePage from './pages/ProfilePage';
+import CreatorsPage from './pages/CreatorsPage';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/read/s/:seriesSlug" element={<SeriesPage />} />
         <Route path="/read/s/:seriesSlug/c/:chapterSlug" element={<ChapterReaderPage />} />
         <Route path="/read/profile" element={<ProfilePage />} />
+        <Route path="/creators" element={<CreatorsPage />} />
       </Routes>
     </Layout>
   );

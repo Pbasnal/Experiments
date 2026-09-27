@@ -9,7 +9,7 @@ export default function FeedbackFab() {
 
   return (
     <a
-      className={`feedback-fab${onChapter ? ' feedback-fab--subtle' : ''}`}
+      className={`feedback-fab${onChapter ? ' feedback-fab--subtle feedback-fab--chapter' : ''}`}
       href={FEEDBACK_FORM_URL}
       target="_blank"
       rel="noopener noreferrer"

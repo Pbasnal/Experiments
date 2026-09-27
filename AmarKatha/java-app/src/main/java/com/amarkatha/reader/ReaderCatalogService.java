@@ -1,5 +1,10 @@
 package com.amarkatha.reader;
 
+import com.amarkatha.business.HomeDiscoveryInput;
+import com.amarkatha.business.HomeDiscoveryInstruction;
+import com.amarkatha.business.HomeDiscoveryPolicy;
+import com.amarkatha.business.HomeFilter;
+import com.amarkatha.catalog.LanguageFilterProperties;
 import com.amarkatha.publishing.ChapterMediaIntegrityService;
 import com.amarkatha.publishing.ChapterPageRepository;
 import com.amarkatha.publishing.ChapterRepository;
@@ -11,16 +16,21 @@ import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.reader.dto.ChapterPageDto;
 import com.amarkatha.reader.dto.ChapterReaderDto;
 import com.amarkatha.reader.dto.ChapterSummaryDto;
+import com.amarkatha.reader.dto.HomeResponse;
+import com.amarkatha.reader.dto.LanguageOptionDto;
 import com.amarkatha.reader.dto.ScheduleStripDto;
 import com.amarkatha.reader.dto.SeriesCardDto;
 import com.amarkatha.reader.dto.SeriesDetailDto;
 import com.amarkatha.scheduling.ScheduleStripView;
+import com.amarkatha.shared.ReaderFeatureGate;
 import com.amarkatha.shared.domain.ChapterState;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -30,12 +40,20 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class ReaderCatalogService {
 
+    private static final String TAGLINE_MESSAGE_KEY = "app.tagline";
+    private static final String TAGLINE_FALLBACK =
+            "Publish on your rhythm. Share a link. Readers know when you're back.";
+
     private final SeriesRepository seriesRepository;
     private final ChapterRepository chapterRepository;
     private final ChapterPageRepository chapterPageRepository;
     private final ChapterMediaIntegrityService mediaIntegrityService;
     private final SeriesScheduleService seriesScheduleService;
     private final JdbcTemplate jdbcTemplate;
+    private final HomeDiscoveryPolicy homeDiscoveryPolicy;
+    private final LanguageFilterProperties languageFilterProperties;
+    private final ReaderFeatureGate readerFeatureGate;
+    private final MessageSource messageSource;
 
     public ReaderCatalogService(
             SeriesRepository seriesRepository,
@@ -43,7 +61,11 @@ public class ReaderCatalogService {
             ChapterPageRepository chapterPageRepository,
             ChapterMediaIntegrityService mediaIntegrityService,
             SeriesScheduleService seriesScheduleService,
-            JdbcTemplate jdbcTemplate
+            JdbcTemplate jdbcTemplate,
+            HomeDiscoveryPolicy homeDiscoveryPolicy,
+            LanguageFilterProperties languageFilterProperties,
+            ReaderFeatureGate readerFeatureGate,
+            MessageSource messageSource
     ) {
         this.seriesRepository = seriesRepository;
         this.chapterRepository = chapterRepository;
@@ -51,22 +73,63 @@ public class ReaderCatalogService {
         this.mediaIntegrityService = mediaIntegrityService;
         this.seriesScheduleService = seriesScheduleService;
         this.jdbcTemplate = jdbcTemplate;
+        this.homeDiscoveryPolicy = homeDiscoveryPolicy;
+        this.languageFilterProperties = languageFilterProperties;
+        this.readerFeatureGate = readerFeatureGate;
+        this.messageSource = messageSource;
+    }
+
+    @Transactional(readOnly = true)
+    public HomeResponse home(Locale locale) {
+        return home(locale, null);
+    }
+
+    @Transactional(readOnly = true)
+    public HomeResponse home(Locale locale, UUID viewerId) {
+        List<TaggedCard> tagged = taggedCards();
+        List<SeriesCardDto> catalog = cardsOf(tagged);
+        List<SeriesCardDto> visible = cardsOf(tagged.stream()
+                .filter(card -> viewerId == null || !viewerId.equals(card.creatorId()))
+                .toList());
+        Map<String, Integer> catalogCountByLanguage = countByLanguage(catalog);
+        boolean discoveryEnabled = readerFeatureGate.landingDiscoveryEnabled();
+        HomeDiscoveryInstruction instruction = homeDiscoveryPolicy.decide(new HomeDiscoveryInput(
+                discoveryEnabled && languageFilterProperties.enabled(),
+                catalog.size(),
+                languageFilterProperties.minimumCatalogSize(),
+                languageFilterProperties.minimumSeriesPerLanguage(),
+                catalogCountByLanguage
+        ));
+        List<String> filters = discoveryEnabled
+                ? instruction.filters().stream().map(HomeFilter::name).toList()
+                : List.of();
+        List<LanguageOptionDto> languageOptions = discoveryEnabled
+                && instruction.filters().contains(HomeFilter.LANGUAGE)
+                ? toLanguageOptions(instruction.eligibleLanguageCodes(), countByLanguage(visible)).stream()
+                        .filter(option -> option.seriesCount() > 0)
+                        .toList()
+                : List.of();
+        return new HomeResponse(
+                resolveTagline(locale),
+                visible,
+                List.of(),
+                filters,
+                languageOptions
+        );
     }
 
     @Transactional(readOnly = true)
     public List<SeriesCardDto> recentlyUpdated() {
-        List<Series> seriesList = seriesRepository.findDiscoverableOrderByRecent();
-        Map<UUID, String> creatorNames = loadCreatorNames(
-                seriesList.stream().map(Series::getCreatorId).distinct().toList()
-        );
-        return seriesList.stream()
-                .map(series -> toCard(series, creatorNames.getOrDefault(series.getCreatorId(), "Creator")))
-                .filter(card -> card.chapterCount() > 0)
-                .toList();
+        return cardsOf(taggedCards());
     }
 
     @Transactional(readOnly = true)
     public SeriesDetailDto seriesBySlug(String slug) {
+        return seriesBySlug(slug, null);
+    }
+
+    @Transactional(readOnly = true)
+    public SeriesDetailDto seriesBySlug(String slug, UUID viewerId) {
         Series series = seriesRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound("Series not found"));
         List<Chapter> listed = listedPublishedChapters(series.getId());
@@ -110,7 +173,11 @@ public class ReaderCatalogService {
                 series.getStatus().name(),
                 lastUpdated(series),
                 summaries.size(),
-                summaries
+                summaries,
+                viewerId != null && viewerId.equals(series.getCreatorId()),
+                series.getRating(),
+                series.getReaderCount(),
+                series.isEditorsPick()
         );
     }
 
@@ -164,6 +231,24 @@ public class ReaderCatalogService {
         );
     }
 
+    private List<TaggedCard> taggedCards() {
+        List<Series> seriesList = seriesRepository.findDiscoverableOrderByRecent();
+        Map<UUID, String> creatorNames = loadCreatorNames(
+                seriesList.stream().map(Series::getCreatorId).distinct().toList()
+        );
+        return seriesList.stream()
+                .map(series -> new TaggedCard(
+                        series.getCreatorId(),
+                        toCard(series, creatorNames.getOrDefault(series.getCreatorId(), "Creator"))
+                ))
+                .filter(tagged -> tagged.card().chapterCount() > 0)
+                .toList();
+    }
+
+    private static List<SeriesCardDto> cardsOf(List<TaggedCard> tagged) {
+        return tagged.stream().map(TaggedCard::card).toList();
+    }
+
     private SeriesCardDto toCard(Series series, String creatorName) {
         int chapterCount = (int) listedPublishedChapters(series.getId()).stream()
                 .filter(c -> mediaIntegrityService.isChapterMediaIntact(c.getId()))
@@ -182,7 +267,10 @@ public class ReaderCatalogService {
                 schedule,
                 series.getStatus().name(),
                 lastUpdated(series),
-                chapterCount
+                chapterCount,
+                series.getRating(),
+                series.getReaderCount(),
+                series.isEditorsPick()
         );
     }
 
@@ -232,11 +320,60 @@ public class ReaderCatalogService {
         return names;
     }
 
+    private String resolveTagline(Locale locale) {
+        Locale effective = locale == null ? Locale.ENGLISH : locale;
+        return messageSource.getMessage(TAGLINE_MESSAGE_KEY, null, TAGLINE_FALLBACK, effective);
+    }
+
+    private static Map<String, Integer> countByLanguage(List<SeriesCardDto> series) {
+        Map<String, Integer> counts = new HashMap<>();
+        for (SeriesCardDto card : series) {
+            String code = normalizeLanguageCode(card.contentLanguage());
+            counts.merge(code, 1, Integer::sum);
+        }
+        return counts;
+    }
+
+    private static List<LanguageOptionDto> toLanguageOptions(
+            List<String> eligibleCodes,
+            Map<String, Integer> seriesCountByLanguage
+    ) {
+        return eligibleCodes.stream()
+                .map(code -> {
+                    Locale language = Locale.forLanguageTag(code);
+                    String label = language.getDisplayLanguage(Locale.ENGLISH);
+                    if (label == null || label.isBlank()) {
+                        label = code;
+                    }
+                    String nativeLabel = language.getDisplayLanguage(language);
+                    if (nativeLabel == null || nativeLabel.isBlank()) {
+                        nativeLabel = label;
+                    }
+                    return new LanguageOptionDto(
+                            code,
+                            label,
+                            nativeLabel,
+                            seriesCountByLanguage.getOrDefault(code, 0)
+                    );
+                })
+                .toList();
+    }
+
+    private static String normalizeLanguageCode(String contentLanguage) {
+        if (contentLanguage == null || contentLanguage.isBlank()) {
+            return "other";
+        }
+        return contentLanguage.trim().toLowerCase(Locale.ROOT);
+    }
+
     private static ResponseStatusException notFound(String message) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
     }
 
     private static ResponseStatusException unavailable(String message) {
         return new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, message);
+    }
+
+    private record TaggedCard(UUID creatorId, SeriesCardDto card) {
     }
 }

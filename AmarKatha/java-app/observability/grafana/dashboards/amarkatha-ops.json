@@ -1,0 +1,108 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_sum{job=\"amarkatha\"}[5m]) / rate(http_server_requests_seconds_count{job=\"amarkatha\"}[5m])",
+          "legendFormat": "{{uri}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP request latency (avg)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{job=\"amarkatha\", area=\"heap\"}",
+          "legendFormat": "{{id}}",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM heap used",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count{job=\"amarkatha\", status=~\"5..\"}[5m])",
+          "legendFormat": "{{uri}} {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 5xx rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "targets": [
+        {
+          "expr": "process_uptime_seconds{job=\"amarkatha\"}",
+          "legendFormat": "uptime",
+          "refId": "A"
+        }
+      ],
+      "title": "Process uptime",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["amarkatha", "ops"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "title": "AmarKatha Ops",
+  "uid": "amarkatha-ops",
+  "version": 1
+}

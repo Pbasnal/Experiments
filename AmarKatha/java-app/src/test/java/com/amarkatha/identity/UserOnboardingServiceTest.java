@@ -46,7 +46,7 @@ class UserOnboardingServiceTest {
         when(userRepository.findByGoogleSub("sub-1")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User user = service.completeOAuthLogin(oauthUser("sub-1", "admin@amarkatha.in"), OAuthIntent.GOOGLE_AUTH, null);
+        User user = service.completeOAuthLogin(oauthUser("sub-1", "admin@amarkatha.in"), OAuthIntent.GOOGLE_AUTH, null).user();
 
         assertEquals(UserRole.ADMIN, user.getRole());
         verify(inviteService, never()).consume(any(), any());
@@ -70,7 +70,7 @@ class UserOnboardingServiceTest {
         when(userRepository.findByGoogleSub("sub-3")).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User user = service.completeOAuthLogin(oauthUser("sub-3", "admin@amarkatha.in"), OAuthIntent.CREATOR_LOGIN, null);
+        User user = service.completeOAuthLogin(oauthUser("sub-3", "admin@amarkatha.in"), OAuthIntent.CREATOR_LOGIN, null).user();
 
         assertEquals(UserRole.ADMIN, user.getRole());
     }
@@ -85,7 +85,7 @@ class UserOnboardingServiceTest {
                 oauthUser("sub-4", "creator@example.com"),
                 OAuthIntent.CREATOR_SIGNUP,
                 "invite-token"
-        );
+        ).user();
 
         assertEquals(UserRole.CREATOR, user.getRole());
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -158,13 +158,14 @@ class UserOnboardingServiceTest {
         when(userRepository.findByGoogleSub("sub-8")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User user = service.completeOAuthLogin(
+        OAuthLoginResult result = service.completeOAuthLogin(
                 oauthUser("sub-8", "reader@example.com"),
                 OAuthIntent.READER_LOGIN,
                 null
         );
 
-        assertEquals(UserRole.READER, user.getRole());
+        assertEquals(UserRole.READER, result.user().getRole());
+        org.junit.jupiter.api.Assertions.assertTrue(result.newAccount());
         verify(inviteService, never()).consume(any(), any());
     }
 
@@ -174,13 +175,14 @@ class UserOnboardingServiceTest {
         when(userRepository.findByGoogleSub("sub-9")).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User user = service.completeOAuthLogin(
+        OAuthLoginResult result = service.completeOAuthLogin(
                 oauthUser("sub-9", "creator@example.com"),
                 OAuthIntent.READER_LOGIN,
                 null
         );
 
-        assertEquals(UserRole.CREATOR, user.getRole());
+        assertEquals(UserRole.CREATOR, result.user().getRole());
+        org.junit.jupiter.api.Assertions.assertFalse(result.newAccount());
         verify(inviteService, never()).consume(any(), any());
     }
 

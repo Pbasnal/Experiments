@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +79,16 @@ public class Series {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
+
+    /** Average star rating, 0 when unset. One decimal, 0–5. */
+    @Column(nullable = false, precision = 2, scale = 1)
+    private BigDecimal rating = BigDecimal.ZERO;
+
+    @Column(name = "reader_count", nullable = false)
+    private int readerCount;
+
+    @Column(name = "editors_pick", nullable = false)
+    private boolean editorsPick;
 
     protected Series() {
     }
@@ -160,6 +172,30 @@ public class Series {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public double getRating() {
+        return rating == null ? 0 : rating.doubleValue();
+    }
+
+    public int getReaderCount() {
+        return readerCount;
+    }
+
+    public boolean isEditorsPick() {
+        return editorsPick;
+    }
+
+    public void setRating(double rating) {
+        this.rating = BigDecimal.valueOf(rating).setScale(1, RoundingMode.HALF_UP);
+    }
+
+    public void setReaderCount(int readerCount) {
+        this.readerCount = readerCount;
+    }
+
+    public void setEditorsPick(boolean editorsPick) {
+        this.editorsPick = editorsPick;
     }
 
     public void setTitle(String title) {

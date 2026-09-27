@@ -95,4 +95,28 @@ class SeriesServiceTest {
         verify(seriesRepository).save(captor.capture());
         assertEquals("New Title", captor.getValue().getTitle());
     }
+
+    @Test
+    void updateSignalsStoresRatingReadersAndEditorsPick() {
+        Series series = Series.create(UUID.randomUUID(), "demo", "Demo");
+        when(seriesRepository.findBySlug("demo")).thenReturn(Optional.of(series));
+        when(seriesRepository.save(any(Series.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Series updated = seriesService.updateSignals("demo", 4.86, 1280, true);
+
+        assertEquals(4.9, updated.getRating());
+        assertEquals(1280, updated.getReaderCount());
+        assertEquals(true, updated.isEditorsPick());
+    }
+
+    @Test
+    void updateSignalsRejectsRatingAboveFive() {
+        Series series = Series.create(UUID.randomUUID(), "demo", "Demo");
+        when(seriesRepository.findBySlug("demo")).thenReturn(Optional.of(series));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> seriesService.updateSignals("demo", 5.1, null, null)
+        );
+    }
 }

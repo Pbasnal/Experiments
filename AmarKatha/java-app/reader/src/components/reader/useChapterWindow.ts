@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { postProgress } from '../../api/engagement';
 import { fetchChapter, trackChapterView } from '../../api/home';
 import type { ChapterReader, ChapterSummary } from '../../types';
 
@@ -83,6 +84,7 @@ export function useChapterWindow({ seriesSlug, playlist, entryChapter }: Options
       if (!trackedRef.current.has(slug)) {
         trackedRef.current.add(slug);
         void trackChapterView(seriesSlug, slug);
+        void postProgress(seriesSlug, slug);
       }
     },
     [seriesSlug, syncUrl],

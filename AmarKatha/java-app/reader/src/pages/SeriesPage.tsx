@@ -1,10 +1,14 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchSeries, trackSeriesView } from '../api/home';
+import FollowButton from '../components/FollowButton';
+import SeriesSignals from '../components/SeriesSignals';
+import { useFeatures } from '../features/FeatureContext';
 import type { SeriesDetail } from '../types';
 
 export default function SeriesPage() {
   const { seriesSlug } = useParams<{ seriesSlug: string }>();
+  const { features } = useFeatures();
   const [series, setSeries] = useState<SeriesDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +117,7 @@ export default function SeriesPage() {
         <div className="series-hero-fade" aria-hidden="true" />
         <div className="series-hero-content">
           <h1 className="series-hero-title">{series.title}</h1>
+          <SeriesSignals series={series} className="hero-signals" />
           <p className="series-creator">by {series.creatorName}</p>
           <div className="series-hero-schedule">
             <strong>{series.schedule?.headline ?? 'Schedule'}</strong>
@@ -160,8 +165,11 @@ export default function SeriesPage() {
             })}
           </ul>
         </section>
-        <div className="share-actions">
-          <button type="button" className="btn btn-primary" onClick={() => void handleShare()}>
+        <div className="series-actions">
+          {features.follows && !series.viewerOwnsSeries ? (
+            <FollowButton seriesSlug={series.slug} />
+          ) : null}
+          <button type="button" className="btn btn-secondary" onClick={() => void handleShare()}>
             Share
           </button>
           {shareFeedback && (

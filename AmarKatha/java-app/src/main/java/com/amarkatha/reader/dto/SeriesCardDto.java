@@ -16,6 +16,9 @@ public record SeriesCardDto(
         ScheduleStripDto schedule,
         String status,
         Instant lastUpdatedAt,
-        int chapterCount
+        int chapterCount,
+        double rating,
+        int readerCount,
+        boolean editorsPick
 ) {
 }

@@ -16,6 +16,14 @@ services:
       timeout: 5s
       retries: 10
 
+  # Local SMTP catcher; notification emails appear at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.21
+    container_name: amarkatha-mailpit
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+
   app:
     build:
       context: .
@@ -24,6 +32,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     ports:
       - "${SERVER_PORT:-8080}:8080"
     environment:
@@ -38,8 +48,19 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-docker-dev-placeholder}
       ADMIN_BOOTSTRAP_EMAILS: ${ADMIN_BOOTSTRAP_EMAILS:-}
       AMARKATHA_CONTACT_EMAIL: ${AMARKATHA_CONTACT_EMAIL:-hello@amarkatha.in}
-      AMARKATHA_PUBLIC_BASE_URL: ${AMARKATHA_PUBLIC_BASE_URL:-}
+      # Email links need an absolute origin; defaults to the local published port.
+      AMARKATHA_PUBLIC_BASE_URL: ${AMARKATHA_PUBLIC_BASE_URL:-http://localhost:8080}
       AMARKATHA_MEDIA_ROOT: /data/media
+      # Defaults deliver to Mailpit; set SMTP_* in .env for a real provider.
+      AMARKATHA_MAIL_ENABLED: ${AMARKATHA_MAIL_ENABLED:-true}
+      AMARKATHA_MAIL_FROM: ${AMARKATHA_MAIL_FROM:-noreply@amarkatha.in}
+      AMARKATHA_READER_FEATURE_EMAIL_NOTIFICATIONS: ${AMARKATHA_READER_FEATURE_EMAIL_NOTIFICATIONS:-true}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_AUTH: ${SMTP_AUTH:-false}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-false}
     volumes:
       # Shared with local runs (AMARKATHA_MEDIA_ROOT=./data/media) so uploads are visible either way
       - ./data/media:/data/media
@@ -49,6 +70,35 @@ services:
       timeout: 5s
       retries: 12
       start_period: 90s
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: amarkatha-prometheus
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: amarkatha-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
 
 volumes:
   amarkatha_pgdata:

@@ -1,6 +1,9 @@
-package com.amarkatha.bootstrap;
+package com.amarkatha.shared.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -19,6 +22,18 @@ class AbsoluteUrlBuilderTest {
                 "https://amarkatha.example.com/read/s/demo",
                 builder.absolute(request, "/read/s/demo")
         );
+        assertTrue(builder.hasConfiguredBaseUrl());
+        assertEquals(
+                "https://amarkatha.example.com/read/s/demo/c/1",
+                builder.absolute("/read/s/demo/c/1")
+        );
+    }
+
+    @Test
+    void absoluteWithoutRequestRequiresConfiguredBase() {
+        AbsoluteUrlBuilder unset = new AbsoluteUrlBuilder("");
+        assertFalse(unset.hasConfiguredBaseUrl());
+        assertThrows(IllegalStateException.class, () -> unset.absolute("/read/profile"));
     }
 
     @Test

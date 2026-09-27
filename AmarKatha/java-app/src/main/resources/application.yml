@@ -38,6 +38,17 @@ spring:
         provider:
           google:
             issuer-uri: https://accounts.google.com
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SMTP_AUTH:true}
+          starttls:
+            enable: ${SMTP_STARTTLS:true}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -52,14 +63,22 @@ server:
         same-site: lax
 
 amarkatha:
-  # Public origin for OG tags when set (e.g. https://amarkatha.example.com). No trailing slash.
-  # Leave empty locally — AbsoluteUrlBuilder falls back to the request / forwarded headers.
+  # Public origin for OG tags / email links when set (e.g. https://amarkatha.example.com). No trailing slash.
+  # Leave empty locally — AbsoluteUrlBuilder falls back to the request / forwarded headers for HTTP;
+  # email delivery stays disabled until a public base URL is configured.
   public-base-url: ${AMARKATHA_PUBLIC_BASE_URL:}
   contact-email: ${AMARKATHA_CONTACT_EMAIL:hello@amarkatha.in}
   grievance:
     officer-name: ${AMARKATHA_GRIEVANCE_OFFICER:Founder (interim)}
   admin:
     bootstrap-emails: ${ADMIN_BOOTSTRAP_EMAILS:}
+  catalog:
+    language-filters:
+      # false always hides the strip; true still requires catalog thresholds.
+      # Local debug: enabled true, minimum-catalog-size 0, minimum-series-per-language 1.
+      enabled: true
+      minimum-catalog-size: 10
+      minimum-series-per-language: 2
   media:
     root: ${AMARKATHA_MEDIA_ROOT:./data/media}
     max-pages-per-chapter: 40
@@ -67,12 +86,38 @@ amarkatha:
     reconcile-on-startup: ${AMARKATHA_MEDIA_RECONCILE_ON_STARTUP:true}
     reconcile-schedule-enabled: ${AMARKATHA_MEDIA_RECONCILE_SCHEDULE:true}
     reconcile-interval-ms: ${AMARKATHA_MEDIA_RECONCILE_INTERVAL_MS:3600000}
+  mail:
+    # Safe default: no SMTP sends. Set true + spring.mail.* for delivery.
+    enabled: ${AMARKATHA_MAIL_ENABLED:false}
+    from: ${AMARKATHA_MAIL_FROM:noreply@amarkatha.in}
+  notifications:
+    processors-enabled: ${AMARKATHA_NOTIFICATIONS_PROCESSORS_ENABLED:true}
+    outbox-poll-interval-ms: ${AMARKATHA_NOTIFICATIONS_OUTBOX_POLL_MS:5000}
+    email-poll-interval-ms: ${AMARKATHA_NOTIFICATIONS_EMAIL_POLL_MS:10000}
+    max-attempts: 10
+    batch-size: 50
+    list-limit-default: 50
+    list-limit-max: 100
+    # Lease for PROCESSING email rows; stale claims recover to PENDING after this.
+    email-processing-lease-ms: ${AMARKATHA_NOTIFICATIONS_EMAIL_LEASE_MS:300000}
+  reader:
+    features:
+      # Staged rollout; anonymous reading stays available when these are false.
+      landing-discovery: ${AMARKATHA_READER_FEATURE_LANDING_DISCOVERY:true}
+      profile-progress: ${AMARKATHA_READER_FEATURE_PROFILE_PROGRESS:true}
+      follows: ${AMARKATHA_READER_FEATURE_FOLLOWS:true}
+      in-app-notifications: ${AMARKATHA_READER_FEATURE_IN_APP_NOTIFICATIONS:true}
+      # Defaults follow mail capability; override independently for rollback.
+      email-notifications: ${AMARKATHA_READER_FEATURE_EMAIL_NOTIFICATIONS:${AMARKATHA_MAIL_ENABLED:false}}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       show-details: when_authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}

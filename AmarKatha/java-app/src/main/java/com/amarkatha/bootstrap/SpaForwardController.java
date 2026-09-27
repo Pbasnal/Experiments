@@ -10,7 +10,8 @@ public class SpaForwardController {
             "/",
             "/read",
             "/read/profile",
-            "/profile"
+            "/profile",
+            "/creators"
     })
     public String forwardReaderSpa() {
         return "forward:/index.html";

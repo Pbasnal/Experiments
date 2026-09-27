@@ -106,6 +106,35 @@ public class SeriesService {
         return seriesRepository.save(series);
     }
 
+    /**
+     * Admin-set presentation signals. Null arguments leave the current value.
+     * Rating is 0–5 with one decimal. Reader count is zero or more.
+     */
+    @Transactional
+    public Series updateSignals(String slug, Double rating, Integer readerCount, Boolean editorsPick) {
+        if (slug == null || slug.isBlank()) {
+            throw new IllegalArgumentException("Series slug is required");
+        }
+        Series series = seriesRepository.findBySlug(slug.trim())
+                .orElseThrow(() -> new SeriesAccessException("Series not found"));
+        if (rating != null) {
+            if (rating < 0 || rating > 5) {
+                throw new IllegalArgumentException("Rating must be between 0 and 5");
+            }
+            series.setRating(Math.round(rating * 10.0) / 10.0);
+        }
+        if (readerCount != null) {
+            if (readerCount < 0) {
+                throw new IllegalArgumentException("Reader count cannot be negative");
+            }
+            series.setReaderCount(readerCount);
+        }
+        if (editorsPick != null) {
+            series.setEditorsPick(editorsPick);
+        }
+        return seriesRepository.save(series);
+    }
+
     @Transactional
     public Series uploadCover(UUID seriesId, UUID creatorId, MultipartFile file) {
         Series series = requireOwned(seriesId, creatorId);

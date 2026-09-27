@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import type { ChapterSummary } from '../../types';
+import { getFocusableElements, trapFocus } from '../../utils/focusTrap';
 
 interface ChapterJumpSheetProps {
   open: boolean;
@@ -18,23 +19,40 @@ export default function ChapterJumpSheet({
 }: ChapterJumpSheetProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) {
       return;
     }
-    closeRef.current?.focus();
+
+    returnFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const sheet = sheetRef.current;
+    const focusables = sheet ? getFocusableElements(sheet) : [];
+    (focusables[0] ?? closeRef.current)?.focus();
+
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         onClose();
       }
     }
     document.addEventListener('keydown', onKey);
+    const releaseTrap = sheet ? trapFocus(sheet) : () => {};
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+
     return () => {
       document.removeEventListener('keydown', onKey);
+      releaseTrap();
       document.body.style.overflow = prevOverflow;
+      const restore = returnFocusRef.current;
+      if (restore && typeof restore.focus === 'function') {
+        restore.focus();
+      }
+      returnFocusRef.current = null;
     };
   }, [open, onClose]);
 
@@ -45,6 +63,7 @@ export default function ChapterJumpSheet({
   return (
     <div className="chapter-jump-overlay" role="presentation" onClick={onClose}>
       <div
+        ref={sheetRef}
         className="chapter-jump-sheet"
         role="dialog"
         aria-modal="true"

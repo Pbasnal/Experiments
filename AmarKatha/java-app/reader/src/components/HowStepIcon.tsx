@@ -1,4 +1,4 @@
-type HowStepIconName = 'upload' | 'schedule' | 'share';
+type HowStepIconName = 'upload' | 'schedule' | 'share' | 'pause' | 'owned';
 
 const icons: Record<HowStepIconName, JSX.Element> = {
   upload: (
@@ -32,6 +32,23 @@ const icons: Record<HowStepIconName, JSX.Element> = {
       <circle cx="34" cy="14" r="5" fill="var(--primary-soft)" stroke="currentColor" strokeWidth="2" />
       <circle cx="34" cy="34" r="5" fill="var(--primary-soft)" stroke="currentColor" strokeWidth="2" />
       <path d="M18.5 21.5 29.5 16M18.5 26.5 29.5 32" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  pause: (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <circle cx="24" cy="24" r="16" fill="var(--primary-soft)" stroke="currentColor" strokeWidth="2" />
+      <path d="M20 17v14M28 17v14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  ),
+  owned: (
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path
+        d="M24 8 28 18h10l-8 6 3 10-9-6-9 6 3-10-8-6h10L24 8Z"
+        fill="var(--primary-soft)"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   ),
 };

@@ -23,6 +23,11 @@ export interface SeriesCard {
   status: 'ONGOING' | 'HIATUS' | 'COMPLETED';
   lastUpdatedAt: string;
   chapterCount: number;
+  /** 0 means unset — hide the stars. */
+  rating?: number;
+  /** 0 means unset — hide the reader count. */
+  readerCount?: number;
+  editorsPick?: boolean;
 }
 
 export interface ChapterSummary {
@@ -34,6 +39,8 @@ export interface ChapterSummary {
 
 export interface SeriesDetail extends SeriesCard {
   chapters: ChapterSummary[];
+  /** True when the signed-in viewer created this series. */
+  viewerOwnsSeries?: boolean;
 }
 
 export interface ChapterPage {
@@ -52,9 +59,27 @@ export interface ChapterReader {
   pages: ChapterPage[];
 }
 
+/** Anticipated home discovery option when LANGUAGE is in filters. */
+export interface LanguageOption {
+  code: string;
+  label: string;
+  nativeLabel: string;
+  seriesCount: number;
+}
+
 export interface HomeResponse {
   tagline: string;
   recentlyUpdated: SeriesCard[];
   /** @deprecated Not shown on public landing; may be omitted. */
   platformRoutes?: unknown[];
+  /**
+   * Discovery filters the backend elected to show (e.g. `['LANGUAGE']`).
+   * Absent or empty → no language strip (backward-safe).
+   */
+  filters?: string[];
+  /**
+   * Language chips when `filters` includes `LANGUAGE`.
+   * Absent → treat as no options (backward-safe).
+   */
+  languageOptions?: LanguageOption[];
 }

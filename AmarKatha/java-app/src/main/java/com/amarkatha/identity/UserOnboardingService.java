@@ -28,7 +28,7 @@ public class UserOnboardingService {
     }
 
     @Transactional
-    public User completeOAuthLogin(OAuth2User oauth2User, OAuthIntent intent, String pendingInviteToken) {
+    public OAuthLoginResult completeOAuthLogin(OAuth2User oauth2User, OAuthIntent intent, String pendingInviteToken) {
         String googleSub = oauth2User.getAttribute("sub");
         String email = oauth2User.getAttribute("email");
         String displayName = oauth2User.getAttribute("name");
@@ -40,19 +40,23 @@ public class UserOnboardingService {
         if (existing.isPresent()) {
             User user = existing.get();
             applyBootstrapAdmin(user, email);
-            return userRepository.save(user);
+            return new OAuthLoginResult(userRepository.save(user), false);
         }
 
         if (properties.admin().isBootstrapAdmin(email)) {
-            return userRepository.save(User.create(googleSub, email, displayName, UserRole.ADMIN));
+            return new OAuthLoginResult(
+                    userRepository.save(User.create(googleSub, email, displayName, UserRole.ADMIN)),
+                    true
+            );
         }
 
-        return switch (intent) {
+        User created = switch (intent) {
             case ADMIN_LOGIN -> throw new OAuthOnboardingException(OAuthOnboardingException.Reason.ADMIN_ACCESS_DENIED);
             case CREATOR_LOGIN -> throw new OAuthOnboardingException(OAuthOnboardingException.Reason.ACCOUNT_NOT_FOUND);
             case READER_LOGIN -> userRepository.save(User.create(googleSub, email, displayName, UserRole.READER));
             case GOOGLE_AUTH, CREATOR_SIGNUP -> createCreator(googleSub, email, displayName, pendingInviteToken);
         };
+        return new OAuthLoginResult(created, true);
     }
 
     private User createCreator(String googleSub, String email, String displayName, String pendingInviteToken) {

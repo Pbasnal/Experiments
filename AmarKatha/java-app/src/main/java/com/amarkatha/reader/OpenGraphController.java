@@ -1,6 +1,6 @@
 package com.amarkatha.reader;
 
-import com.amarkatha.bootstrap.AbsoluteUrlBuilder;
+import com.amarkatha.shared.web.AbsoluteUrlBuilder;
 import com.amarkatha.publishing.ChapterRepository;
 import com.amarkatha.publishing.SeriesRepository;
 import com.amarkatha.publishing.SeriesScheduleService;
