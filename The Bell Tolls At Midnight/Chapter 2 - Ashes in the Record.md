@@ -240,13 +240,13 @@ Cassius tugged off his glasses and scrubbed both hands over his face. "Saints. I
 
 Raven hooked a thumb at the bed. "That doesn't answer the charge."
 
-"Window light," Cassius said from behind his palms. "For notes. Also if Theron appears out of nowhere again, I want the option to throw myself into the street."
+"Window light," Cassius said from behind his palms. "For notes. Also if he appears out of nowhere again, I want the option to throw myself into the street."
 
 "Reasonable," Raven said. "Petty, but reasonable."
 
 She stole the chair by the same window, turned it half toward the room and half toward the shutter, and propped one boot on the sill while working a knot from her wrist bracer with her teeth.
 
-"You nearly did," she said. "When Brenn asked about prior fieldwork, you looked one breath from diving out the window and yelling that the balls of the man were haunted."
+"You nearly did dive," she said. "When Brenn asked about prior fieldwork. One breath from yelling about the man's—well. You know."
 
 Cassius lowered his hands. "That was relevant."
 
@@ -254,115 +254,140 @@ Cassius lowered his hands. "That was relevant."
 
 "Both."
 
-"To any serious discussion of haunt manifestation."
-
 Raven pulled the knot free and smiled around the leather. "There he is."
 
-Lyra set her sword belt on the table with a hard wooden thump. "If you're done arguing over furniture rights, we should decide what we're walking into tomorrow."
+Lyra's sword belt hit the table. Not hard. Just enough. She worked one gauntlet loose, then the other, and set them aside. Her eyes went around the room observing everyone out of habit—Cassius still wound tight on the bed, Raven half-joking to keep her from spinning, Elena already making herself useful at the basin.
 
-Cassius blinked at her. "How have you been this calm all day? Theron was breathing down our necks from dawn onward, and you sounded exactly like this then too."
 
-Lyra gave him a flat look. "By opening my mouth and speaking."
+Cassius sat up. "I—I think we're ready? We march during daylight on the east path to avoid combat as much as possible. We pack Soulbane at least, and whatever other oils we can find. Blessed salt to deal with the knight. Elena can hold a room till midnight." He glanced at Lyra, then Raven, then the floor. "But it's still a place none of us have walked. If you think we should rethink any of it before morning, then… we should."
 
-"You know what I mean," he said. He pushed himself upright on the bed, suddenly younger again than he'd looked all day. "If this goes badly, Theron writes us up as a failed first team, and we go back to pity work."
+Raven's boot heel tapped the sill once, then stopped. "The plan is fine. I'm not arguing with it." She tipped her head toward the shutter. "It's the road. Harbin said that stretch is bad—dogs turning on people, livestock going mad. If the town animals are already like that, what's waiting in the woods? We spent the whole evening packing for the bell and the witch and whatever's left of that knight. We haven't given the walk up there a single honest thought."
 
-Raven tipped her chair back onto two legs. "He's got a point. You and Elena are acting like we misplaced a mule, not our membership."
+Lyra didn't look surprised. She held Raven's eye a moment longer than the nod needed.
 
-Lyra began tugging off one gauntlet, then the other. "Blade at the throat first. Scar later."
+"What do you want for the woods."
 
-At the washstand, Elena folded a linen strip in half, then in half again. "There are bigger things than membership." Her gaze flicked over the room, over each of them. "The town. The missing. You know."
+"Extra enchantments on the blades," Raven said. "Not just what we're carrying for the ghosts and spirits, we need for beasts that can jump us in the woods. Harbin wasn't talking about dogs we can shoo. If something comes out of those trees, I want our weapons to be well coated and enchanted."
 
-Raven let the chair legs drop and gave a short nod.
+Elena had taken the washstand without claiming it. She ran a finger along the basin's rim, found dust, wiped it on her skirt without looking. "I've counted for spirits on that stretch ghosts, wraith residue, anything that trails a line without a body. That part's covered. We can pack bleeding oil, cinder to burn their fur, beastbane for extra damage." She continues, "I'll prepare a few magic seals for quick enchantments with keen-edge, heat metal and arrow-burst. I can also enchant one weapon with Paralyze spell or Consecration for a short duration."
 
-The room settled into work: Cassius's crystals clicked as he emptied his pockets, Elena unrolled ward-linen, Raven's boot heel tapped under the window.
+"Those sound useful," Raven said. Cassius stared at Elena. "Consecration isn't useful, Raven—it's ordained-level work. Most priests never manage a clean cast. And paralysis on living flesh? That's not Guild street magic. That's—"
 
-Lyra crossed to the shutter, cracked it two fingers, squinted at the tower through the fog, and shut it against harbor stink and distant bell-metal. "Brenn is holding something back."
+"Years," Lyra said, quiet for her. "I've watched companies buy those from specialists and still get half-failures. If you can put both on our kit, Elena, we're on par with my unit in the North."
 
-Cassius looked up, glasses hanging from two fingers. "On what grounds?"
+"I would still prefer not to cast them before we get to the witch. It would be great if we can avoid any serious conflict till midnight"
 
-"Men who give you half a map," Lyra said. "Churches included."
 
-Cassius pushed his glasses on. "His people are disappearing. I don't think he's playing games with that."
+"Long-range scout formation, then," Lyra said. "Raven on the treetops. Cassius, Elena—scrying eyes on the flanks. If something moves, we bend the path before we bend steel. I'd rather lose twenty yards than pick a fight on the slope."
 
-"Neither do I. That doesn't mean he told us everything about the tower."
+Elena turned from the basin. "If we meet her at the top and we still can't tell Wraith from Umbra—"
 
-Elena tied off a ward strip. "He meant it when he said he's coming. Whatever he's keeping, his heart is with the town."
+"We put her down," Lyra said. Flat. No apology in it. "Town's still emptying and I'm not dying on a classification error."
 
-"Or with something he thinks he can control," Lyra said.
+Cassius's mouth tightened. He didn't argue. Not yet. He pulled his notebook into his lap instead and opened it to a page already dark with ink.
 
-Cassius bent for a notebook, flipped too fast, nearly tore a page. "Fine. Hold that. Practical problem." He slid to the floor and spread notes across the boards—quick hands now, the Theron-voice gone. "Curse is pulling things toward the tower and down into town. Dates cluster on the full moon. Priests have already tried the hill. It should have weakened. It came back."
+Lyra went to the window. Cracked the shutter. Fog, and the darker shape inside it. She shut it again before the bell-metal on the wind could settle in the room.
 
-Elena crouched beside the spread. "Renews itself—or they never touched the real knot."
+"Brenn," she said to the wood.
 
-Cassius's glasses slipped. "Worse. If I can't name what she is, I can't break her. Wrong oil. Wrong hour. Wrong rite. We burn the window on a guess."
+Cassius glanced up. "What about him?"
 
-Raven's boot went still. "So we don't know what we're fighting."
+"He's not telling us everything. People will always prioritize their own skin over the good of common men." She said. "I'll bet anything that Brenn was hiding something from us. The question is, if we have enough to get the job done?"
 
-"Wraith. Cursed spirit. Umbra-grade." Cassius tapped three different pages. "Each one hates different steel. Guess wrong and midnight is wasted."
+Raven's heel stopped. Elena turned from the basin.
 
-Lyra exhaled through her nose. "Dusk is coming whether we like it or not. Moonbane, Specter if we can get it, Soulfire on my blade. Kill what walks before it kills us."
+Cassius laughed once, thin. "He spent half the evening telling us everything. Solstice. The old man who lived. The knight—"
 
-Elena's voice flattened. "Force destruction when peace was possible and the town may sleep—but the hill stays sick for decades."
+"He spent half the evening telling us how to climb," Lyra said. She stayed at the shutter. "There's a difference. Ask him about those three acolytes and watch his hands. Ask him why the files are sealed and he gives you dignity. He evaded all the questions related to church."
 
-"People are vanishing now."
+"He stood between Theron and the rest of us," Cassius said. Quieter. "He said I'd earned my seat."
 
-Elena nodded once. "Then the living first. If we have to scar the ground to keep them, we scar it."
+"And you needed to hear it." Lyra looked at him then, not unkind. "That doesn't mean he opened the whole cupboard."
 
-Cassius kept his eyes on the notes. "I'm not asking for perfect. I'm asking what she is before we turn her to ash. Wrong preparation is how the last teams died screaming."
+Elena folded her arms. "He's climbing that hill with us. If he only cared about covering the church, he'd stay in town and let us die clean. A man who takes cracked cups for payment so people don't owe him anything isn't sending strangers up there to bury a secret."
 
-Raven worried the seam of her glove. "We're not heroes for the dead. But killing the wrong thing the wrong way—" She broke off. "Turns my stomach."
+"You've never seen his cupboard," Raven said.
 
-Lyra looked at Elena.
+"I've seen his hands," Elena said. "And Harbin's face when Brenn said he was going. That wasn't a man losing a conspirator. That was a man losing a friend."
 
-"Classify first," Elena said. "If the room turns, if civilians are at risk, if we lose the fight—kill doctrine. No hesitation."
+Lyra came back to the table and rested both palms on it. "I'm not calling him a liar. I'm saying the church story has holes, and he walks around them. I want us be on gaurd around him."
 
-"Fine," Lyra said. "Your way until it isn't. Cassius—what do you need by tomorrow?"
+Raven tipped her chair onto two legs, thinking. "He wants the hill quiet. Same as Harbin. Same as us, if we're honest." A pause. "Doesn't mean I won't watch him on the stairs."
 
-"Death how. Death why. Anything that says which spirit class she fell into." He hesitated. "Pressing Brenn again might help."
+Cassius had gone pink. He muttered something that might have been agreement and bent over his notes again—pages turning, pen tapping, the rest of them half-forgotten.
 
-Elena shook her head. "Not cleanly. Not in one room. Ledgers. Burial records. Tavern mouths. Fishwives. Alchemists. Clerks who keep dates."
+Raven watched him a moment. Then, almost idle: "While we're collecting people we don't fully trust."
 
-Lyra nodded. "Investigation before we march. If you still can't give me a read by departure, we do it my way at the door. Either path—we prep oils for all three classes if the church will sell them."
+Lyra waited.
 
-Cassius answered at once. "Moonbane baseline. Specter. Soulbane if they keep any for sanctioned work. Carry one and meet another, and we've packed for a different contract."
+"Theron," Raven said. "Brenn asked him straight. Why us. Why unbadged on a hill that's eaten veterans. And Theron talked about the wraith, and the ghouls, and results." She clicked her tongue. "He never said why the Guild didn't send someone with a stamp."
 
-Raven leaned forward. "Iron shavings. Cedar smoke. Approach may already be infested if the curse is pulling things in. Ready from the town gate, not the tower door."
+Elena sat on the edge of the second bed. "Maybe there wasn't anyone. Solstice tomorrow. Badges get booked."
 
-"Shortest route before dusk," Lyra said. "Clear a room inside, ward it, rest what we can before midnight. Elena?"
+"Maybe we're cheaper," Raven said. "Probation coin. Harbin's purse is already a sad joke."
 
-"A few hours. No more. After that I wouldn't trust the ward."
+"Maybe he wanted the contract," Lyra said. She didn't like how the words tasted. "Invigilator picks the team, invigilator writes what happened after."
 
-A bell sounded outside, low and blunt through the shutters.
+Raven shrugged. "Or he meant it. We did walk out of that job."
 
-Raven tested the latch with two fingers. "Brenn asked the right question. Why send us?"
+"We did," Lyra said. "Once. But is that enough the guild to trust us?"
 
-Cassius pushed his glasses higher. "Theron answered like a man already committed. Not like a man who proved it."
+Cassius's pen had gone still. He stared at a blank margin and did not look up.
 
-Lyra paced once, rug end to rug end. "One real operation under him. One. Keep the guard up—around Theron too."
+Elena glanced at him, then back to Raven. "So what are you asking? That we turn him out? Climb without an invigilator?"
 
-Elena set salt and chalk beside the notes. "Morning. Raven: route in daylight, then town office and church archive on the way back. Cassius: library, shops, alchemist counters. I'll take Brenn. Lyra—"
+"I'm asking why the answer didn't land," Raven said. "Brenn's face. Harbin's. Mine. Even you paused, Elena. Theron didn't. That's the bit that concerns me. He was ready with an answer which didn't answer the question actually, just avoided it."
 
-"Theron and Harbin," Lyra said. "We meet back here without Theron. Compare. Decide what we tell whom."
 
-Elena's fingers closed on the salt vial. She bowed her head a fraction. "Keep them through the night." Lyra heard it, and said nothing.
+"I don't have a better theory than any of yours," Lyra said. "And I don't have time to invent one. We have to keep him. Frankly, I don't see any reason for us to be suspicious of Theron. He doesn't gain anything if this job goes sideways."
 
-The bell again. Closer—or the night thinner.
+Raven let the chair down. "I guess you are right. But I'm still going to keep an eye on him."
 
-Lyra dragged a chair from the table and sat. That did more than another speech would have.
+The quiet that settled was the tired kind. Outside, somewhere, a cart axle complained. Cassius shut his notebook.
 
-Cassius stacked two pages, then ruined them with a third sideways. "If I start spiraling in front of Brenn tomorrow, throw chalk at me."
+The sound was small. It turned every head.
 
-Raven snorted. "Happily."
+"I can't," he said.
 
-"Not the face. I need the face."
+Lyra frowned. "Can't what?"
 
-"You need a leash, mage."
+"Kill her." He stood too fast and had to catch the bedpost. "I thought I could. In the office it was oils and classes and windows. Up here it—" He gestured helplessly at the shutter, at the fog beyond it. "If the account is soft—if those files are sealed because someone did something ugly—then she might not be what they named her. She might have been wronged. And if she was, and we walk in with Soulfire because it's tidy—"
 
-"Expense list."
+He stopped. Started again, voice thinner.
 
-Elena smiled before she could stop herself. Lyra laughed once, short—blade on stone.
+"I won't be the next person who hurts her for the Church's convenience. I want to know what she is. I want to free her if she can be freed. If she can't—if she's only hate, or only the evil she chose—then we end her. But not because a ledger said she is a heretic and we were in a hurry."
 
-Outside the door, Theron stood in the dim hall with one hand on the railing, listening to their voices soften through old wood. He did not knock. After a moment, a thin smile touched his mouth, and he went down the corridor without a sound.
+Raven tipped her chair back, then slammed the front legs down. "Oh, for—"
+
+Lyra was already off the shutter. She crossed the room in three strides, palm flat on the table hard enough to rattle Cassius's ink bottle. "People are dying now. Mothers at Harbin's door. You're asking us to spare a maybe-wronged witch while the living keep vanishing."
+
+"I'm asking for a morning," Cassius said. His hands were fists at his sides, white at the knuckles. "And for us not to decide her sentence before we've looked. You all know that Brenn is hiding church's involvement. The only reason he would do so if those acolytes wronged a decent women all those years ago."
+
+Elena rose. She didn't go to him at once. She looked at Lyra first, measuring, then crossed and set two fingers against Cassius's wrist as if checking a pulse that wasn't medical.
+
+"He's not wrong about that," she said. "And he's not wrong, then wrong steel on the wrong spirit will leave a scar the town forever." A breath. "Lyra. We should listen to him, if he is right, then we would be able to finish the job cleanly and all we have to do is a bit of investigation before we head out. If we can't figure her out by then, then we kill her as planned."
+
+Lyra stared at Cassius. He stared back. For a moment he looked as if he might apologize just to end it—and then he didn't.
+
+"One morning," Lyra said. "Raven will head out to docks and get stories about the witch from locals. Elena will scout and talk to acolytes. Find them around the town, and maybe talk to shopkeepers while you are at it. Cassius, you need to go to office archives, find names, records, anything from 100 years ago about the witch and the town. I'll go and handle all the shopping and Theron. But if we don't have a conclusive answer by the time we head out, we will march to kill her." She stares at Cassius and into his soul, "Do not have any lingering doubts, doubts cause hesitation and hesitation kills."
+
+"Clear," Cassius said. The word came out unsteady. The nod after it wasn't.
+
+"And inside," Elena said, already moving to her kit, already practical again, "one room won't serve us if we want to survive till midnight. I'll make quick wards. Scrolls. They won't hold long—a few minutes when we need to breathe, bind a doorway, move on. Light enough that I can cast more than once without dying of exhaustion."
+
+
+
+Raven stretched until her shoulders cracked. "Marvelous. The academy boy grows a conscience and suddenly we're running a rescue for a woman a hundred years dead." She eyed Cassius. "Try not to look so pleased about it. It's unseemly."
+
+"I'm not pleased," Cassius said. He sat down as if someone had cut his strings. "I'm terrified."
+
+"That," Raven said, "is much more seemly."
+
+Elena's mouth softened despite herself. Lyra huffed something that might, in a kinder year, have been a laugh.
+
+A bell carried through the shutters—low, blunt, too close.
+
+Outside the door, Theron stood in the dim hall with one hand on the railing. Their voices came soft through old wood. He did not knock. After a moment, a thin smile touched his mouth, and he went down the corridor without a sound.
 
 ## Scene 3
 
@@ -370,7 +395,7 @@ The vestry smelled of wax, old linen, and cold stone.
 
 Only three candles burned. Their light clung to the low ceiling and left the corners brown with shadow. A draft worried the narrow window in its frame. In the brazier, one coal showed red through a skin of ash, like an eye half-lidded and unwilling to close.
 
-Against the far wall stood Brenn's display cupboard. It had once been meant for silver reliquaries, but no silver had survived Bell's End. Behind the warped glass, shelf after shelf held the town's small payments—hundreds of them, crowded tight: chipped cups, broken toys, buttons, gloves, river stones, scraps of lace, carved bones, bent coins, and among them, somewhere on the middle shelf, a little book with a broken spine.
+Against the far wall stood Brenn's display cupboard. It had once been meant for silver reliquaries, but it now housed items far more precious. Behind the warped glass, shelf after shelf held the town's small payments—hundreds of them, crowded tight: chipped cups, broken toys, buttons, gloves, river stones, scraps of lace, carved bones, bent coins, and among them, somewhere on the middle shelf, a little book with a broken spine.
 
 Brother Tovin had laid Father Brenn's supplies across the table and kept finding reasons to touch them. Censer. Oil. Salt. A coil of silver chain. Three bundles of ward tapers tied with red thread.
 
