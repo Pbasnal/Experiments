@@ -1,5 +1,14 @@
-import { useCallback, useEffect, useId, useRef, useState, type TouchEvent } from 'react';
-import { Link } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type MouseEvent,
+  type TouchEvent,
+} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchReadTarget } from '../api/engagement';
 import type { SeriesCard } from '../types';
 import CoverImage from './CoverImage';
 import SeriesSignals from './SeriesSignals';
@@ -19,7 +28,9 @@ function langLabel(code: string): string {
  * slide chooser buttons with aria-current.
  */
 export default function HeroCarousel({ slides }: HeroCarouselProps) {
+  const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const [resolvingReadTarget, setResolvingReadTarget] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const labelId = useId();
   const multi = slides.length > 1;
@@ -53,6 +64,17 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
     touchStartX.current = null;
     if (Math.abs(delta) < SWIPE_THRESHOLD_PX) return;
     go(delta < 0 ? index + 1 : index - 1);
+  }
+
+  async function onRead(e: MouseEvent<HTMLAnchorElement>) {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    if (resolvingReadTarget) return;
+    setResolvingReadTarget(true);
+    const href = await fetchReadTarget(slide.slug);
+    navigate(href);
   }
 
   return (
@@ -107,8 +129,13 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               ) : null}
             </p>
             <div className="landing-actions">
-              <Link to={`/read/s/${slide.slug}`} className="btn btn-primary">
-                Read
+              <Link
+                to={`/read/s/${slide.slug}`}
+                className="btn btn-primary"
+                onClick={onRead}
+                aria-busy={resolvingReadTarget}
+              >
+                {resolvingReadTarget ? 'Opening…' : 'Read'}
               </Link>
               <a href="#stories" className="btn btn-secondary">
                 Browse stories

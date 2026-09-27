@@ -10,4 +10,9 @@ public class BusinessConfig {
     HomeDiscoveryPolicy homeDiscoveryPolicy() {
         return new HomeDiscoveryPolicy();
     }
+
+    @Bean
+    ReadingEntryPolicy readingEntryPolicy() {
+        return new ReadingEntryPolicy();
+    }
 }

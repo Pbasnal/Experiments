@@ -23,27 +23,27 @@ const HOW_STEPS = [
   {
     name: 'upload',
     title: 'Upload chapters',
-    body: 'Drop page images, publish when ready.',
+    body: 'Pages to publish.',
   },
   {
     name: 'schedule',
     title: 'Set your rhythm',
-    body: 'Weekly or custom days. Skip a slot or pause on hiatus.',
+    body: 'Weekly or custom.',
   },
   {
     name: 'share',
     title: 'Share the link',
-    body: 'Readers see the next update and come back after a skip.',
+    body: 'One link to read.',
   },
   {
     name: 'pause',
     title: 'Skip and hiatus',
-    body: 'Skip a slot or pause. Readers see the next expected update.',
+    body: 'Pause with clarity.',
   },
   {
     name: 'owned',
     title: 'Creator-owned',
-    body: 'You made it, you keep it. A platform, not a publisher.',
+    body: 'Your work. Your rights.',
   },
 ] as const;
 
@@ -236,8 +236,7 @@ export default function HomePage() {
                 <p className="section-kicker">How it works</p>
                 <h2 id="how-heading">Your story deserves to be read</h2>
                 <p className="creator-pitch-message">
-                  Amar Katha is built for writers, artists, and storytellers from every corner of
-                  India. Publish in your language, find your audience, keep your rights.
+                  Publish in your language. Find your readers. Keep your rights.
                 </p>
               </div>
               <a href="/creator/signup" className="btn btn-ink">

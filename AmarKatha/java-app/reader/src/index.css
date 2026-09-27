@@ -637,13 +637,14 @@ main {
 }
 
 .hero-slide-cover-wrap {
-  display: none;
+  display: flex;
   justify-content: center;
+  order: -1;
 }
 
 .hero-slide-cover {
   position: relative;
-  width: min(100%, 22rem);
+  width: min(62vw, 15rem);
   aspect-ratio: 3 / 4;
   background: var(--smoke);
   overflow: hidden;
@@ -717,6 +718,11 @@ main {
 
   .hero-slide-cover-wrap {
     display: flex;
+    order: initial;
+  }
+
+  .hero-slide-cover {
+    width: min(100%, 22rem);
   }
 }
 
@@ -1122,14 +1128,13 @@ main {
 
 /* —— Creator pitch under the hero —— */
 .creator-pitch {
-  padding: 1.75rem 0 1.5rem;
+  padding: 1.5rem 0;
+  background: var(--saffron);
   border-bottom: 1px solid var(--smoke);
 }
 
 .creator-pitch-panel {
-  padding-top: 1.25rem;
-  padding-bottom: 1.35rem;
-  background: var(--saffron);
+  background: transparent;
   color: var(--ink);
 }
 

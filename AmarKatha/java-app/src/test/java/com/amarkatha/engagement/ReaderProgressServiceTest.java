@@ -7,6 +7,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.amarkatha.business.ReadingEntryInput;
+import com.amarkatha.business.ReadingEntryInstruction;
+import com.amarkatha.business.ReadingEntryPolicy;
 import com.amarkatha.engagement.domain.ReaderProgress;
 import com.amarkatha.engagement.dto.ProgressUpdateRequest;
 import com.amarkatha.engagement.dto.ReaderProgressDto;
@@ -36,6 +39,8 @@ class ReaderProgressServiceTest {
     private SeriesRepository seriesRepository;
     @Mock
     private ChapterRepository chapterRepository;
+    @Mock
+    private ReadingEntryPolicy readingEntryPolicy;
 
     @InjectMocks
     private ReaderProgressService readerProgressService;
@@ -97,5 +102,35 @@ class ReaderProgressServiceTest {
                 () -> readerProgressService.recordRead(userId, new ProgressUpdateRequest(" ", "ch-1"))
         );
         verify(seriesRepository, never()).findBySlug(any());
+    }
+
+    @Test
+    void readTargetResumesLastPublishedChapter() {
+        ReaderProgress progress = ReaderProgress.create(userId, series.getId(), chapter.getId());
+        when(seriesRepository.findBySlug("demo-series")).thenReturn(Optional.of(series));
+        when(readerProgressRepository.findByUserIdAndSeriesId(userId, series.getId()))
+                .thenReturn(Optional.of(progress));
+        when(chapterRepository.findById(chapter.getId())).thenReturn(Optional.of(chapter));
+        when(readingEntryPolicy.decide(new ReadingEntryInput(true)))
+                .thenReturn(ReadingEntryInstruction.RESUME_LAST_CHAPTER);
+
+        var target = readerProgressService.readTarget(userId, "demo-series");
+
+        assertEquals("/read/s/demo-series/c/ch-1", target.href());
+        assertEquals(true, target.resumed());
+    }
+
+    @Test
+    void readTargetOpensSeriesForFirstVisit() {
+        when(seriesRepository.findBySlug("demo-series")).thenReturn(Optional.of(series));
+        when(readerProgressRepository.findByUserIdAndSeriesId(userId, series.getId()))
+                .thenReturn(Optional.empty());
+        when(readingEntryPolicy.decide(new ReadingEntryInput(false)))
+                .thenReturn(ReadingEntryInstruction.OPEN_SERIES);
+
+        var target = readerProgressService.readTarget(userId, "demo-series");
+
+        assertEquals("/read/s/demo-series", target.href());
+        assertEquals(false, target.resumed());
     }
 }

@@ -147,6 +147,25 @@ export async function fetchMyProgress(): Promise<ReaderProgress[]> {
   return res.json();
 }
 
+export async function fetchReadTarget(seriesSlug: string): Promise<string> {
+  const fallback = `/read/s/${seriesSlug}`;
+  try {
+    const res = await fetch(
+      `/api/reader/v1/series/${encodeURIComponent(seriesSlug)}/read-target`,
+      { credentials: 'same-origin' },
+    );
+    if (!res.ok) {
+      return fallback;
+    }
+    const body = (await res.json()) as { href?: unknown };
+    return typeof body.href === 'string' && body.href.startsWith('/read/s/')
+      ? body.href
+      : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function fetchMyFollowing(): Promise<FollowedSeries[]> {
   const res = await fetch('/api/reader/v1/me/following', { credentials: 'same-origin' });
   if (res.status === 401 || res.status === 403) {

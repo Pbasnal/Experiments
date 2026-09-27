@@ -1,7 +1,11 @@
 package com.amarkatha.engagement;
 
+import com.amarkatha.business.ReadingEntryInput;
+import com.amarkatha.business.ReadingEntryInstruction;
+import com.amarkatha.business.ReadingEntryPolicy;
 import com.amarkatha.engagement.domain.ReaderProgress;
 import com.amarkatha.engagement.dto.ProgressUpdateRequest;
+import com.amarkatha.engagement.dto.ReadTargetDto;
 import com.amarkatha.engagement.dto.ReaderProgressDto;
 import com.amarkatha.publishing.ChapterRepository;
 import com.amarkatha.publishing.SeriesCoverPresentation;
@@ -24,15 +28,18 @@ public class ReaderProgressService {
     private final ReaderProgressRepository readerProgressRepository;
     private final SeriesRepository seriesRepository;
     private final ChapterRepository chapterRepository;
+    private final ReadingEntryPolicy readingEntryPolicy;
 
     public ReaderProgressService(
             ReaderProgressRepository readerProgressRepository,
             SeriesRepository seriesRepository,
-            ChapterRepository chapterRepository
+            ChapterRepository chapterRepository,
+            ReadingEntryPolicy readingEntryPolicy
     ) {
         this.readerProgressRepository = readerProgressRepository;
         this.seriesRepository = seriesRepository;
         this.chapterRepository = chapterRepository;
+        this.readingEntryPolicy = readingEntryPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +85,30 @@ public class ReaderProgressService {
         progress.markRead(chapter.getId(), now);
         readerProgressRepository.save(progress);
         return toDto(series, chapter, now);
+    }
+
+    @Transactional(readOnly = true)
+    public ReadTargetDto readTarget(UUID userId, String seriesSlug) {
+        Series series = seriesRepository.findBySlug(seriesSlug)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Series not found"));
+
+        Chapter lastChapter = userId == null
+                ? null
+                : readerProgressRepository.findByUserIdAndSeriesId(userId, series.getId())
+                        .flatMap(progress -> chapterRepository.findById(progress.getLastChapterId()))
+                        .filter(chapter -> chapter.getSeriesId().equals(series.getId()))
+                        .filter(chapter -> chapter.getState() == ChapterState.PUBLISHED)
+                        .filter(chapter -> chapter.getListedAt() != null)
+                        .orElse(null);
+
+        ReadingEntryInstruction instruction = readingEntryPolicy.decide(
+                new ReadingEntryInput(lastChapter != null)
+        );
+        String seriesPath = "/read/s/" + series.getSlug();
+        if (instruction == ReadingEntryInstruction.RESUME_LAST_CHAPTER) {
+            return new ReadTargetDto(seriesPath + "/c/" + lastChapter.getSlug(), true);
+        }
+        return new ReadTargetDto(seriesPath, false);
     }
 
     private static ReaderProgressDto toDto(Series series, Chapter chapter, Instant lastReadAt) {

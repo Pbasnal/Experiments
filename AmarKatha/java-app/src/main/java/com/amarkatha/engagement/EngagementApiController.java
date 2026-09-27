@@ -10,6 +10,7 @@ import com.amarkatha.engagement.dto.NotificationPreferenceUpdateRequest;
 import com.amarkatha.engagement.dto.PendingFollowDto;
 import com.amarkatha.engagement.dto.ProgressUpdateRequest;
 import com.amarkatha.engagement.dto.ReadAllResponse;
+import com.amarkatha.engagement.dto.ReadTargetDto;
 import com.amarkatha.engagement.dto.ReaderPortalSummaryDto;
 import com.amarkatha.engagement.dto.ReaderProgressDto;
 import com.amarkatha.engagement.dto.UnreadCountDto;
@@ -185,6 +186,15 @@ public class EngagementApiController {
     ) {
         UUID userId = principal == null ? null : principal.getId();
         return seriesFollowService.followState(userId, slug);
+    }
+
+    @GetMapping("/series/{slug}/read-target")
+    public ReadTargetDto readTarget(
+            @PathVariable String slug,
+            @AuthenticationPrincipal AmarKathaPrincipal principal
+    ) {
+        UUID userId = principal == null ? null : principal.getId();
+        return readerProgressService.readTarget(userId, slug);
     }
 
     @PostMapping("/series/{slug}/follow")
