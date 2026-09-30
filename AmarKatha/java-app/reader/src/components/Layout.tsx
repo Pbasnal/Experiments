@@ -138,6 +138,11 @@ export default function Layout({ children }: LayoutProps) {
             </span>
             <span className="brand-text">AmarKatha</span>
           </Link>
+          {auth?.authenticated && auth.demoMode ? (
+            <a href="/admin/profile" className="demo-badge">
+              Demo data
+            </a>
+          ) : null}
 
           <nav className="site-nav" aria-label="Main">
             <Link

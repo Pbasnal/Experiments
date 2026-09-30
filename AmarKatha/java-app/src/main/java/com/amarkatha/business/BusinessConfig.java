@@ -15,4 +15,9 @@ public class BusinessConfig {
     ReadingEntryPolicy readingEntryPolicy() {
         return new ReadingEntryPolicy();
     }
+
+    @Bean
+    ExperienceSourcePolicy experienceSourcePolicy() {
+        return new ExperienceSourcePolicy();
+    }
 }

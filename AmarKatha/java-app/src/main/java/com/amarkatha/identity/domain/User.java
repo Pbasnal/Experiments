@@ -36,6 +36,10 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
+    /** Admin-only preview flag. Other roles are ignored by ExperienceSourcePolicy. */
+    @Column(name = "demo_mode", nullable = false)
+    private boolean demoMode;
+
     protected User() {
     }
 
@@ -83,5 +87,13 @@ public class User {
 
     public void setLocale(String locale) {
         this.locale = locale;
+    }
+
+    public boolean isDemoMode() {
+        return demoMode;
+    }
+
+    public void setDemoMode(boolean demoMode) {
+        this.demoMode = demoMode;
     }
 }

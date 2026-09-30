@@ -143,10 +143,9 @@ class ModuleArchitectureTest {
                         "com.amarkatha.admin..",
                         "com.amarkatha.media..",
                         "com.amarkatha.catalog..",
-                        "com.amarkatha.business..",
                         "com.amarkatha.payments..",
                         "com.amarkatha.bootstrap..")
-                .because("engagement depends on shared, publishing, identity, outbox, analytics");
+                .because("engagement depends on shared, publishing, identity, outbox, analytics, business");
         rule.check(classes);
     }
 }

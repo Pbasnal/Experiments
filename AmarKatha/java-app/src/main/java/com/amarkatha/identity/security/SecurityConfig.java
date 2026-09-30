@@ -1,5 +1,7 @@
 package com.amarkatha.identity.security;
 
+import com.amarkatha.identity.UserRepository;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -27,11 +30,24 @@ public class SecurityConfig {
     }
 
     @Bean
+    DemoModeSignalFilter demoModeSignalFilter(UserRepository userRepository) {
+        return new DemoModeSignalFilter(userRepository);
+    }
+
+    @Bean
+    FilterRegistrationBean<DemoModeSignalFilter> demoModeSignalFilterRegistration(DemoModeSignalFilter filter) {
+        FilterRegistrationBean<DemoModeSignalFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             OAuthInviteGateFilter oauthInviteGateFilter,
             AmarKathaOAuth2SuccessHandler successHandler,
-            SecurityContextRepository securityContextRepository
+            SecurityContextRepository securityContextRepository,
+            DemoModeSignalFilter demoModeSignalFilter
     ) throws Exception {
         http
                 .securityContext(context -> context.securityContextRepository(securityContextRepository))
@@ -88,7 +104,8 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("SESSION", "JSESSIONID")
                 )
-                .addFilterBefore(oauthInviteGateFilter, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
+                .addFilterBefore(oauthInviteGateFilter, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class)
+                .addFilterAfter(demoModeSignalFilter, SecurityContextHolderFilter.class);
         return http.build();
     }
 }

@@ -3,6 +3,7 @@ export type AuthUser = {
   email: string;
   displayName: string;
   role: 'ADMIN' | 'CREATOR' | 'READER';
+  demoMode?: boolean;
 };
 
 export type AuthMeResponse =

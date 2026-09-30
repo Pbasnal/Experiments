@@ -316,6 +316,19 @@ a {
   gap: 0.75rem;
 }
 
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--saffron);
+  color: var(--saffron);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
 .auth-email {
   font-size: 0.875rem;
   color: var(--mist);

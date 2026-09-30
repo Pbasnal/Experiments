@@ -20,11 +20,31 @@
         <p><strong>Name:</strong> <span th:text="${displayName}">Admin</span></p>
         <p><strong>Email:</strong> <span th:text="${adminEmail}">admin@example.com</span></p>
         <p><strong>Role:</strong> <span th:text="${role}">ADMIN</span></p>
-        <p class="muted" style="margin-top: 1rem;">More profile settings coming soon.</p>
-        <div class="actions" style="margin-top: 1.25rem;">
-            <a th:href="@{/admin}" class="btn btn-secondary">Back to dashboard</a>
-            <a href="/" class="btn btn-secondary">Reader site</a>
-        </div>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <div class="card">
+        <h2>Demo preview</h2>
+        <p class="muted">Fill the reader site with sample comics, ratings, follows, and notifications. Your live catalog stays untouched.</p>
+        <form th:action="@{/admin/profile/demo}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label style="display:flex; gap:0.6rem; align-items:flex-start; margin: 1rem 0;">
+                <input type="checkbox" name="demoMode" value="true" th:checked="${demoMode}" style="margin-top:0.2rem;">
+                <span>
+                    <strong>Preview demo experience</strong><br>
+                    <span class="muted">Show sample content on the reader site for this admin account.</span>
+                </span>
+            </label>
+            <div class="actions">
+                <button type="submit" class="btn">Save</button>
+                <a href="/" class="btn btn-secondary">Open reader site</a>
+            </div>
+        </form>
+        <form th:action="@{/admin/profile/demo/reset}" method="post" style="margin-top: 0.75rem;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="btn btn-secondary">Reset demo data</button>
+        </form>
     </div>
 </main>
 </body>

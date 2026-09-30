@@ -5,6 +5,9 @@ import com.amarkatha.identity.UserRepository;
 import com.amarkatha.identity.domain.InviteToken;
 import com.amarkatha.identity.domain.User;
 import com.amarkatha.identity.security.AmarKathaPrincipal;
+import com.amarkatha.shared.demo.DemoPreviewState;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -57,11 +61,42 @@ public class AdminInviteController {
 
     @GetMapping("/profile")
     public String profile(Model model, @AuthenticationPrincipal AmarKathaPrincipal principal) {
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         model.addAttribute("navActive", "profile");
         model.addAttribute("adminEmail", principal.getEmail());
         model.addAttribute("displayName", principal.getDisplayName());
         model.addAttribute("role", principal.getRole().name());
+        model.addAttribute("demoMode", user.isDemoMode());
         return "admin/profile";
+    }
+
+    @PostMapping("/profile/demo")
+    public String updateDemoMode(
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam(value = "demoMode", defaultValue = "false") boolean demoMode,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        user.setDemoMode(demoMode);
+        userRepository.save(user);
+        if (!demoMode) {
+            DemoPreviewState.clear(session);
+        }
+        redirectAttributes.addFlashAttribute(
+                "success",
+                demoMode ? "Demo preview is on." : "Demo preview is off. Live data is showing."
+        );
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping("/profile/demo/reset")
+    public String resetDemoPreview(HttpSession session, RedirectAttributes redirectAttributes) {
+        DemoPreviewState.clear(session);
+        redirectAttributes.addFlashAttribute("success", "Demo preview reset to the sample library.");
+        return "redirect:/admin/profile";
     }
 
     @PostMapping("/invites")

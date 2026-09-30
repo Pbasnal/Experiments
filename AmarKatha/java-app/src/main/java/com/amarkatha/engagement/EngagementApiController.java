@@ -1,5 +1,6 @@
 package com.amarkatha.engagement;
 
+import com.amarkatha.business.ExperienceSourcePolicy;
 import com.amarkatha.engagement.dto.FollowStateDto;
 import com.amarkatha.engagement.dto.FollowedSeriesDto;
 import com.amarkatha.engagement.dto.MarkReadResponse;
@@ -18,6 +19,7 @@ import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.identity.security.AuthSessionKeys;
 import com.amarkatha.identity.security.SafeReturnPath;
 import com.amarkatha.shared.ReaderFeatureGate;
+import com.amarkatha.shared.demo.DemoModeSignals;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -46,26 +48,38 @@ public class EngagementApiController {
     private final ReaderProgressService readerProgressService;
     private final ReaderNotificationService readerNotificationService;
     private final NotificationPreferenceService notificationPreferenceService;
+    private final DemoEngagementService demoEngagementService;
     private final ReaderFeatureGate readerFeatureGate;
+    private final ExperienceSourcePolicy experienceSourcePolicy;
 
     public EngagementApiController(
             SeriesFollowService seriesFollowService,
             ReaderProgressService readerProgressService,
             ReaderNotificationService readerNotificationService,
             NotificationPreferenceService notificationPreferenceService,
-            ReaderFeatureGate readerFeatureGate
+            DemoEngagementService demoEngagementService,
+            ReaderFeatureGate readerFeatureGate,
+            ExperienceSourcePolicy experienceSourcePolicy
     ) {
         this.seriesFollowService = seriesFollowService;
         this.readerProgressService = readerProgressService;
         this.readerNotificationService = readerNotificationService;
         this.notificationPreferenceService = notificationPreferenceService;
+        this.demoEngagementService = demoEngagementService;
         this.readerFeatureGate = readerFeatureGate;
+        this.experienceSourcePolicy = experienceSourcePolicy;
     }
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
-    public ReaderPortalSummaryDto portalSummary(@AuthenticationPrincipal AmarKathaPrincipal principal) {
+    public ReaderPortalSummaryDto portalSummary(
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
         readerFeatureGate.requireProfileProgress();
+        if (demo(request)) {
+            return demoEngagementService.portal(principal, request.getSession());
+        }
         UUID userId = requireUser(principal);
         List<ReaderProgressDto> progress = readerProgressService.listProgress(userId);
         List<FollowedSeriesDto> following = seriesFollowService.listFollowing(userId);
@@ -81,15 +95,27 @@ public class EngagementApiController {
 
     @GetMapping("/me/following")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
-    public List<FollowedSeriesDto> following(@AuthenticationPrincipal AmarKathaPrincipal principal) {
+    public List<FollowedSeriesDto> following(
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
         readerFeatureGate.requireFollows();
+        if (demo(request)) {
+            return demoEngagementService.following(request.getSession());
+        }
         return seriesFollowService.listFollowing(requireUser(principal));
     }
 
     @GetMapping("/me/progress")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
-    public List<ReaderProgressDto> progress(@AuthenticationPrincipal AmarKathaPrincipal principal) {
+    public List<ReaderProgressDto> progress(
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
         readerFeatureGate.requireProfileProgress();
+        if (demo(request)) {
+            return demoEngagementService.progress(request.getSession());
+        }
         return readerProgressService.listProgress(requireUser(principal));
     }
 
@@ -97,9 +123,19 @@ public class EngagementApiController {
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
     public ReaderProgressDto updateProgress(
             @AuthenticationPrincipal AmarKathaPrincipal principal,
-            @RequestBody ProgressUpdateRequest body
+            @RequestBody ProgressUpdateRequest body,
+            HttpServletRequest request
     ) {
         readerFeatureGate.requireProfileProgress();
+        if (demo(request)) {
+            if (body == null || body.seriesSlug() == null || body.chapterSlug() == null) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "seriesSlug and chapterSlug required"
+                );
+            }
+            return demoEngagementService.recordRead(body.seriesSlug(), body.chapterSlug(), request.getSession());
+        }
         return readerProgressService.recordRead(requireUser(principal), body);
     }
 
@@ -107,14 +143,24 @@ public class EngagementApiController {
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
     public NotificationListResponse notifications(
             @AuthenticationPrincipal AmarKathaPrincipal principal,
-            @RequestParam(required = false) Integer limit
+            @RequestParam(required = false) Integer limit,
+            HttpServletRequest request
     ) {
+        if (demo(request)) {
+            return demoEngagementService.notifications(request.getSession(), limit);
+        }
         return readerNotificationService.list(requireUser(principal), limit);
     }
 
     @GetMapping("/me/notifications/unread-count")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
-    public UnreadCountDto unreadCount(@AuthenticationPrincipal AmarKathaPrincipal principal) {
+    public UnreadCountDto unreadCount(
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
+        if (demo(request)) {
+            return demoEngagementService.unread(request.getSession());
+        }
         return readerNotificationService.unread(requireUser(principal));
     }
 
@@ -126,6 +172,9 @@ public class EngagementApiController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        if (demo(request)) {
+            return demoEngagementService.markRead(id, request.getSession());
+        }
         return readerNotificationService.markRead(requireUser(principal), id, request, response);
     }
 
@@ -136,14 +185,21 @@ public class EngagementApiController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        if (demo(request)) {
+            return demoEngagementService.markAllRead(request.getSession());
+        }
         return readerNotificationService.markAllRead(requireUser(principal), request, response);
     }
 
     @GetMapping("/me/notification-preferences")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
     public NotificationPreferenceDto notificationPreferences(
-            @AuthenticationPrincipal AmarKathaPrincipal principal
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
     ) {
+        if (demo(request)) {
+            return demoEngagementService.preferences(request.getSession());
+        }
         return notificationPreferenceService.getPreferences(requireUser(principal));
     }
 
@@ -151,17 +207,25 @@ public class EngagementApiController {
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
     public NotificationPreferenceDto updateNotificationPreferences(
             @AuthenticationPrincipal AmarKathaPrincipal principal,
-            @RequestBody NotificationPreferenceUpdateRequest body
+            @RequestBody NotificationPreferenceUpdateRequest body,
+            HttpServletRequest request
     ) {
+        if (demo(request)) {
+            return demoEngagementService.updatePreferences(body, request.getSession());
+        }
         return notificationPreferenceService.updatePreferences(requireUser(principal), body);
     }
 
     @GetMapping("/me/notification-capabilities")
     @PreAuthorize("hasAnyRole('READER','CREATOR','ADMIN')")
     public NotificationCapabilitiesDto notificationCapabilities(
-            @AuthenticationPrincipal AmarKathaPrincipal principal
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
     ) {
         requireUser(principal);
+        if (demo(request)) {
+            return demoEngagementService.capabilities();
+        }
         return notificationPreferenceService.capabilities();
     }
 
@@ -182,17 +246,25 @@ public class EngagementApiController {
     @GetMapping("/series/{slug}/follow")
     public FollowStateDto followState(
             @PathVariable String slug,
-            @AuthenticationPrincipal AmarKathaPrincipal principal
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
     ) {
         UUID userId = principal == null ? null : principal.getId();
+        if (demo(request)) {
+            return demoEngagementService.followState(slug, request.getSession());
+        }
         return seriesFollowService.followState(userId, slug);
     }
 
     @GetMapping("/series/{slug}/read-target")
     public ReadTargetDto readTarget(
             @PathVariable String slug,
-            @AuthenticationPrincipal AmarKathaPrincipal principal
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
     ) {
+        if (demo(request)) {
+            return demoEngagementService.readTarget(slug, request.getSession());
+        }
         UUID userId = principal == null ? null : principal.getId();
         return readerProgressService.readTarget(userId, slug);
     }
@@ -206,6 +278,9 @@ public class EngagementApiController {
             HttpServletResponse response,
             HttpSession session
     ) {
+        if (demo(request)) {
+            return demoEngagementService.follow(slug, session);
+        }
         FollowStateDto state = seriesFollowService.follow(requireUser(principal), slug, request, response);
         clearPendingFollowIfMatches(session, slug);
         return state;
@@ -219,6 +294,9 @@ public class EngagementApiController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        if (demo(request)) {
+            return demoEngagementService.unfollow(slug, request.getSession());
+        }
         return seriesFollowService.unfollow(requireUser(principal), slug, request, response);
     }
 
@@ -248,5 +326,9 @@ public class EngagementApiController {
             );
         }
         return principal.getId();
+    }
+
+    private boolean demo(HttpServletRequest request) {
+        return experienceSourcePolicy.demo(DemoModeSignals.admin(request), DemoModeSignals.requested(request));
     }
 }
