@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Chapter editor · ' + ${series.title}">Chapter editor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
-    <th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
+<th:block th:replace="~{fragments/creator-layout :: styles}"></th:block>
     <style>
         .page-grid {
             display: grid;
@@ -60,7 +57,7 @@
             padding: 0.25rem 0.35rem;
             border: 1px solid var(--border);
             border-radius: 0.35rem;
-            background: var(--card, #fffcf7);
+            background: var(--ink);
             cursor: pointer;
             color: var(--text);
         }
@@ -70,9 +67,9 @@
         }
         .page-thumb .reorder button.is-danger {
             flex-basis: 100%;
-            color: #b91c1c;
-            border-color: #fecaca;
-            background: #fef2f2;
+            color: var(--error-text);
+            border-color: rgba(240, 168, 160, 0.45);
+            background: var(--error-bg);
         }
         .pending-empty {
             display: none;

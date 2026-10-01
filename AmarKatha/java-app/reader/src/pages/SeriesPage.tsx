@@ -97,13 +97,15 @@ export default function SeriesPage() {
     }
   }
 
+  const firstChapter = series.chapters[0];
+
   return (
     <div className="series-page">
       <Link to="/" className="back-link">
-        ← All series
+        ← Stories
       </Link>
       <header
-        className={`series-hero${series.coverUrl ? ' has-cover' : ''}`}
+        className={`series-hero panel-border${series.coverUrl ? ' has-cover' : ''}`}
         style={series.coverUrl ? undefined : { background: series.coverGradient }}
       >
         {series.coverUrl && (
@@ -116,6 +118,7 @@ export default function SeriesPage() {
         )}
         <div className="series-hero-fade" aria-hidden="true" />
         <div className="series-hero-content">
+          <p className="section-kicker series-hero-kicker">Series</p>
           <h1 className="series-hero-title">{series.title}</h1>
           <SeriesSignals series={series} className="hero-signals" />
           <p className="series-creator">by {series.creatorName}</p>
@@ -134,6 +137,27 @@ export default function SeriesPage() {
           {series.description && (
             <p className="series-hero-desc">{series.description}</p>
           )}
+          <div className="series-hero-actions">
+            {firstChapter ? (
+              <Link
+                to={`/read/s/${series.slug}/c/${firstChapter.slug}`}
+                className="btn btn-primary"
+              >
+                Start reading
+              </Link>
+            ) : null}
+            {features.follows && !series.viewerOwnsSeries ? (
+              <FollowButton seriesSlug={series.slug} />
+            ) : null}
+            <button type="button" className="btn btn-secondary" onClick={() => void handleShare()}>
+              Share
+            </button>
+            {shareFeedback && (
+              <span className="share-feedback" role="status">
+                {shareFeedback}
+              </span>
+            )}
+          </div>
         </div>
       </header>
       <div className="series-content">
@@ -147,9 +171,10 @@ export default function SeriesPage() {
           </div>
         )}
         <section className="chapter-list-preview">
+          <p className="section-kicker">Episodes</p>
           <h2>Chapters</h2>
           <p className="muted">{series.chapterCount} listed chapter{series.chapterCount === 1 ? '' : 's'}</p>
-          <ul>
+          <ul className="chapter-panel-list">
             {series.chapters.map((chapter) => {
               const title =
                 chapter.title?.trim() ||
@@ -165,19 +190,6 @@ export default function SeriesPage() {
             })}
           </ul>
         </section>
-        <div className="series-actions">
-          {features.follows && !series.viewerOwnsSeries ? (
-            <FollowButton seriesSlug={series.slug} />
-          ) : null}
-          <button type="button" className="btn btn-secondary" onClick={() => void handleShare()}>
-            Share
-          </button>
-          {shareFeedback && (
-            <span className="share-feedback" role="status">
-              {shareFeedback}
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );

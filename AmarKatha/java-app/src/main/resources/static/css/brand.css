@@ -1,0 +1,230 @@
+/**
+ * Shared AmarKatha / Ripple brand tokens.
+ * Used by Thymeleaf auth, creator, admin, and legal shells.
+ * Keep in sync with reader/src/index.css :root.
+ */
+:root {
+  --ink: #0f0d0a;
+  --paper: #f5f0e8;
+  --saffron: #e8860a;
+  --turmeric: #c9600a;
+  --smoke: #1c1a16;
+  --ash: #2e2b25;
+  --mist: #6b6558;
+  --primary: #e8860a;
+  --primary-hover: #c9600a;
+  --primary-dark: #c9600a;
+  --primary-soft: rgba(232, 134, 10, 0.16);
+  --bg: #0f0d0a;
+  --card: #1c1a16;
+  --text: #f5f0e8;
+  --text-secondary: #a39e93;
+  --muted: #6b6558;
+  --border: #2e2b25;
+  --radius: 2px;
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  --font-sans: 'Work Sans', system-ui, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-script: 'Tiro Devanagari Hindi', serif;
+  --error-bg: rgba(185, 28, 28, 0.22);
+  --error-text: #f0a8a0;
+  --success-bg: rgba(4, 120, 87, 0.22);
+  --success-text: #6ee7b7;
+  --warn-bg: rgba(180, 83, 9, 0.22);
+  --warn-text: #fdba74;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--saffron);
+}
+
+.logo {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--paper);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.logo:hover {
+  color: var(--saffron);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.15rem;
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 2.75rem;
+}
+
+.btn-primary {
+  background: var(--saffron);
+  color: var(--ink);
+}
+
+.btn-primary:hover {
+  background: var(--turmeric);
+  color: var(--ink);
+}
+
+.btn-primary:disabled,
+.btn-primary.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--saffron);
+  color: var(--saffron);
+}
+
+.btn-google {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--paper);
+  width: 100%;
+}
+
+.btn-google:hover {
+  background: #fff;
+  border-color: var(--saffron);
+  color: var(--ink);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid rgba(240, 168, 160, 0.35);
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid rgba(110, 231, 183, 0.35);
+}
+
+.alert-warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid rgba(253, 186, 116, 0.35);
+}
+
+.section-kicker {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--saffron);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+.muted,
+.subtitle,
+.meta,
+.hint,
+.empty {
+  color: var(--mist);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(232, 134, 10, 0.45);
+  border-color: var(--saffron);
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -179,14 +179,18 @@ function ChapterReaderSession({
   return (
     <div className="chapter-reader">
       <header className="chapter-reader-header">
-        <Link to={`/read/s/${seriesSlug}`} className="back-link">
-          ← {seriesTitle}
-        </Link>
-        {activeMeta && (
-          <p className="chapter-reader-active">
-            Reading Ch. {formatChapterNumber(activeMeta.chapterNumber)}
-          </p>
-        )}
+        <div className="chapter-reader-header-inner">
+          <Link to={`/read/s/${seriesSlug}`} className="back-link">
+            ← {seriesTitle}
+          </Link>
+          {activeMeta && (
+            <p className="chapter-reader-active">
+              <span className="section-kicker">Reading</span>
+              Ch. {formatChapterNumber(activeMeta.chapterNumber)}
+              {activeMeta.title?.trim() ? ` · ${activeMeta.title.trim()}` : ''}
+            </p>
+          )}
+        </div>
       </header>
 
       <button

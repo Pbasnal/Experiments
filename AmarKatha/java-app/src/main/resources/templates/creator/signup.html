@@ -10,12 +10,15 @@
 <nav class="nav">
     <a href="/" class="logo">AmarKatha</a>
     <div class="nav-links">
-        <a href="/">Reader</a>
+        <a href="/">Stories</a>
+        <a href="/login">Sign in</a>
     </div>
 </nav>
 <main>
     <div class="card">
-        <h1>Sign up</h1>
+        <p class="section-kicker">Invite only</p>
+        <h1>Creator sign up</h1>
+        <p class="subtitle">Publishing is invite-only. Enter your code, then continue with Google.</p>
 
         <div class="alert alert-error" th:if="${errorCode == 'invite_required'}">
             Enter an invite code to continue.

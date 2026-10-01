@@ -7,7 +7,8 @@
 target
 reader/node_modules
 reader/dist
-src/main/resources/static
+src/main/resources/static/index.html
+src/main/resources/static/assets
 docs
 **/.DS_Store
 **/agent-transcripts
