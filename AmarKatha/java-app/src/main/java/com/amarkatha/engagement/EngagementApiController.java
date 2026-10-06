@@ -20,6 +20,7 @@ import com.amarkatha.identity.security.AuthSessionKeys;
 import com.amarkatha.identity.security.SafeReturnPath;
 import com.amarkatha.shared.ReaderFeatureGate;
 import com.amarkatha.shared.demo.DemoModeSignals;
+import com.amarkatha.shared.glimpse.ImageReactionState;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,6 +52,7 @@ public class EngagementApiController {
     private final DemoEngagementService demoEngagementService;
     private final ReaderFeatureGate readerFeatureGate;
     private final ExperienceSourcePolicy experienceSourcePolicy;
+    private final GlimpseReactionService glimpseReactionService;
 
     public EngagementApiController(
             SeriesFollowService seriesFollowService,
@@ -59,7 +61,8 @@ public class EngagementApiController {
             NotificationPreferenceService notificationPreferenceService,
             DemoEngagementService demoEngagementService,
             ReaderFeatureGate readerFeatureGate,
-            ExperienceSourcePolicy experienceSourcePolicy
+            ExperienceSourcePolicy experienceSourcePolicy,
+            GlimpseReactionService glimpseReactionService
     ) {
         this.seriesFollowService = seriesFollowService;
         this.readerProgressService = readerProgressService;
@@ -68,6 +71,7 @@ public class EngagementApiController {
         this.demoEngagementService = demoEngagementService;
         this.readerFeatureGate = readerFeatureGate;
         this.experienceSourcePolicy = experienceSourcePolicy;
+        this.glimpseReactionService = glimpseReactionService;
     }
 
     @GetMapping("/me")
@@ -298,6 +302,32 @@ public class EngagementApiController {
             return demoEngagementService.unfollow(slug, request.getSession());
         }
         return seriesFollowService.unfollow(requireUser(principal), slug, request, response);
+    }
+
+    @PostMapping("/glimpses/{glimpseId}/images/{imageId}/reaction")
+    public ImageReactionState reactToGlimpseImage(
+            @PathVariable UUID glimpseId,
+            @PathVariable UUID imageId,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
+        if (demo(request)) {
+            return demoEngagementService.reactToGlimpse(glimpseId, imageId, request.getSession());
+        }
+        return glimpseReactionService.react(requireUser(principal), glimpseId, imageId);
+    }
+
+    @DeleteMapping("/glimpses/{glimpseId}/images/{imageId}/reaction")
+    public ImageReactionState clearGlimpseReaction(
+            @PathVariable UUID glimpseId,
+            @PathVariable UUID imageId,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            HttpServletRequest request
+    ) {
+        if (demo(request)) {
+            return demoEngagementService.clearGlimpseReaction(glimpseId, imageId, request.getSession());
+        }
+        return glimpseReactionService.clear(requireUser(principal), glimpseId, imageId);
     }
 
     private static String readPendingFollowSlug(HttpSession session) {

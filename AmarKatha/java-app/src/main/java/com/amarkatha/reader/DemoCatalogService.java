@@ -8,6 +8,8 @@ import com.amarkatha.catalog.LanguageFilterProperties;
 import com.amarkatha.reader.dto.ChapterPageDto;
 import com.amarkatha.reader.dto.ChapterReaderDto;
 import com.amarkatha.reader.dto.ChapterSummaryDto;
+import com.amarkatha.reader.dto.GlimpseDto;
+import com.amarkatha.reader.dto.GlimpseImageDto;
 import com.amarkatha.reader.dto.HomeResponse;
 import com.amarkatha.reader.dto.LanguageOptionDto;
 import com.amarkatha.reader.dto.ScheduleStripDto;
@@ -15,7 +17,10 @@ import com.amarkatha.reader.dto.SeriesCardDto;
 import com.amarkatha.reader.dto.SeriesDetailDto;
 import com.amarkatha.shared.demo.DemoLibrary;
 import com.amarkatha.shared.demo.DemoLibrary.DemoChapter;
+import com.amarkatha.shared.demo.DemoLibrary.DemoGlimpse;
+import com.amarkatha.shared.demo.DemoLibrary.DemoGlimpseImage;
 import com.amarkatha.shared.demo.DemoLibrary.DemoStory;
+import com.amarkatha.shared.demo.DemoPreviewState;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -69,7 +74,12 @@ public class DemoCatalogService {
     }
 
     public SeriesDetailDto series(String slug) {
+        return series(slug, new DemoPreviewState());
+    }
+
+    public SeriesDetailDto series(String slug, DemoPreviewState state) {
         DemoStory story = requireStory(slug);
+        DemoPreviewState reactions = state == null ? new DemoPreviewState() : state;
         List<ChapterSummaryDto> chapters = story.chapters().stream()
                 .map(chapter -> new ChapterSummaryDto(
                         chapter.slug(),
@@ -77,6 +87,9 @@ public class DemoCatalogService {
                         chapter.number(),
                         agoDays(chapter.listedDaysAgo())
                 ))
+                .toList();
+        List<GlimpseDto> glimpses = DemoLibrary.glimpsesFor(story.slug()).stream()
+                .map(glimpse -> toGlimpse(glimpse, reactions))
                 .toList();
         SeriesCardDto card = card(story);
         return new SeriesDetailDto(
@@ -97,8 +110,22 @@ public class DemoCatalogService {
                 false,
                 card.rating(),
                 card.readerCount(),
-                card.editorsPick()
+                card.editorsPick(),
+                glimpses
         );
+    }
+
+    private static GlimpseDto toGlimpse(DemoGlimpse glimpse, DemoPreviewState state) {
+        List<GlimpseImageDto> images = glimpse.images().stream()
+                .map(image -> toImage(image, state))
+                .toList();
+        return new GlimpseDto(glimpse.id(), glimpse.tag(), agoDays(glimpse.postedDaysAgo()), images);
+    }
+
+    private static GlimpseImageDto toImage(DemoGlimpseImage image, DemoPreviewState state) {
+        boolean reacted = state.glimpseReacted(image.id());
+        long count = image.reactionCount() + (reacted ? 1 : 0);
+        return new GlimpseImageDto(image.id(), image.url(), image.sortOrder(), count, reacted);
     }
 
     public ChapterReaderDto chapter(String seriesSlug, String chapterSlug) {

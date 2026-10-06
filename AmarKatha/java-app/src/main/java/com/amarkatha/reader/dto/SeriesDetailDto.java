@@ -21,6 +21,7 @@ public record SeriesDetailDto(
         boolean viewerOwnsSeries,
         double rating,
         int readerCount,
-        boolean editorsPick
+        boolean editorsPick,
+        List<GlimpseDto> glimpses
 ) {
 }

@@ -18,6 +18,17 @@ public final class DemoLibrary {
     public static final UUID NOTICE_PLATFORM = UUID.fromString("6f1c0b10-7a11-4c2e-9a10-000000000002");
     public static final UUID NOTICE_PAPER = UUID.fromString("6f1c0b10-7a11-4c2e-9a10-000000000003");
     public static final UUID NOTICE_SALT = UUID.fromString("6f1c0b10-7a11-4c2e-9a10-000000000004");
+    public static final UUID NOTICE_GLIMPSE = UUID.fromString("6f1c0b10-7a11-4c2e-9a10-000000000005");
+
+    public static final UUID GLIMPSE_MONSOON_CHARACTER = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000001");
+    public static final UUID GLIMPSE_MONSOON_CHAR_1 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000002");
+    public static final UUID GLIMPSE_MONSOON_CHAR_2 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000003");
+    public static final UUID GLIMPSE_MONSOON_CHAR_3 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000004");
+    public static final UUID GLIMPSE_MONSOON_TEASER = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000011");
+    public static final UUID GLIMPSE_MONSOON_TEASE_1 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000012");
+    public static final UUID GLIMPSE_MONSOON_TEASE_2 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000013");
+    public static final UUID GLIMPSE_SALT_LORE = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000021");
+    public static final UUID GLIMPSE_SALT_LORE_1 = UUID.fromString("6f1c0b10-7a11-4c2e-9a20-000000000022");
 
     private static final List<DemoStory> STORIES = List.of(
             story("monsoon-market", "Monsoon Market", "Meera Iyer",
@@ -72,13 +83,31 @@ public final class DemoLibrary {
 
     private static final List<DemoNotice> NOTICES = List.of(
             new DemoNotice(NOTICE_MONSOON, "monsoon-market", "chapter-4",
-                    "New chapter: Monsoon Market", "Chapter 4 is ready to read.", 2, true),
+                    "New chapter: Monsoon Market", "Chapter 4 is ready to read.", 2, true, null),
+            new DemoNotice(NOTICE_GLIMPSE, "monsoon-market", null,
+                    "New glimpse: Monsoon Market", "Meera shared a character turnaround.", 6, true,
+                    GLIMPSE_MONSOON_CHARACTER),
             new DemoNotice(NOTICE_PLATFORM, "platform-three", "chapter-4",
-                    "New chapter: Platform Three", "Asha Raman published Chapter 4.", 20, true),
+                    "New chapter: Platform Three", "Asha Raman published Chapter 4.", 20, true, null),
             new DemoNotice(NOTICE_PAPER, "paper-boats", "chapter-3",
-                    "New chapter: Paper Boats", "Chapter 3 went out on Wednesday.", 50, false),
+                    "New chapter: Paper Boats", "Chapter 3 went out on Wednesday.", 50, false, null),
             new DemoNotice(NOTICE_SALT, "salt-and-saffron", "chapter-4",
-                    "New chapter: Salt and Saffron", "The Sunday chapter is up.", 80, false)
+                    "New chapter: Salt and Saffron", "The Sunday chapter is up.", 80, false, null)
+    );
+
+    private static final List<DemoGlimpse> GLIMPSES = List.of(
+            new DemoGlimpse(GLIMPSE_MONSOON_CHARACTER, "monsoon-market", "CHARACTER", 18, List.of(
+                    new DemoGlimpseImage(GLIMPSE_MONSOON_CHAR_1, "/demo/glimpses/monsoon-character-1.svg", 1, 18),
+                    new DemoGlimpseImage(GLIMPSE_MONSOON_CHAR_2, "/demo/glimpses/monsoon-character-2.svg", 2, 7),
+                    new DemoGlimpseImage(GLIMPSE_MONSOON_CHAR_3, "/demo/glimpses/monsoon-character-3.svg", 3, 3)
+            )),
+            new DemoGlimpse(GLIMPSE_MONSOON_TEASER, "monsoon-market", "TEASER", 10, List.of(
+                    new DemoGlimpseImage(GLIMPSE_MONSOON_TEASE_1, "/demo/glimpses/monsoon-teaser-1.svg", 1, 4),
+                    new DemoGlimpseImage(GLIMPSE_MONSOON_TEASE_2, "/demo/glimpses/monsoon-teaser-2.svg", 2, 1)
+            )),
+            new DemoGlimpse(GLIMPSE_SALT_LORE, "salt-and-saffron", "LORE", 4, List.of(
+                    new DemoGlimpseImage(GLIMPSE_SALT_LORE_1, "/demo/glimpses/salt-lore.svg", 1, 2)
+            ))
     );
 
     private DemoLibrary() {
@@ -101,6 +130,21 @@ public final class DemoLibrary {
 
     public static Optional<DemoNotice> notice(UUID id) {
         return NOTICES.stream().filter(notice -> notice.id().equals(id)).findFirst();
+    }
+
+    public static List<DemoGlimpse> glimpsesFor(String slug) {
+        if (slug == null) {
+            return List.of();
+        }
+        return GLIMPSES.stream().filter(glimpse -> glimpse.seriesSlug().equalsIgnoreCase(slug.trim())).toList();
+    }
+
+    public static Optional<DemoGlimpseImage> glimpseImage(UUID glimpseId, UUID imageId) {
+        return GLIMPSES.stream()
+                .filter(glimpse -> glimpse.id().equals(glimpseId))
+                .flatMap(glimpse -> glimpse.images().stream())
+                .filter(image -> image.id().equals(imageId))
+                .findFirst();
     }
 
     private static DemoStory story(
@@ -194,7 +238,20 @@ public final class DemoLibrary {
             String title,
             String message,
             int ageHours,
-            boolean unreadByDefault
+            boolean unreadByDefault,
+            UUID glimpseId
     ) {
+    }
+
+    public record DemoGlimpse(
+            UUID id,
+            String seriesSlug,
+            String tag,
+            int postedDaysAgo,
+            List<DemoGlimpseImage> images
+    ) {
+    }
+
+    public record DemoGlimpseImage(UUID id, String url, int sortOrder, long reactionCount) {
     }
 }

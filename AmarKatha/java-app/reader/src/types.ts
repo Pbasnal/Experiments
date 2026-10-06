@@ -37,10 +37,28 @@ export interface ChapterSummary {
   listedAt: string | null;
 }
 
+export type GlimpseTag = 'CHARACTER' | 'BACKGROUND' | 'LORE' | 'ITEMS' | 'TEASER';
+
+export interface GlimpseImage {
+  id: string;
+  url: string;
+  sortOrder: number;
+  reactionCount: number;
+  reacted: boolean;
+}
+
+export interface Glimpse {
+  id: string;
+  tag: GlimpseTag;
+  postedAt: string;
+  images: GlimpseImage[];
+}
+
 export interface SeriesDetail extends SeriesCard {
   chapters: ChapterSummary[];
   /** True when the signed-in viewer created this series. */
   viewerOwnsSeries?: boolean;
+  glimpses?: Glimpse[];
 }
 
 export interface ChapterPage {

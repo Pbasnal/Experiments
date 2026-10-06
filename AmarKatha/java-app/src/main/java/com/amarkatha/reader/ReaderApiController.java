@@ -7,6 +7,7 @@ import com.amarkatha.reader.dto.ReaderFeaturesDto;
 import com.amarkatha.reader.dto.SeriesDetailDto;
 import com.amarkatha.shared.ReaderFeatureGate;
 import com.amarkatha.shared.demo.DemoModeSignals;
+import com.amarkatha.shared.demo.DemoPreviewState;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class ReaderApiController {
     @GetMapping("/series/{slug}")
     public SeriesDetailDto series(@PathVariable String slug, HttpServletRequest request) {
         if (demo(request)) {
-            return demoCatalogService.series(slug);
+            return demoCatalogService.series(slug, DemoPreviewState.from(request.getSession()));
         }
         return readerCatalogService.seriesBySlug(slug, viewerId(request));
     }

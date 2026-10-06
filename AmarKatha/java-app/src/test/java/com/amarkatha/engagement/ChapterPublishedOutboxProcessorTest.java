@@ -349,6 +349,60 @@ class ChapterPublishedOutboxProcessorTest {
         assertFalse(body.contains("Read it here: /read/"));
     }
 
+    @Test
+    void processNotifiesAFollowerOnceAndSkipsTheSeriesCreatorForAGlimpse() {
+        UUID seriesId = UUID.randomUUID();
+        UUID glimpseId = UUID.randomUUID();
+        UUID creatorId = UUID.randomUUID();
+        UUID readerId = UUID.randomUUID();
+
+        Map<String, Object> glimpsePayload = new HashMap<>();
+        glimpsePayload.put("seriesId", seriesId.toString());
+        glimpsePayload.put("glimpseId", glimpseId.toString());
+        glimpsePayload.put("seriesSlug", "monsoon-market");
+        glimpsePayload.put("seriesTitle", "Monsoon Market");
+        glimpsePayload.put("tag", "CHARACTER");
+        glimpsePayload.put("postedAt", Instant.now().toString());
+
+        DomainEventOutbox event = DomainEventOutbox.pending(
+                DomainEventTypes.GLIMPSE_PUBLISHED,
+                "glimpse",
+                glimpseId,
+                DomainEventTypes.GLIMPSE_PUBLISHED + ":" + glimpseId,
+                glimpsePayload
+        );
+        when(outboxRepository.findTop50ByStatusAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
+                eq(OutboxEventStatus.PENDING), any(Instant.class)
+        )).thenReturn(List.of(event));
+        when(outboxRepository.claimPending(event.getId())).thenReturn(1);
+        when(outboxRepository.findById(event.getId())).thenReturn(Optional.of(event));
+        when(seriesRepository.findById(seriesId)).thenReturn(Optional.of(
+                Series.create(creatorId, "monsoon-market", "Monsoon Market")
+        ));
+        when(seriesFollowRepository.findBySeriesId(seriesId)).thenReturn(List.of(
+                SeriesFollow.create(creatorId, seriesId),
+                SeriesFollow.create(readerId, seriesId)
+        ));
+        when(preferenceService.resolve(readerId)).thenReturn(NotificationPreference.defaults(readerId));
+        when(notificationRepository.findByUserIdAndTypeAndGlimpseId(any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(notificationRepository.save(any(ReaderNotification.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        int processed = processor.processPendingBatch();
+
+        assertEquals(1, processed);
+        ArgumentCaptor<ReaderNotification> notificationCaptor = ArgumentCaptor.forClass(ReaderNotification.class);
+        verify(notificationRepository, times(1)).save(notificationCaptor.capture());
+        ReaderNotification saved = notificationCaptor.getValue();
+        assertEquals(readerId, saved.getUserId());
+        assertEquals(ReaderNotification.TYPE_GLIMPSE_PUBLISHED, saved.getType());
+        assertEquals(glimpseId, saved.getGlimpseId());
+        assertEquals(null, saved.getChapterId());
+        assertTrue(saved.getHref().contains("#glimpse-" + glimpseId));
+        verify(preferenceService, never()).resolve(creatorId);
+        verify(emailDeliveryRepository, never()).save(any());
+    }
+
     private static Map<String, Object> payload(UUID seriesId, UUID chapterId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("seriesId", seriesId.toString());

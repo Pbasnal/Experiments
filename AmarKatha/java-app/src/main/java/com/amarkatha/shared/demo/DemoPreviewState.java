@@ -28,6 +28,7 @@ public final class DemoPreviewState implements Serializable {
     private Boolean inAppNewChapter;
     private Boolean emailNewChapter;
     private Boolean emailProductUpdates;
+    private Set<UUID> reactedGlimpseImages = new LinkedHashSet<>();
 
     public static DemoPreviewState from(HttpSession session) {
         if (session == null) {
@@ -102,6 +103,21 @@ public final class DemoPreviewState implements Serializable {
 
     public boolean emailProductUpdates(boolean defaultValue) {
         return emailProductUpdates == null ? defaultValue : emailProductUpdates;
+    }
+
+    public boolean glimpseReacted(UUID imageId) {
+        return reactedGlimpseImages != null && reactedGlimpseImages.contains(imageId);
+    }
+
+    public void setGlimpseReaction(UUID imageId, boolean reacted) {
+        if (reactedGlimpseImages == null) {
+            reactedGlimpseImages = new LinkedHashSet<>();
+        }
+        if (reacted) {
+            reactedGlimpseImages.add(imageId);
+        } else {
+            reactedGlimpseImages.remove(imageId);
+        }
     }
 
     public void updatePreferences(Boolean inApp, Boolean emailChapter, Boolean emailProduct) {

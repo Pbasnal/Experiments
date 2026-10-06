@@ -118,6 +118,10 @@ public class ChapterPublishedOutboxProcessor {
     }
 
     private void processClaimed(DomainEventOutbox event) {
+        if (DomainEventTypes.GLIMPSE_PUBLISHED.equals(event.getEventType())) {
+            processGlimpse(event);
+            return;
+        }
         if (!DomainEventTypes.CHAPTER_PUBLISHED.equals(event.getEventType())) {
             return;
         }
@@ -165,6 +169,131 @@ public class ChapterPublishedOutboxProcessor {
                 queueEmail(follow.getUserId(), notification, seriesTitle, chapterTitle, href);
             }
         }
+    }
+
+    private void processGlimpse(DomainEventOutbox event) {
+        Map<String, Object> payload = event.getPayload();
+        UUID seriesId = uuid(payload.get("seriesId"));
+        UUID glimpseId = uuid(payload.get("glimpseId"));
+        String seriesSlug = string(payload.get("seriesSlug"));
+        String seriesTitle = string(payload.get("seriesTitle"));
+        String href = "/read/s/" + seriesSlug + "#glimpse-" + glimpseId;
+        String title = seriesTitle + " — new glimpse";
+        String message = "A new glimpse is up.";
+
+        UUID creatorId = seriesRepository.findById(seriesId).map(Series::getCreatorId).orElse(null);
+        List<SeriesFollow> followers = seriesFollowRepository.findBySeriesId(seriesId);
+        for (SeriesFollow follow : followers) {
+            if (creatorId != null && creatorId.equals(follow.getUserId())) {
+                continue;
+            }
+            NotificationPreference preference = preferenceService.resolve(follow.getUserId());
+            boolean wantInApp = preference.isInAppNewChapter() && readerFeatureGate.inAppNotificationsEnabled();
+            boolean wantEmail = preference.isEmailNewChapter()
+                    && readerFeatureGate.emailNotificationsEnabled(mailSender.isEnabled());
+            if (!wantInApp && !wantEmail) {
+                continue;
+            }
+            ReaderNotification notification = ensureGlimpseNotification(
+                    follow.getUserId(),
+                    seriesId,
+                    glimpseId,
+                    title,
+                    message,
+                    href,
+                    wantInApp
+            );
+            if (notification == null) {
+                continue;
+            }
+            if (wantEmail) {
+                queueGlimpseEmail(follow.getUserId(), notification, seriesTitle, href);
+            }
+        }
+    }
+
+    private ReaderNotification ensureGlimpseNotification(
+            UUID userId,
+            UUID seriesId,
+            UUID glimpseId,
+            String title,
+            String message,
+            String href,
+            boolean inAppVisible
+    ) {
+        Optional<ReaderNotification> existing = notificationRepository.findByUserIdAndTypeAndGlimpseId(
+                userId,
+                ReaderNotification.TYPE_GLIMPSE_PUBLISHED,
+                glimpseId
+        );
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        try {
+            ReaderNotification created = notificationRepository.save(ReaderNotification.glimpsePublished(
+                    userId,
+                    seriesId,
+                    glimpseId,
+                    title,
+                    message,
+                    href,
+                    inAppVisible
+            ));
+            metrics.notificationCreated();
+            return created;
+        } catch (DataIntegrityViolationException ignored) {
+            return notificationRepository.findByUserIdAndTypeAndGlimpseId(
+                    userId,
+                    ReaderNotification.TYPE_GLIMPSE_PUBLISHED,
+                    glimpseId
+            ).orElse(null);
+        }
+    }
+
+    private void queueGlimpseEmail(
+            UUID userId,
+            ReaderNotification notification,
+            String seriesTitle,
+            String href
+    ) {
+        String dedupeKey = "EMAIL:" + ReaderNotification.TYPE_GLIMPSE_PUBLISHED + ":" + userId + ":"
+                + notification.getGlimpseId();
+        if (emailDeliveryRepository.findByDedupeKey(dedupeKey).isPresent()) {
+            return;
+        }
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+            return;
+        }
+        String subject = "New glimpse: " + seriesTitle;
+        String absoluteHref = absoluteUrlBuilder.absolute(href);
+        String absolutePrefs = absoluteUrlBuilder.absolute("/read/profile");
+        String body = buildGlimpseEmailBody(seriesTitle, absoluteHref, absolutePrefs, productName());
+        try {
+            emailDeliveryRepository.save(NotificationEmailDelivery.pending(
+                    userId,
+                    notification.getId(),
+                    dedupeKey,
+                    user.getEmail(),
+                    subject,
+                    body
+            ));
+            metrics.emailQueued();
+        } catch (DataIntegrityViolationException ignored) {
+            // concurrent queue
+        }
+    }
+
+    static String buildGlimpseEmailBody(
+            String seriesTitle,
+            String absoluteHref,
+            String absolutePrefsHref,
+            String productName
+    ) {
+        String name = productName == null || productName.isBlank() ? APP_NAME_FALLBACK : productName;
+        return "A new glimpse of " + seriesTitle + " is now available on " + name + ".\n\n"
+                + "See it here: " + absoluteHref + "\n\n"
+                + "Manage email preferences: " + absolutePrefsHref + "\n";
     }
 
     private ReaderNotification ensureNotification(

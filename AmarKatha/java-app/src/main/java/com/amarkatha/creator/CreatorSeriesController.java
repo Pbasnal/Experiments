@@ -3,6 +3,8 @@ package com.amarkatha.creator;
 import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.publishing.ChapterException;
 import com.amarkatha.publishing.ChapterService;
+import com.amarkatha.publishing.GlimpseException;
+import com.amarkatha.publishing.GlimpseService;
 import com.amarkatha.publishing.OngoingSeriesCapExceededException;
 import com.amarkatha.publishing.ScheduleServiceException;
 import com.amarkatha.publishing.SeriesAccessException;
@@ -12,10 +14,13 @@ import com.amarkatha.publishing.SeriesService;
 import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.scheduling.ScheduleCalendar;
 import com.amarkatha.scheduling.ScheduleStripView;
+import com.amarkatha.publishing.domain.Glimpse;
+import com.amarkatha.publishing.domain.GlimpseImage;
 import java.time.DateTimeException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -34,19 +39,24 @@ public class CreatorSeriesController {
 
     private static final DateTimeFormatter NEXT_EXPECTED_FMT =
             DateTimeFormatter.ofPattern("EEE, d MMM yyyy 'at' h a").withLocale(Locale.ENGLISH);
+    private static final DateTimeFormatter POSTED_FMT =
+            DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a").withLocale(Locale.ENGLISH);
 
     private final SeriesService seriesService;
     private final ChapterService chapterService;
     private final SeriesScheduleService seriesScheduleService;
+    private final GlimpseService glimpseService;
 
     public CreatorSeriesController(
             SeriesService seriesService,
             ChapterService chapterService,
-            SeriesScheduleService seriesScheduleService
+            SeriesScheduleService seriesScheduleService,
+            GlimpseService glimpseService
     ) {
         this.seriesService = seriesService;
         this.chapterService = chapterService;
         this.seriesScheduleService = seriesScheduleService;
+        this.glimpseService = glimpseService;
     }
 
     @GetMapping({"", "/"})
@@ -122,6 +132,18 @@ public class CreatorSeriesController {
         model.addAttribute("user", principal);
         model.addAttribute("series", series);
         model.addAttribute("chapters", chapterService.listForSeries(id, principal.getId()));
+        List<Glimpse> glimpses = glimpseService.listForSeries(id, principal.getId());
+        Map<UUID, List<GlimpseImage>> imagesByGlimpse = glimpseService.imagesByGlimpse(glimpses);
+        model.addAttribute("glimpses", glimpses.stream()
+                .map(glimpse -> new CreatorGlimpseView(
+                        glimpse.getId(),
+                        tagLabel(glimpse.getTag()),
+                        POSTED_FMT.format(glimpse.getPostedAt().atZone(ScheduleCalendar.IST)),
+                        imagesByGlimpse.getOrDefault(glimpse.getId(), List.of()).stream()
+                                .map(image -> "/media/" + image.getStorageKey())
+                                .toList()
+                ))
+                .toList());
         model.addAttribute("scheduleStrip", strip);
         model.addAttribute("promptCadence", seriesScheduleService.shouldPromptCadence(id, principal.getId()));
         model.addAttribute("nextExpectedLabel", formatNextExpected(series));
@@ -259,6 +281,49 @@ public class CreatorSeriesController {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/glimpses")
+    public String publishGlimpse(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            @RequestParam String tag,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "copyrightAck", required = false) String copyrightAck,
+            RedirectAttributes redirectAttributes
+    ) {
+        boolean ack = "true".equalsIgnoreCase(copyrightAck) || "on".equalsIgnoreCase(copyrightAck);
+        try {
+            glimpseService.publish(id, principal.getId(), tag, images, ack);
+            redirectAttributes.addFlashAttribute("success", "Quick update posted.");
+        } catch (GlimpseException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    @PostMapping("/{id}/glimpses/{glimpseId}/delete")
+    public String deleteGlimpse(
+            @PathVariable UUID id,
+            @PathVariable UUID glimpseId,
+            @AuthenticationPrincipal AmarKathaPrincipal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            glimpseService.delete(id, glimpseId, principal.getId());
+            redirectAttributes.addFlashAttribute("success", "Quick update deleted.");
+        } catch (GlimpseException | SeriesAccessException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/creator/series/" + id;
+    }
+
+    private static String tagLabel(String tag) {
+        if (tag == null || tag.isBlank()) {
+            return "";
+        }
+        String lower = tag.toLowerCase(Locale.ROOT);
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
     private static String formatNextExpected(Series series) {

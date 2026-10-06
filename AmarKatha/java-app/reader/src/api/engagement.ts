@@ -376,6 +376,29 @@ export function readerLoginWithFollowIntent(seriesSlug: string, returnTo?: strin
   return `/login/reader?${params.toString()}`;
 }
 
+export type GlimpseReaction = {
+  count: number;
+  reacted: boolean;
+};
+
+export async function setGlimpseReaction(
+  glimpseId: string,
+  imageId: string,
+  reacted: boolean,
+): Promise<GlimpseReaction> {
+  const res = await fetch(
+    `/api/reader/v1/glimpses/${encodeURIComponent(glimpseId)}/images/${encodeURIComponent(imageId)}/reaction`,
+    { method: reacted ? 'POST' : 'DELETE', credentials: 'same-origin' },
+  );
+  if (res.status === 401 || res.status === 403) {
+    throw new EngagementAuthError();
+  }
+  if (!res.ok) {
+    throw new Error(await readApiError(res, `Could not update reaction (${res.status})`));
+  }
+  return res.json();
+}
+
 export function readerLoginWithReturn(returnTo: string): string {
   const params = new URLSearchParams();
   params.set('returnTo', returnTo);

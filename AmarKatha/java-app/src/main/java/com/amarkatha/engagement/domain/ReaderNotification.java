@@ -12,6 +12,7 @@ import java.util.UUID;
 public class ReaderNotification {
 
     public static final String TYPE_CHAPTER_PUBLISHED = "CHAPTER_PUBLISHED";
+    public static final String TYPE_GLIMPSE_PUBLISHED = "GLIMPSE_PUBLISHED";
 
     @Id
     private UUID id;
@@ -25,8 +26,11 @@ public class ReaderNotification {
     @Column(name = "series_id", nullable = false)
     private UUID seriesId;
 
-    @Column(name = "chapter_id", nullable = false)
+    @Column(name = "chapter_id")
     private UUID chapterId;
+
+    @Column(name = "glimpse_id")
+    private UUID glimpseId;
 
     @Column(nullable = false, length = 500)
     private String title;
@@ -72,6 +76,29 @@ public class ReaderNotification {
         return notification;
     }
 
+    public static ReaderNotification glimpsePublished(
+            UUID userId,
+            UUID seriesId,
+            UUID glimpseId,
+            String title,
+            String message,
+            String href,
+            boolean inAppVisible
+    ) {
+        ReaderNotification notification = new ReaderNotification();
+        notification.id = UUID.randomUUID();
+        notification.userId = userId;
+        notification.type = TYPE_GLIMPSE_PUBLISHED;
+        notification.seriesId = seriesId;
+        notification.glimpseId = glimpseId;
+        notification.title = title;
+        notification.message = message;
+        notification.href = href;
+        notification.inAppVisible = inAppVisible;
+        notification.createdAt = Instant.now();
+        return notification;
+    }
+
     public void markRead(Instant now) {
         if (this.readAt == null) {
             this.readAt = now;
@@ -96,6 +123,10 @@ public class ReaderNotification {
 
     public UUID getChapterId() {
         return chapterId;
+    }
+
+    public UUID getGlimpseId() {
+        return glimpseId;
     }
 
     public String getTitle() {

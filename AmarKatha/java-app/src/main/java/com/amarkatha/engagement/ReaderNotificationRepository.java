@@ -20,6 +20,8 @@ public interface ReaderNotificationRepository extends JpaRepository<ReaderNotifi
 
     Optional<ReaderNotification> findByUserIdAndTypeAndChapterId(UUID userId, String type, UUID chapterId);
 
+    Optional<ReaderNotification> findByUserIdAndTypeAndGlimpseId(UUID userId, String type, UUID glimpseId);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             update ReaderNotification n

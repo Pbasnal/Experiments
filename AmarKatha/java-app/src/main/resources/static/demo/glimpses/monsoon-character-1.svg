@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960">
+  <rect width="720" height="960" fill="#e7edf3"/>
+  <circle cx="360" cy="300" r="110" fill="#3d7ea6"/>
+  <rect x="250" y="430" width="220" height="360" rx="100" fill="#243040"/>
+  <text x="360" y="890" text-anchor="middle" font-family="Georgia, serif" font-size="48" fill="#243040">Front</text>
+</svg>

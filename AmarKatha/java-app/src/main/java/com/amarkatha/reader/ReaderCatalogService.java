@@ -8,23 +8,32 @@ import com.amarkatha.catalog.LanguageFilterProperties;
 import com.amarkatha.publishing.ChapterMediaIntegrityService;
 import com.amarkatha.publishing.ChapterPageRepository;
 import com.amarkatha.publishing.ChapterRepository;
+import com.amarkatha.publishing.GlimpseImageRepository;
+import com.amarkatha.publishing.GlimpseRepository;
 import com.amarkatha.publishing.SeriesRepository;
 import com.amarkatha.publishing.SeriesScheduleService;
 import com.amarkatha.publishing.domain.Chapter;
 import com.amarkatha.publishing.domain.ChapterPage;
+import com.amarkatha.publishing.domain.Glimpse;
+import com.amarkatha.publishing.domain.GlimpseImage;
 import com.amarkatha.publishing.domain.Series;
 import com.amarkatha.reader.dto.ChapterPageDto;
 import com.amarkatha.reader.dto.ChapterReaderDto;
 import com.amarkatha.reader.dto.ChapterSummaryDto;
+import com.amarkatha.reader.dto.GlimpseDto;
+import com.amarkatha.reader.dto.GlimpseImageDto;
 import com.amarkatha.reader.dto.HomeResponse;
 import com.amarkatha.reader.dto.LanguageOptionDto;
 import com.amarkatha.reader.dto.ScheduleStripDto;
 import com.amarkatha.reader.dto.SeriesCardDto;
 import com.amarkatha.reader.dto.SeriesDetailDto;
+import com.amarkatha.shared.glimpse.GlimpseReactionLookup;
+import com.amarkatha.shared.glimpse.ImageReactionState;
 import com.amarkatha.scheduling.ScheduleStripView;
 import com.amarkatha.shared.ReaderFeatureGate;
 import com.amarkatha.shared.domain.ChapterState;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +63,9 @@ public class ReaderCatalogService {
     private final LanguageFilterProperties languageFilterProperties;
     private final ReaderFeatureGate readerFeatureGate;
     private final MessageSource messageSource;
+    private final GlimpseRepository glimpseRepository;
+    private final GlimpseImageRepository glimpseImageRepository;
+    private final GlimpseReactionLookup glimpseReactionLookup;
 
     public ReaderCatalogService(
             SeriesRepository seriesRepository,
@@ -65,7 +77,10 @@ public class ReaderCatalogService {
             HomeDiscoveryPolicy homeDiscoveryPolicy,
             LanguageFilterProperties languageFilterProperties,
             ReaderFeatureGate readerFeatureGate,
-            MessageSource messageSource
+            MessageSource messageSource,
+            GlimpseRepository glimpseRepository,
+            GlimpseImageRepository glimpseImageRepository,
+            GlimpseReactionLookup glimpseReactionLookup
     ) {
         this.seriesRepository = seriesRepository;
         this.chapterRepository = chapterRepository;
@@ -77,6 +92,9 @@ public class ReaderCatalogService {
         this.languageFilterProperties = languageFilterProperties;
         this.readerFeatureGate = readerFeatureGate;
         this.messageSource = messageSource;
+        this.glimpseRepository = glimpseRepository;
+        this.glimpseImageRepository = glimpseImageRepository;
+        this.glimpseReactionLookup = glimpseReactionLookup;
     }
 
     @Transactional(readOnly = true)
@@ -177,8 +195,46 @@ public class ReaderCatalogService {
                 viewerId != null && viewerId.equals(series.getCreatorId()),
                 series.getRating(),
                 series.getReaderCount(),
-                series.isEditorsPick()
+                series.isEditorsPick(),
+                glimpsesFor(series.getId(), viewerId)
         );
+    }
+
+    private List<GlimpseDto> glimpsesFor(UUID seriesId, UUID viewerId) {
+        List<Glimpse> glimpses = glimpseRepository.findBySeriesIdOrderByPostedAtAsc(seriesId);
+        if (glimpses.isEmpty()) {
+            return List.of();
+        }
+        List<UUID> glimpseIds = glimpses.stream().map(Glimpse::getId).toList();
+        List<GlimpseImage> images = glimpseImageRepository.findByGlimpseIdInOrderBySortOrderAsc(glimpseIds);
+        Map<UUID, ImageReactionState> reactions = glimpseReactionLookup.forImages(
+                viewerId,
+                images.stream().map(GlimpseImage::getId).toList()
+        );
+        Map<UUID, List<GlimpseImageDto>> imagesByGlimpse = new HashMap<>();
+        for (GlimpseImage image : images) {
+            ImageReactionState reaction = reactions.getOrDefault(
+                    image.getId(),
+                    new ImageReactionState(0, false)
+            );
+            imagesByGlimpse
+                    .computeIfAbsent(image.getGlimpseId(), ignored -> new ArrayList<>())
+                    .add(new GlimpseImageDto(
+                            image.getId(),
+                            ReaderPresentation.mediaUrl(image.getStorageKey()),
+                            image.getSortOrder(),
+                            reaction.count(),
+                            reaction.reacted()
+                    ));
+        }
+        return glimpses.stream()
+                .map(glimpse -> new GlimpseDto(
+                        glimpse.getId(),
+                        glimpse.getTag(),
+                        glimpse.getPostedAt(),
+                        imagesByGlimpse.getOrDefault(glimpse.getId(), List.of())
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)

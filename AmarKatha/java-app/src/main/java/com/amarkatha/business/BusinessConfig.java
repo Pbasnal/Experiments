@@ -20,4 +20,9 @@ public class BusinessConfig {
     ExperienceSourcePolicy experienceSourcePolicy() {
         return new ExperienceSourcePolicy();
     }
+
+    @Bean
+    GlimpsePostPolicy glimpsePostPolicy() {
+        return new GlimpsePostPolicy();
+    }
 }

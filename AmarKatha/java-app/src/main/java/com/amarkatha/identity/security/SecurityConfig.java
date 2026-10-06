@@ -59,6 +59,10 @@ public class SecurityConfig {
                         .hasAnyRole(ENGAGEMENT_ROLES)
                         .requestMatchers(HttpMethod.DELETE, "/api/reader/v1/series/*/follow")
                         .hasAnyRole(ENGAGEMENT_ROLES)
+                        .requestMatchers(HttpMethod.POST, "/api/reader/v1/glimpses/*/images/*/reaction")
+                        .hasAnyRole(ENGAGEMENT_ROLES)
+                        .requestMatchers(HttpMethod.DELETE, "/api/reader/v1/glimpses/*/images/*/reaction")
+                        .hasAnyRole(ENGAGEMENT_ROLES)
                         .requestMatchers(
                                 "/",
                                 "/read/**",

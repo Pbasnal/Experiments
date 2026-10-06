@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#152033"/>
+  <path d="M0 480 C 220 400, 440 540, 680 450 S 1020 340, 1200 410 L 1200 720 L 0 720 Z" fill="#0c1624"/>
+  <circle cx="160" cy="180" r="36" fill="#d5deea"/>
+  <text x="60" y="120" font-family="Georgia, serif" font-size="56" fill="#f4f7fb">A stall appears</text>
+</svg>

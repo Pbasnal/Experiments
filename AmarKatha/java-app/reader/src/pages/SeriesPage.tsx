@@ -2,9 +2,11 @@ import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchSeries, trackSeriesView } from '../api/home';
 import FollowButton from '../components/FollowButton';
+import GlimpseStrip from '../components/GlimpseStrip';
 import SeriesSignals from '../components/SeriesSignals';
 import { useFeatures } from '../features/FeatureContext';
 import type { SeriesDetail } from '../types';
+import { groupTimeline, mergeSeriesTimeline } from './seriesTimeline';
 
 export default function SeriesPage() {
   const { seriesSlug } = useParams<{ seriesSlug: string }>();
@@ -43,6 +45,13 @@ export default function SeriesPage() {
       cancelled = true;
     };
   }, [seriesSlug]);
+
+  useEffect(() => {
+    if (!series || !window.location.hash.startsWith('#glimpse-')) {
+      return;
+    }
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: 'center' });
+  }, [series]);
 
   if (loading) {
     return (
@@ -174,21 +183,36 @@ export default function SeriesPage() {
           <p className="section-kicker">Episodes</p>
           <h2>Chapters</h2>
           <p className="muted">{series.chapterCount} listed chapter{series.chapterCount === 1 ? '' : 's'}</p>
-          <ul className="chapter-panel-list">
-            {series.chapters.map((chapter) => {
-              const title =
-                chapter.title?.trim() ||
-                `Chapter ${formatChapterNumber(chapter.chapterNumber)}`;
+          <div className="series-timeline">
+            {groupTimeline(mergeSeriesTimeline(series.chapters, series.glimpses ?? [])).map((group) => {
+              if (group.kind === 'glimpse') {
+                return (
+                  <GlimpseStrip
+                    key={group.glimpse.id}
+                    seriesSlug={series.slug}
+                    glimpse={group.glimpse}
+                  />
+                );
+              }
               return (
-                <li key={chapter.slug}>
-                  <Link to={`/read/s/${series.slug}/c/${chapter.slug}`} className="chapter-link">
-                    <span className="chapter-title">{title}</span>
-                    <span className="chapter-num">Ch. {formatChapterNumber(chapter.chapterNumber)}</span>
-                  </Link>
-                </li>
+                <ul className="chapter-panel-list" key={group.chapters[0].slug}>
+                  {group.chapters.map((chapter) => {
+                    const title =
+                      chapter.title?.trim() ||
+                      `Chapter ${formatChapterNumber(chapter.chapterNumber)}`;
+                    return (
+                      <li key={chapter.slug}>
+                        <Link to={`/read/s/${series.slug}/c/${chapter.slug}`} className="chapter-link">
+                          <span className="chapter-title">{title}</span>
+                          <span className="chapter-num">Ch. {formatChapterNumber(chapter.chapterNumber)}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
               );
             })}
-          </ul>
+          </div>
         </section>
       </div>
     </div>

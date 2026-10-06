@@ -20,9 +20,11 @@ import com.amarkatha.identity.security.AmarKathaPrincipal;
 import com.amarkatha.publishing.SeriesCoverPresentation;
 import com.amarkatha.shared.demo.DemoLibrary;
 import com.amarkatha.shared.demo.DemoLibrary.DemoChapter;
+import com.amarkatha.shared.demo.DemoLibrary.DemoGlimpseImage;
 import com.amarkatha.shared.demo.DemoLibrary.DemoNotice;
 import com.amarkatha.shared.demo.DemoLibrary.DemoStory;
 import com.amarkatha.shared.demo.DemoPreviewState;
+import com.amarkatha.shared.glimpse.ImageReactionState;
 import jakarta.servlet.http.HttpSession;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -108,6 +110,28 @@ public class DemoEngagementService {
             return new ReadTargetDto(seriesPath + "/c/" + chapter.slug(), true);
         }
         return new ReadTargetDto(seriesPath, false);
+    }
+
+    public ImageReactionState reactToGlimpse(UUID glimpseId, UUID imageId, HttpSession session) {
+        return glimpseReaction(glimpseId, imageId, session, true);
+    }
+
+    public ImageReactionState clearGlimpseReaction(UUID glimpseId, UUID imageId, HttpSession session) {
+        return glimpseReaction(glimpseId, imageId, session, false);
+    }
+
+    private ImageReactionState glimpseReaction(
+            UUID glimpseId,
+            UUID imageId,
+            HttpSession session,
+            boolean reacted
+    ) {
+        DemoGlimpseImage image = DemoLibrary.glimpseImage(glimpseId, imageId)
+                .orElseThrow(() -> notFound("Image not found"));
+        DemoPreviewState state = DemoPreviewState.from(session);
+        state.setGlimpseReaction(imageId, reacted);
+        long count = image.reactionCount() + (reacted ? 1 : 0);
+        return new ImageReactionState(count, reacted);
     }
 
     public NotificationListResponse notifications(HttpSession session, Integer limit) {
@@ -224,9 +248,24 @@ public class DemoEngagementService {
 
     private static ReaderNotificationDto notification(DemoNotice notice, DemoPreviewState state) {
         DemoStory story = DemoLibrary.find(notice.seriesSlug()).orElseThrow();
-        DemoChapter chapter = story.chapter(notice.chapterSlug()).orElseThrow();
         boolean read = state.notificationRead(notice.id(), notice.unreadByDefault());
         Instant createdAt = Instant.now().minus(notice.ageHours(), ChronoUnit.HOURS);
+        if (notice.glimpseId() != null) {
+            return new ReaderNotificationDto(
+                    notice.id(),
+                    "GLIMPSE_PUBLISHED",
+                    story.slug(),
+                    story.title(),
+                    null,
+                    null,
+                    notice.title(),
+                    notice.message(),
+                    "/read/s/" + story.slug() + "#glimpse-" + notice.glimpseId(),
+                    read ? createdAt.plus(1, ChronoUnit.HOURS) : null,
+                    createdAt
+            );
+        }
+        DemoChapter chapter = story.chapter(notice.chapterSlug()).orElseThrow();
         return new ReaderNotificationDto(
                 notice.id(),
                 "CHAPTER_PUBLISHED",

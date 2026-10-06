@@ -140,10 +140,15 @@ public class ReaderNotificationService {
                         notifications.stream().map(ReaderNotification::getSeriesId).distinct().toList()
                 ).stream()
                 .collect(Collectors.toMap(Series::getId, Function.identity()));
-        Map<UUID, Chapter> chaptersById = chapterRepository.findAllById(
-                        notifications.stream().map(ReaderNotification::getChapterId).distinct().toList()
-                ).stream()
-                .collect(Collectors.toMap(Chapter::getId, Function.identity()));
+        List<UUID> chapterIds = notifications.stream()
+                .map(ReaderNotification::getChapterId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<UUID, Chapter> chaptersById = chapterIds.isEmpty()
+                ? Map.of()
+                : chapterRepository.findAllById(chapterIds).stream()
+                        .collect(Collectors.toMap(Chapter::getId, Function.identity()));
 
         List<ReaderNotificationDto> items = new ArrayList<>(notifications.size());
         for (ReaderNotification notification : notifications) {
