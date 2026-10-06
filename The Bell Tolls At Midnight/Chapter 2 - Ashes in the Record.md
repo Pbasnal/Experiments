@@ -24,7 +24,7 @@ The door opened before its knock had finished, and Father Brenn came in on a dra
 
 “I started the third kettle,” Harbin said. “The good one went hours ago.”
 
-“Then I'm late twice over.” Brenn drew off his gloves finger by finger, and his eyes were already working the room—Lyra's weapons, Cassius's clutter, the corner where Raven stood, the healer by the fire. Counting them. Weighing what he counted. “Forgive an old man his staring. Harbin's had five swords promised to him for the better part of a month. I've a mind to see what a month of a desperate man's hope looks like in the flesh.”
+“Then I'm late twice over.” Brenn drew off his gloves finger by finger, and his eyes were already working the room—Lyra's weapons, Cassius's clutter, the corner where Raven stood, the healer by the fire. Counting them. Weighing what he counted. “Forgive an old man his staring. Harbin's had five swords promised to him for a fortnight. I've a mind to see what a fortnight of a desperate man's hope looks like in the flesh.”
 
 Lyra met the look and did not flinch from it. “It looks tired, Father, and it would like your map.”
 
@@ -184,7 +184,7 @@ Harbin nodded. “I'll be here. Where else would I be.”
 
 Brenn set both hands flat on the desk. “There's one thing more, and not one of you will care for it. I'm going up with you.”
 
-Harbin's head came up sharply. “Brenn. No.” The refusal came out ahead of its reasons. “This town needs you standing. I need you standing. Don't make me wait at that window tomorrow night wondering if you've come down off it.”
+Harbin's jaw tightened. He had heard it in this room already, a fortnight past, and it had not grown any easier to bear. “Brenn. Don't.” The old argument, worn smooth. “I asked you then to stay. I'm asking you again. This town needs you standing. I need you standing. Don't make me wait at that window tomorrow night wondering if you've come down off it.”
 
 “I can hold my own on that hill,” Brenn said. “Not from books. I've done the work before. I won't be dead weight.”
 
@@ -198,7 +198,7 @@ Raven's voice was even. “Can you take an order you don't like, in the middle o
 
 Elena's eyes had gone to Brenn's hands—the old burn scars, the older marks a blade leaves behind. “Those weren't earned lighting candles.”
 
-Brenn turned his palms up and considered them as though they belonged to a man he used to be. “No. Mercenary company, before the cloth. I buried every last one of them, and the church was what I crawled to afterward.” He closed his hands. “I know precisely what that hill can take from a person. That is rather the point of my coming.”
+Brenn turned his palms up and considered them as though they belonged to a man he used to be. “No. Mercenary company, before the cloth. I buried every last one of them.” He closed his hands. “A priest found me on the night I had nowhere left. The church was what I crawled to afterward. I know precisely what that hill can take from a person. That is rather the point of my coming.”
 
 Elena held his gaze, then gave a single nod—one field hand to another. “Then you follow the calls the instant they come, Father. Fast, and without the sermon. Agree to that, and you're welcome at my side.”
 
@@ -208,7 +208,7 @@ Lyra looked round the room. No voice rose against it.
 
 Harbin's jaw worked. He looked at Brenn a long moment, then down at the ruined map with all its blank and smudged places. “Tomorrow, then. After your list. You'll have whatever you ask of me if I strip this hall to the beams to find it.” The steadiness left his voice at the last. “Only come back down. All of you. I've watched enough mornings come up empty.”
 
-Brenn rested a hand, briefly, on his old friend's shoulder. “We leave with the light.”
+Brenn rested a hand, briefly, on his old friend's shoulder. “We take the morning to stock. We leave while the sun is still high.”
 
 And this time, no one argued.
 
@@ -397,7 +397,9 @@ Only three candles burned. Their light clung to the low ceiling and left the cor
 
 Against the far wall stood Brenn's display cupboard. It had once been meant for silver reliquaries, but it now housed items far more precious. Behind the warped glass, shelf after shelf held the town's small payments—hundreds of them, crowded tight: chipped cups, broken toys, buttons, gloves, river stones, scraps of lace, carved bones, bent coins, and among them, somewhere on the middle shelf, a little book with a broken spine.
 
-Brother Tovin had laid Father Brenn's supplies across the table and kept finding reasons to touch them. Censer. Oil. Salt. A coil of silver chain. Three bundles of ward tapers tied with red thread.
+Brother Tovin had laid Father Brenn's supplies across the table and kept finding reasons to touch them. Censer. Oil. Salt. A coil of silver chain. Three bundles of ward tapers tied with red thread. Brenn had come in from Town Hall, hung his cloak, and said it before he sat: he was going up the hill with them.
+
+Tovin had been arguing since.
 
 "You're missing the spare flint," Tovin said.
 
@@ -439,7 +441,7 @@ Tovin lowered his voice. "Harbin has spent months buying wards, paying healers, 
 
 "And you mean to stand with them in front of a curse that has eaten priests and sellswords alike."
 
-"I am a priest. Standing in unfortunate places is most of the work."
+"I am a priest. Standing in unfortunate places is most of the work." Brenn's voice stayed quiet. "You said it yourself this afternoon. This is our duty. Ours. I'm going to fulfill it."
 
 "Brenn."
 

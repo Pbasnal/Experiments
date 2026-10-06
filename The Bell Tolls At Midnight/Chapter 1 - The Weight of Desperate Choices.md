@@ -20,9 +20,9 @@ Father Brenn Ardent, his face a landscape of hard-earned peace, stepped inside. 
 
 “A bad year,” Harbin corrected, pushing the cup across the desk. “A bad century, if the stories are to be believed.”
 
-Brenn took a slow sip, his face remaining impassive. “The stories are to be believed. A town isn't a town anymore if it can’t find its own peace. I suppose you’ve put out a posting?”
+Brenn took a slow sip, his face remaining impassive. “The stories are to be believed. A town isn't a town anymore if it can’t find its own peace. I suppose the Guild has written back.”
 
-Harbin nodded, feeling the weariness settle deeper into his bones. "I put out a posting. Not just for any ghost or ghoul, but for the tower specifically. The guild wanted all the details I had." He gestured vaguely at a stack of documents on his desk, the latest of which bore the red seal of the Adventurers' Guild. "I gave them everything: the disappearances, the rot, the madness. Everything I know."
+Harbin nodded, feeling the weariness settle deeper into his bones. "I put the posting out a week ago. Not just for any ghost or ghoul, but for the tower specifically. The guild wanted all the details I had." He gestured vaguely at a stack of documents on his desk, the latest of which bore the red seal of the Adventurers' Guild. "I gave them everything: the disappearances, the rot, the madness. Everything I know. The letter came this afternoon."
 
 "Everything you know!" Brenn's emphasis on "you" made Harbin look up sharply. The priest caught himself, his face smoothing over as he noted Harbin's confusion. "I see."
 
@@ -32,7 +32,7 @@ Harbin's brow furrowed. The courier had arrived barely three hours ago, and he h
 
 "The town grows thin these days," Brenn cut in smoothly, taking another slow sip of wine. His eyes watered slightly as he finally managed to swallow the acrid vintage. "Word travels fast when there are fewer ears to catch it."
 
-"Too thin," Harbin said, watching the priest's careful movements. Brenn set his cup down and moved to the window—the same window he'd gravitated to during a hundred similar conversations over the years. His fingers traced the familiar groove in the weathered sill where he usually rested his prayer book. "By next week, half the fine houses will be shuttered. The wealthy can afford to flee before the full moon. The rest of us stay and pray this second winter is kinder than the last." Harbin rubbed his temples. "Makes running the town a nightmare. By good grace, you should leave too, Brenn. No sense in staying."
+"Too thin," Harbin said, watching the priest's careful movements. Brenn set his cup down and moved to the window—the same window he'd gravitated to during a hundred similar conversations over the years. His fingers traced the familiar groove in the weathered sill where he usually rested his prayer book. "By the solstice, half the fine houses will be shuttered. The wealthy can afford to flee before that night. The rest of us stay and pray this second winter is kinder than the last." Harbin rubbed his temples. "Makes running the town a nightmare. By good grace, you should leave too, Brenn. No sense in staying."
 
 Brenn kept his eyes on the tower. "Leave for where, Harbin? This is the only place that still calls me by name."
 
@@ -42,7 +42,7 @@ He turned from the window, and Harbin felt the weight of centuries in the priest
 
 Harbin's fingers drummed against his desk, considering Brenn's words. "Others, yes. Wandering sellswords looking for glory, village priests with holy water. No offense, Brenn, but..." He gestured vaguely at the guild's seal on the document. "This is different. The Guild doesn't send amateurs. These people, they've dealt with curses before. Lifted them." His voice caught on that last word, and he spread his hands helplessly. "The town dies a little more each year. What else can I grasp at?"
 
-Brenn was quiet for a long moment, his gaze fixed on the dying candle. "This place... it breaks everything it touches. We've had knights full of courage, priests full of conviction, and mages full of fire. All of them believed they were the ones who would fix it. And all of them failed. Why should these be any different?"
+Brenn was quiet for a long moment, his gaze fixed on the dying candle. "This place... it breaks everything it touches. We've had knights full of courage, priests full of conviction, and mages full of fire. All of them believed they could destroy it if they hit hard enough. Why should these be any different?"
 
 Harbin’s frustration flared. "So what? We do nothing? We just wait for the town to wither away?" He leaned forward, his voice low and fierce. "This is a new team. A new chance. Maybe they are different."
 
@@ -50,11 +50,11 @@ The priest's composed mask slipped, and Harbin recognized the fear in his eyes�
 
 "Look," Harbin said, softening his tone. "These people, they know what they're doing. They'll cleanse the tower, drive out every last spirit. Put an end to all of this." He gestured toward the window, toward the looming shadow beyond. "Maybe then we can all sleep easier."
 
-Brenn's fingers traced the burn scars on his hands. "Do you remember when I first came to Gravedawn, Harbin? Before the cloth, before the Eternal Flame?" A ghost of a smile crossed his face. "Just another lost adventurer with a sword and too much pride."
+Brenn's fingers traced the burn scars on his hands. "Do you remember when I first came to Gravedawn, Harbin? Before the cloth, before the Eternal Flame?" A ghost of a smile crossed his face. "Just another broken mercenary. Company gone. Nowhere left to go."
 
-"And a drinking problem," Harbin added softly, the memory warming his voice. "You slept in my stable for a week."
+"And a drinking problem," Harbin added softly, the memory warming his voice. "You slept in my stable for a week. Still said please when you asked for water."
 
-"Until you kicked me out." Brenn's smile grew more genuine. "Best thing anyone ever did for me. The Flame found me that night, showed me a different kind of strength." He looked at his scarred hands. "These weren't my last scars, but they were my most important ones."
+"Until you kicked me out." Brenn's smile grew more genuine. "Best thing anyone ever did for me. A priest found me that night. Gave me a cot in the vestry when I had nowhere left." He looked at his scarred hands. "The Flame found me that night. Showed me a different kind of strength. These weren't my last scars, but they were my most important ones."
 
 "You found your path," Harbin said.
 
@@ -70,7 +70,7 @@ Harbin’s head snapped up. "What?"
 
 "I am a man of faith, Harbin. And my faith tells me that this is a time for more than just prayer. It is a time for action. We've tried to put out the fire from the outside. This time, we go in." He placed a hand on Harbin's shoulder. "Tell me when they arrive. I will have a pack ready."
 
-With that, Brenn left. Harbin sat back down in the growing darkness, the conversation settling heavy in his chest. He'd known Brenn since before the man wore the cloth—had watched him transform from a broken adventurer into a pillar of faith. Now that same faith was driving his old friend back into darkness. The guild's letter lay on his desk, its red seal dulled in the fading light. Some hope that was—sending his oldest friend to die in that damned tower.
+With that, Brenn left. Harbin sat back down in the growing darkness, the conversation settling heavy in his chest. He'd known Brenn since before the man wore the cloth—had watched him transform from a broken mercenary into a pillar of faith. Now that same faith was driving his old friend back into darkness. The guild's letter lay on his desk, its red seal dulled in the fading light. Some hope that was—sending his oldest friend to die in that damned tower, and the five named in the letter still a fortnight of road away.
 
 Outside, the wind picked up, carrying with it the salt smell of the sea and something else. Something that reminded Harbin of old graves and older regrets. His eyes drifted to the tower's silhouette against the darkening sky. The cursed thing seemed closer tonight, its shadow longer, as if it had crept a few steps nearer while they'd talked.
 
@@ -79,7 +79,7 @@ Harbin turned away. The winter solstice was still weeks away, but already he cou
 --------
 ## Scene 2
 
-The cart's wheels had been grinding against the same rutted track for what felt like days, the kind of road that punished every axle and spine with equal malice. Forest scents clung to everything—pine sap and damp earth, undercut by the sharp tang of wild mint crushed under hooves. Somewhere behind them, a crow cawed its endless commentary, and ahead, nothing but more trees and the promise of ghosts.
+Two weeks on the road had worn the novelty off travel. The cart's wheels had been grinding against the same rutted track for what felt like days, the kind of road that punished every axle and spine with equal malice. Forest scents clung to everything—pine sap and damp earth, undercut by the sharp tang of wild mint crushed under hooves. Somewhere behind them, a crow cawed its endless commentary, and ahead, nothing but more trees and the promise of ghosts.
 
 Armored joints creaked against the rough-hewn bench. "Seven hours in this rattling box, and I'm starting to think the Guild sent us out here just to test our patience. Or our backsides."
 
@@ -214,7 +214,7 @@ The chapel lamps had burned low by the time Brenn returned. Brother Tovin was st
 
 Tovin did not look up. “You sent them to Harbin.”
 
-“I did.” Brenn hung his cloak on the same peg he’d used for years and smoothed the sleeve where old wax had hardened.
+“I did.” Brenn hung his cloak on the same peg he’d used for years and smoothed the sleeve where old wax had hardened. “They arrived when we needed them. Right on time. Just before the solstice.”
 
 “Them.” Tovin finally turned, jaw set. “Steel and charms and academy words. Father, with respect—no blade cuts a spirit. This is our duty. Ours. We should be the ones cleansing the tower.”
 
@@ -330,7 +330,7 @@ Mira clicked her tongue. “Stubborn fool. Good man.”
 
 Brenn nodded. “Also checked on Alma the midwife. She’s low on clean spirits and thread.”
 
-“I’ve got both in the back crate,” Mira said. “I’ll send them before dusk.” She studied him a beat longer. “Whole town is doing this now. Small fires, small circles, small hopes. If this keeps on till next solstice, there won’t be enough of us left to call this place a town.”
+“I’ve got both in the back crate,” Mira said. “I’ll send them before dusk.” She studied him a beat longer. “Whole town is doing this now. Small fires, small circles, small hopes. We’ll scrape through this solstice. We always have. But if this keeps on till the next one, there won’t be enough of us left to call this place a town.”
 
 She looked past him toward the door. “I grew up stealing crusts off these tables, you remember? If Gravedawn empties, I’ll be old and half-blind in some stranger’s harbor, learning new gutters.”
 
